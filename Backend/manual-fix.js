@@ -24,7 +24,7 @@ async function manualFix() {
     });
 
     // Get all PDF files with their modification times
-    const storageDir = path.join(__dirname, 'storage', 'flipbooks');
+    const storageDir = '/var/www/menastories/menastories.me/Backend/storage/flipbooks';
     const files = await fs.readdir(storageDir);
     const pdfFiles = files.filter(file => file.endsWith('.pdf'));
 

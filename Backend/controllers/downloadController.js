@@ -8,7 +8,7 @@ const rssService = require('../services/rssService');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'storage/downloads/');
+    cb(null, '/var/www/menastories/menastories.me/Backend/storage/downloads/');
   },
 
   filename: function (req, file, cb) {
@@ -277,7 +277,7 @@ class DownloadController {
 
       // Handle file upload
       const fileName = req.file.filename;
-      const fileUrl = `/storage/downloads/${fileName}`;
+      const fileUrl = `/var/www/menastories/menastories.me/Backend/storage/downloads/${fileName}`;
 
       // Parse JSON strings
       const parsedTags = tags ? JSON.parse(tags) : [];
@@ -378,7 +378,7 @@ class DownloadController {
       let fileData = {};
       if (req.file) {
         const fileName = req.file.filename;
-        const fileUrl = `/storage/downloads/${fileName}`;
+        const fileUrl = `/var/www/menastories/menastories.me/Backend/storage/downloads/${fileName}`;
 
         // Determine file type
         const fileExtension = path.extname(req.file.originalname).toLowerCase().replace('.', '');

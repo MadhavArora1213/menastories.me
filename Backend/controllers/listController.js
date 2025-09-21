@@ -249,13 +249,13 @@ class ListController {
               quality: 85,
               format: 'webp'
             });
-            featuredImagePath = `/storage/images/${processedFilename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
             console.log('✅ Featured image processed:', processedFilename);
             console.log('📄 Featured image path for DB:', featuredImagePath);
           } catch (imageError) {
             console.error('❌ Image processing error:', imageError);
             // Fallback to original file
-            featuredImagePath = `/storage/images/${featuredImageFile.filename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${featuredImageFile.filename}`;
             console.log('🔄 Using fallback image path:', featuredImagePath);
           }
         }
@@ -484,7 +484,7 @@ class ListController {
               quality: 85,
               format: 'webp'
             });
-            featuredImagePath = `/storage/images/${processedFilename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
 
             // Delete old image if exists
             if (list.featuredImage) {
@@ -496,7 +496,7 @@ class ListController {
             }
           } catch (imageError) {
             console.error('Image processing error:', imageError);
-            featuredImagePath = `/storage/images/${featuredImageFile.filename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${featuredImageFile.filename}`;
           }
         }
       }
@@ -765,7 +765,7 @@ class ListController {
             quality: 85,
             format: 'webp'
           });
-          imagePath = `/storage/images/${processedFilename}`;
+          imagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
         }
       }
 
@@ -838,7 +838,7 @@ class ListController {
             quality: 85,
             format: 'webp'
           });
-          imagePath = `/storage/images/${processedFilename}`;
+          imagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
 
           // Delete old image if exists
           if (entry.image) {

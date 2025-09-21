@@ -27,7 +27,7 @@ async function checkGhostscriptInstallation() {
 // Configure multer for flipbook uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../storage/flipbooks');
+    const uploadPath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
     // Ensure directory exists
     require('fs').mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);
@@ -316,7 +316,7 @@ exports.updateFlipbookMagazine = async (req, res) => {
        }
 
        // Set new file path
-       updateData.originalFilePath = path.join(__dirname, '../storage/flipbooks', req.file.filename);
+       updateData.originalFilePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', req.file.filename);
        updateData.fileSize = req.file.size;
 
        // Reset processing status for new file
@@ -557,8 +557,8 @@ exports.getFlipbookPages = async (req, res) => {
 
           // Create page record in database
           // Convert absolute paths to relative URLs for frontend access
-          const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/storage');
-          const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/storage');
+          const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
+          const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
 
           await FlipbookPage.create({
             magazineId: id,
@@ -686,7 +686,7 @@ exports.uploadFlipbook = async (req, res) => {
     // Ensure unique filename with flipbook prefix
     let filename = `flipbook_${titleForFilename}.pdf`;
     let fileCounter = 1;
-    const storageDir = path.join(__dirname, '../storage/flipbooks');
+    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
     while (await fs.access(path.join(storageDir, filename)).then(() => true).catch(() => false)) {
       filename = `flipbook_${titleForFilename}_${fileCounter}.pdf`;
       fileCounter++;
@@ -745,7 +745,7 @@ exports.uploadFlipbook = async (req, res) => {
         await processFlipbookPDF(magazine.id, tempFilePath);
 
         // After successful processing, move to final location with title-based name
-        const finalFilePath = path.join(__dirname, '../storage/flipbooks', filename);
+        const finalFilePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', filename);
 
         // Move the processed file to final location
         const fs = require('fs').promises;
@@ -871,8 +871,8 @@ async function processFlipbookPDF(magazineId, filePath) {
 
       // Create page record
       // Convert absolute paths to relative URLs for frontend access
-      const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/api/storage');
-      const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/api/storage');
+      const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
+      const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
 
       await FlipbookPage.create({
         magazineId,
@@ -1223,7 +1223,7 @@ exports.downloadFlipbook = async (req, res) => {
       console.error(`File not accessible at stored path: ${magazine.originalFilePath}`, accessError.message);
 
       // Try alternative path resolution
-      const alternativePath = path.join(__dirname, '../storage/flipbooks', path.basename(magazine.originalFilePath));
+      const alternativePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', path.basename(magazine.originalFilePath));
       console.log(`Trying alternative path: ${alternativePath}`);
 
       try {
@@ -1452,7 +1452,7 @@ exports.fixFilePaths = async (req, res) => {
     console.log(`Checking file paths for ${magazines.length} magazines`);
 
     const results = [];
-    const storageDir = path.join(__dirname, '../storage/flipbooks');
+    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
 
     for (const magazine of magazines) {
       try {
@@ -1636,7 +1636,7 @@ exports.regeneratePDFs = async (req, res) => {
     console.log(`Checking ${magazines.length} magazines for regeneration`);
 
     const results = [];
-    const storageDir = path.join(__dirname, '../storage/flipbooks');
+    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
 
     for (const magazine of magazines) {
       try {

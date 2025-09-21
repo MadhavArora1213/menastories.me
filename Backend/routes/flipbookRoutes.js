@@ -8,7 +8,7 @@ const path = require('path');
 // Configure multer for flipbook uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join(__dirname, '../storage/flipbooks');
+    const uploadPath = '/var/www/menastories/menastories.me/Backend/storage/flipbooks';
     // Ensure directory exists
     require('fs').mkdirSync(uploadPath, { recursive: true });
     cb(null, uploadPath);

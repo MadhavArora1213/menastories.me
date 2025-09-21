@@ -242,11 +242,11 @@ class PowerListController {
               quality: 85,
               format: 'webp'
             });
-            featuredImagePath = `/api/storage/images/${processedFilename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
             console.log('✅ Featured image processed:', processedFilename);
           } catch (imageError) {
             console.error('❌ Image processing error:', imageError);
-            featuredImagePath = `/api/storage/images/${featuredImageFile.filename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${featuredImageFile.filename}`;
           }
         }
       }
@@ -467,7 +467,7 @@ class PowerListController {
               quality: 85,
               format: 'webp'
             });
-            featuredImagePath = `/api/storage/images/${processedFilename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
 
             // Delete old image if exists
             if (list.featuredImage) {
@@ -479,7 +479,7 @@ class PowerListController {
             }
           } catch (imageError) {
             console.error('Image processing error:', imageError);
-            featuredImagePath = `/api/storage/images/${featuredImageFile.filename}`;
+            featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${featuredImageFile.filename}`;
           }
         }
       }
@@ -751,7 +751,7 @@ class PowerListController {
           quality: 85,
           format: 'webp'
         });
-        photoPath = `/api/storage/images/${processedFilename}`;
+        photoPath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
       }
 
       // Create power list entry
@@ -816,7 +816,7 @@ class PowerListController {
       let photoPath = entry.photo;
       if (req.file && req.file.fieldname === 'photo') {
         const fileName = req.file.filename;
-        photoPath = `/api/storage/images/${fileName}`;
+        photoPath = `/var/www/menastories/menastories.me/Backend/storage/images/${fileName}`;
 
         // Delete old photo if exists
         if (entry.photo) {

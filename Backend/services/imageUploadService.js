@@ -6,7 +6,7 @@ const multer = require('multer');
 // Storage path for images
 const STORAGE_PATH = process.platform === 'win32'
   ? path.join(__dirname, '../storage/images')
-  : '/var/www/storage/images';
+  : '/var/www/menastories/menastories.me/Backend/storage/images';
 const TEMP_UPLOAD_PATH = path.join(__dirname, '../uploads');
 
 console.log('🗂️  Image service paths:');

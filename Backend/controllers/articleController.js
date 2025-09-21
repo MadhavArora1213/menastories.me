@@ -10,7 +10,7 @@ const taxonomyService = require('../services/taxonomyService');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'storage/images/');
+    cb(null, '/var/www/menastories/menastories.me/Backend/storage/images/');
   },
 
   filename: function (req, file, cb) {
@@ -424,7 +424,7 @@ class ArticleController {
           quality: 85,
           format: 'webp'
         });
-        featuredImagePath = `/storage/images/${processedFilename}`;
+        featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
       }
 
       // Handle gallery images
@@ -432,7 +432,7 @@ class ArticleController {
       if (req.body.gallery_images && Array.isArray(req.body.gallery_images)) {
         // Gallery images are already processed and uploaded by frontend
         galleryImages = req.body.gallery_images.map(filename => ({
-          url: `/storage/images/${filename}`,
+          url: `/var/www/menastories/menastories.me/Backend/storage/images/${filename}`,
           alt: '',
           caption: ''
         }));
@@ -691,8 +691,8 @@ class ArticleController {
       let featuredImagePath = article.featuredImage;
       if (req.file) {
         const fileName = req.file.filename;
-        featuredImagePath = `/storage/images/${fileName}`;
-        
+        featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${fileName}`;
+
         // Delete old image if exists
         if (article.featuredImage) {
           try {
@@ -1236,10 +1236,10 @@ class ArticleController {
       let profileImagePath = null;
       if (req.file) {
         const fileName = `author-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
-        const uploadPath = path.join(__dirname, '../storage/images', fileName);
+        const uploadPath = path.join('/var/www/menastories/menastories.me/Backend/storage/images', fileName);
 
         await fs.rename(req.file.path, uploadPath);
-        profileImagePath = `/storage/images/${fileName}`;
+        profileImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${fileName}`;
       }
 
       const author = await Author.create({
@@ -1324,10 +1324,10 @@ class ArticleController {
       let profileImagePath = author.profile_image;
       if (req.file) {
         const fileName = `author-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
-        const uploadPath = path.join(__dirname, '../storage/images', fileName);
+        const uploadPath = path.join('/var/www/menastories/menastories.me/Backend/storage/images', fileName);
 
         await fs.rename(req.file.path, uploadPath);
-        profileImagePath = `/storage/images/${fileName}`;
+        profileImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${fileName}`;
 
         // Delete old image if exists
         if (author.profile_image) {

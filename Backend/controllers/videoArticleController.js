@@ -1113,7 +1113,7 @@ class VideoArticleController {
       let profileImagePath = null;
       if (req.file) {
         const fileName = `author-${Date.now()}-${Math.round(Math.random() * 1E9)}${path.extname(req.file.originalname)}`;
-        const uploadPath = path.join(__dirname, '../storage/images', fileName);
+        const uploadPath = path.join('/var/www/menastories/menastories.me/Backend/storage/images', fileName);
 
         await fs.rename(req.file.path, uploadPath);
         profileImagePath = `/storage/images/${fileName}`;

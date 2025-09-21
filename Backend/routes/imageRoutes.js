@@ -8,7 +8,7 @@ const { adminAuthMiddleware } = require('../middleware/adminAuth');
 router.get('/articles/:articleId/:filename', (req, res) => {
   try {
     const { articleId, filename } = req.params;
-    const imagePath = path.join(__dirname, '../storage/images/articles', articleId, filename);
+    const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage/images/articles', articleId, filename);
 
     // Check if file exists
     if (!fs.existsSync(imagePath)) {
@@ -47,7 +47,7 @@ router.get('/articles/:articleId/:filename', (req, res) => {
 router.get('/:filename', (req, res) => {
   try {
     const { filename } = req.params;
-    const imagePath = path.join(__dirname, '../storage/images', filename);
+    const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage/images', filename);
 
     // Check if file exists
     if (!fs.existsSync(imagePath)) {

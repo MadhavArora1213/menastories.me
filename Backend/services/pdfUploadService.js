@@ -5,7 +5,7 @@ const { optimizeSpecificPDF } = require('../optimize-pdf');
 
 class PDFUploadService {
   constructor() {
-    this.storagePath = path.join(__dirname, '../storage/pdfs');
+    this.storagePath = '/var/www/menastories/menastories.me/Backend/storage/pdfs';
     this.ensureStoragePath();
   }
 

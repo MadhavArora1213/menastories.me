@@ -44,7 +44,7 @@ async function repairAllPDFs() {
   try {
     console.log('Starting PDF repair process...');
 
-    const storageDir = path.join(__dirname, 'storage', 'flipbooks');
+    const storageDir = '/var/www/menastories/menastories.me/Backend/storage/flipbooks';
     const files = await fs.readdir(storageDir);
     const pdfFiles = files.filter(file => file.endsWith('.pdf'));
 

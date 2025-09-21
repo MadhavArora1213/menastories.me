@@ -5,7 +5,7 @@ const crypto = require('crypto');
 
 class ArticleImageService {
   constructor() {
-    this.baseDir = path.join(__dirname, '../storage/articles');
+    this.baseDir = '/var/www/menastories/menastories.me/Backend/storage/articles';
     this.sizes = {
       thumbnail: { width: 300, height: 200, fit: 'cover' },
       medium: { width: 800, height: 600, fit: 'inside' },
@@ -171,7 +171,7 @@ class ArticleImageService {
     for (const [size, imagePath] of Object.entries(imagePaths)) {
       if (imagePath && typeof imagePath === 'string') {
         // Convert relative path to absolute
-        const fullPath = path.join(__dirname, '../storage', imagePath);
+        const fullPath = `/var/www/menastories/menastories.me/Backend/storage${imagePath}`;
 
         cleanupPromises.push(
           fs.unlink(fullPath).catch(error => {

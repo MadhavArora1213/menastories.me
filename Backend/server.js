@@ -150,7 +150,7 @@ app.use('/api/public/comments/*', (req, res, next) => {
 });
 
 // Serve static files from storage directory
-app.use('/api/storage', express.static('storage', {
+app.use('/api/storage', express.static('/var/www/menastories/menastories.me/Backend/storage', {
   maxAge: '1d', // Cache for 1 day
   etag: true,
   lastModified: true,
@@ -172,7 +172,7 @@ app.use('/api/storage', express.static('storage', {
 }));
 
 // Serve download files with appropriate headers
-app.use('/api/storage/downloads', express.static('storage/downloads', {
+app.use('/api/storage/downloads', express.static('/var/www/menastories/menastories.me/Backend/storage/downloads', {
   maxAge: '7d', // Cache downloads for 7 days
   etag: true,
   lastModified: true,
@@ -187,7 +187,7 @@ app.use('/api/storage/downloads', express.static('storage/downloads', {
 // Specific route for images as fallback
 app.get('/api/storage/images/:filename', (req, res) => {
   const { filename } = req.params;
-  const imagePath = path.join(__dirname, 'storage', 'images', filename);
+  const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images', filename);
 
   console.log('🖼️  Image request:', filename);
   console.log('📁 Image path:', imagePath);
@@ -218,7 +218,7 @@ app.get('/api/storage/images/:filename', (req, res) => {
     console.log('❌ Image not found at path');
     // List files in the images directory for debugging
     try {
-      const files = fs.readdirSync(path.join(__dirname, 'storage', 'images'));
+      const files = fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images'));
       console.log('📂 Files in images directory:', files);
     } catch (error) {
       console.log('❌ Error reading images directory:', error.message);
@@ -227,7 +227,7 @@ app.get('/api/storage/images/:filename', (req, res) => {
       success: false,
       message: 'Image not found',
       requestedFile: filename,
-      availableFiles: fs.readdirSync(path.join(__dirname, 'storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
+      availableFiles: fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
     });
   }
 });
@@ -265,7 +265,7 @@ app.get('/api/images/health', (req, res) => {
   const path = require('path');
 
   try {
-    const imagesDir = path.join(__dirname, 'storage', 'images');
+    const imagesDir = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images');
     const files = fs.readdirSync(imagesDir);
     const imageFiles = files.filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file));
 
@@ -292,7 +292,7 @@ app.get('/api/images/health', (req, res) => {
 // Test image serving endpoint
 app.get('/api/images/test/:filename', (req, res) => {
   const { filename } = req.params;
-  const imagePath = path.join(__dirname, 'storage', 'images', filename);
+  const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images', filename);
 
   console.log('🧪 Test image request:', filename);
   console.log('📁 Test image path:', imagePath);
@@ -323,7 +323,7 @@ app.get('/api/images/test/:filename', (req, res) => {
       message: 'Test image not found',
       requestedFile: filename,
       fullPath: imagePath,
-      availableFiles: fs.readdirSync(path.join(__dirname, 'storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
+      availableFiles: fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
     });
   }
 });

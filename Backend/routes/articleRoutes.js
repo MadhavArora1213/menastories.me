@@ -12,7 +12,7 @@ const bulkUploadService = new BulkUploadService();
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'storage/images/');
+    cb(null, '/var/www/menastories/menastories.me/Backend/storage/images/');
   },
   filename: function (req, file, cb) {
     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);

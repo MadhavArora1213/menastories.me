@@ -12,9 +12,9 @@ const path = require('path');
 // Configure multer for file uploads
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    let uploadPath = 'storage/images/';
+    let uploadPath = '/var/www/menastories/menastories.me/Backend/storage/images/';
     if (file.fieldname === 'docx_file') {
-      uploadPath = 'storage/docs/';
+      uploadPath = '/var/www/menastories/menastories.me/Backend/storage/docs/';
     }
 
     // Ensure directory exists
