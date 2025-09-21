@@ -52,7 +52,10 @@ jobs:
             # Frontend: Install, build, and deploy
             echo "Building frontend..."
             cd ../Magazine_Website
-            npm ci --legacy-peer-deps
+            
+            # Clean node_modules to avoid corruption issues
+            rm -rf node_modules package-lock.json
+            npm install --legacy-peer-deps
             npm run build
 
             # Ensure build directory has correct ownership
