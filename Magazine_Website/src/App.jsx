@@ -10,9 +10,9 @@ import Header from './Components/Header';
 import Footer from './Components/Footer';
 import ToastContainer from './Components/ToastContainer';
 // Authentication Components
-import { LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, VerifyEmail, MFASetup, UserProfile, RoleManagement } from './components/Auth';
+import { LoginForm, RegisterForm, ForgotPasswordForm, ResetPasswordForm, VerifyEmail, MFASetup, UserProfile, RoleManagement } from './Components/Auth';
 // CMS Components
-import { CMSDashboard } from './components/CMS';
+import { CMSDashboard } from './Components/CMS';
 // Article Components
 import ArticleRenderer from './Components/ArticleRenderer';
 import HomePage from './Pages/HomePage';
