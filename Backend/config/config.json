@@ -1,0 +1,30 @@
+{
+  "development": {
+    "username": "myuser",
+    "password": "Advocate@vandan@28",
+    "database": "magazine",
+    "host": "72.60.108.85",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false,
+    "timezone": "+05:30"
+  },
+  "test": {
+    "username": "postgres",
+    "password": "password",
+    "database": "magazine_website_test",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  },
+  "production": {
+    "username": "postgres",
+    "password": "password",
+    "database": "magazine_website_prod",
+    "host": "127.0.0.1",
+    "port": 5432,
+    "dialect": "postgres",
+    "logging": false
+  }
+}

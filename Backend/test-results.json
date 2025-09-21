@@ -1,0 +1,126 @@
+{
+  "timestamp": "2025-08-26T17:40:33.182Z",
+  "summary": {
+    "total": 23,
+    "success": 6,
+    "warning": 5,
+    "error": 6
+  },
+  "results": [
+    {
+      "timestamp": "2025-08-26T17:40:32.356Z",
+      "type": "info",
+      "message": "🚀 Starting Complete System Test"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:32.369Z",
+      "type": "info",
+      "message": "================================"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:32.787Z",
+      "type": "success",
+      "message": "✅ Backend server is running"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:32.910Z",
+      "type": "error",
+      "message": "❌ Admin login failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:32.947Z",
+      "type": "warning",
+      "message": "⚠️ Proceeding with limited tests (no authentication)"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:32.955Z",
+      "type": "info",
+      "message": "Testing Comment Moderation Routes..."
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.041Z",
+      "type": "error",
+      "message": "❌ Get Comments route failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.058Z",
+      "type": "error",
+      "message": "❌ Get Comment Stats route failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.081Z",
+      "type": "error",
+      "message": "❌ Bulk Moderate Comments route failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.098Z",
+      "type": "error",
+      "message": "❌ Get Comment Reports route failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.099Z",
+      "type": "info",
+      "message": "Testing PDF Generation Routes..."
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.117Z",
+      "type": "warning",
+      "message": "⚠️ Generate Article PDF route not found (may need data)"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.132Z",
+      "type": "warning",
+      "message": "⚠️ Generate Comment Report PDF route not found (may need data)"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.155Z",
+      "type": "warning",
+      "message": "⚠️ Generate Custom Report PDF route not found (may need data)"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.168Z",
+      "type": "warning",
+      "message": "⚠️ Generate Analytics Report PDF route not found (may need data)"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.168Z",
+      "type": "info",
+      "message": "Testing Article Routes..."
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.174Z",
+      "type": "error",
+      "message": "❌ Articles route failed: Request failed with status code 404"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.176Z",
+      "type": "info",
+      "message": "Testing Admin Panel Features..."
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.178Z",
+      "type": "success",
+      "message": "✅ Comment Moderation Interface implemented"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.179Z",
+      "type": "success",
+      "message": "✅ PDF Generation Buttons implemented"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.180Z",
+      "type": "success",
+      "message": "✅ Article Display Test implemented"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.180Z",
+      "type": "success",
+      "message": "✅ Admin Navigation implemented"
+    },
+    {
+      "timestamp": "2025-08-26T17:40:33.181Z",
+      "type": "success",
+      "message": "✅ Role-based Access Control implemented"
+    }
+  ]
+}

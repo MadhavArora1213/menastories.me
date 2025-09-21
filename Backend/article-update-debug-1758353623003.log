@@ -1,0 +1,236 @@
+[2025-09-20T07:33:38.695Z] [INFO] 🚀 Starting comprehensive article update debug tests...
+[2025-09-20T07:33:38.698Z] [INFO] 📋 Test suite includes:
+[2025-09-20T07:33:38.698Z] [INFO]   - Enhanced JSON parsing validation
+[2025-09-20T07:33:38.699Z] [INFO]   - Foreign key constraint validation
+[2025-09-20T07:33:38.699Z] [INFO]   - Invalid ID format validation
+[2025-09-20T07:33:38.699Z] [INFO]   - Published article permission checks
+[2025-09-20T07:33:38.700Z] [INFO]   - Transaction rollback testing
+[2025-09-20T07:33:38.700Z] [INFO]   - Enhanced error messages
+[2025-09-20T07:33:38.700Z] [INFO] Attempting to authenticate admin user...
+[2025-09-20T07:33:39.970Z] [INFO] ✅ Authentication successful
+[2025-09-20T07:33:39.970Z] [INFO] Admin: Master Admin (masteradmin1@magazine.com)
+[2025-09-20T07:33:39.970Z] [INFO] Role: Master Admin
+[2025-09-20T07:33:39.971Z] [INFO] Permissions: {
+  "system": true,
+  "system.full_access": true,
+  "system.user_management": true,
+  "system.role_management": true,
+  "system.site_config": true,
+  "system.technical_access": true,
+  "system.performance_monitoring": true,
+  "system.maintenance": true,
+  "system.settings": true,
+  "system.logs": true,
+  "content": true,
+  "content.create": true,
+  "content.edit": true,
+  "content.delete": true,
+  "content.publish": true,
+  "content.moderate": true,
+  "content.read": true,
+  "content.view": true,
+  "content.schedule": true,
+  "content.approve": true,
+  "content.quality_control": true,
+  "content.feature_articles": true,
+  "content.investigative": true,
+  "users": true,
+  "users.view": true,
+  "users.read": true,
+  "users.manage_roles": true,
+  "users.manage": true,
+  "users.view_content_users": true,
+  "analytics": true,
+  "analytics.view": true,
+  "analytics.read": true,
+  "analytics.export": true,
+  "security": true,
+  "security.view_logs": true,
+  "security.read": true,
+  "security.manage": true,
+  "security.manage_security": true,
+  "communication": true,
+  "communication.manage": true,
+  "social": true,
+  "social.manage_platforms": true,
+  "social.content_promotion": true,
+  "social.engagement": true,
+  "social.analytics": true
+}
+[2025-09-20T07:33:39.971Z] [INFO] Fetching article 80c3b12e-dba4-4a2f-92b4-bd2f13726fba...
+[2025-09-20T07:33:40.096Z] [INFO] ✅ Article fetched successfully
+[2025-09-20T07:33:40.096Z] [INFO] Article status: draft
+[2025-09-20T07:33:40.097Z] [INFO] Article title: Test Foreign Key Validation
+[2025-09-20T07:33:40.097Z] [INFO] Testing article update...
+[2025-09-20T07:33:40.097Z] [INFO] Request data: {
+  "title": "Test Article Update - Enhanced Validation",
+  "subtitle": "Testing enhanced validation and error handling",
+  "content": "This is a comprehensive test update to validate all the new error handling and validation features.",
+  "excerpt": "Test excerpt for enhanced validation testing",
+  "description": "Detailed description for testing",
+  "category_id": "existing-category-id",
+  "primary_author_id": "existing-author-id",
+  "status": "draft",
+  "co_authors": "[\"author1\",\"author2\"]",
+  "tags": "[\"test\",\"validation\",\"debug\"]",
+  "seo_keywords": "[\"test\",\"validation\",\"error-handling\"]",
+  "links": "[{\"title\":\"Test Link\",\"url\":\"https://example.com\"}]",
+  "socialEmbeds": "[{\"platform\":\"twitter\",\"url\":\"https://twitter.com/test\"}]",
+  "publishDate": "2025-09-20T07:33:38.692Z",
+  "scheduled_publish_date": "2025-09-27T07:33:38.695Z",
+  "writerDate": "2025-09-20T07:33:38.695Z",
+  "externalLinkFollow": "true",
+  "captchaVerified": "true",
+  "guidelinesAccepted": "true",
+  "nationality": "Test Nationality",
+  "age": "25-35",
+  "gender": "Other",
+  "ethnicity": "Test Ethnicity",
+  "residency": "Test Residency",
+  "industry": "Technology",
+  "position": "Developer",
+  "imageDisplayMode": "single"
+}
+[2025-09-20T07:33:40.747Z] [INFO] ✅ Article update successful
+[2025-09-20T07:33:40.747Z] [INFO] Response: {
+  "success": true,
+  "message": "Article updated successfully",
+  "data": {
+    "id": "80c3b12e-dba4-4a2f-92b4-bd2f13726fba",
+    "title": "Test Article Update - Enhanced Validation",
+    "slug": "test-article-update-enhanced-validation",
+    "subtitle": "Testing enhanced validation and error handling",
+    "content": "This is a comprehensive test update to validate all the new error handling and validation features.",
+    "excerpt": "Test excerpt for enhanced validation testing",
+    "description": "Detailed description for testing",
+    "featuredImage": "/storage/images/featured_image-1758351156295-667744147.png",
+    "imageCaption": "",
+    "imageAlt": null,
+    "gallery": [],
+    "status": "draft",
+    "workflowStage": "creation",
+    "categoryId": "eda6dc94-b02a-48d9-96f2-7b97cda10a54",
+    "subcategoryId": null,
+    "authorId": "62e9de23-6111-47c7-adc5-3452ddac9ba9",
+    "coAuthors": [
+      "author1",
+      "author2"
+    ],
+    "authorBioOverride": "",
+    "featured": false,
+    "heroSlider": false,
+    "trending": false,
+    "pinned": false,
+    "allowComments": true,
+    "readingTime": 1,
+    "metaTitle": "ertdyfuihojk",
+    "metaDescription": "xdfchvjbkn",
+    "keywords": [
+      "test",
+      "validation",
+      "error-handling"
+    ],
+    "tags": [
+      "test",
+      "validation",
+      "debug"
+    ],
+    "publishDate": "2025-09-20T07:33:38.692Z",
+    "scheduledPublishDate": null,
+    "viewCount": 0,
+    "likeCount": 0,
+    "shareCount": 0,
+    "assignedTo": null,
+    "nextAction": null,
+    "createdBy": "12f264f9-dfad-436d-b95d-de7322d83acd",
+    "updatedBy": "12f264f9-dfad-436d-b95d-de7322d83acd",
+    "nationality": "Test Nationality",
+    "age": "25-35",
+    "gender": "Other",
+    "ethnicity": "Test Ethnicity",
+    "residency": "Test Residency",
+    "industry": "Technology",
+    "position": "Developer",
+    "imageDisplayMode": "single",
+    "links": [
+      {
+        "title": "Test Link",
+        "url": "https://example.com"
+      }
+    ],
+    "socialEmbeds": [
+      {
+        "platform": "twitter",
+        "url": "https://twitter.com/test"
+      }
+    ],
+    "externalLinkFollow": true,
+    "captchaVerified": true,
+    "guidelinesAccepted": true,
+    "createdAt": "2025-09-20T04:59:08.851Z",
+    "updatedAt": "2025-09-20T07:33:40.417Z",
+    "category": {
+      "id": "eda6dc94-b02a-48d9-96f2-7b97cda10a54",
+      "name": "Geographic Coverage",
+      "slug": "geographic-coverage",
+      "description": "Regional and country-specific content location",
+      "design": "design1",
+      "status": "active",
+      "featureImage": null,
+      "parentId": null,
+      "order": 2,
+      "isActive": true,
+      "createdAt": "2025-09-15T14:25:12.750Z",
+      "updatedAt": "2025-09-15T14:25:12.750Z"
+    },
+    "subcategory": null,
+    "primaryAuthor": {
+      "id": "62e9de23-6111-47c7-adc5-3452ddac9ba9",
+      "name": "Maria Garcia",
+      "email": "maria.garcia@magazine.com",
+      "bio": "Maria covers the hospitality industry, travel trends, and tourism innovation with a global perspective.",
+      "profile_image": null,
+      "title": "Hospitality & Tourism Reporter",
+      "experience": "9+ years in travel and hospitality journalism",
+      "education": "MA in Tourism Management, BA in International Relations",
+      "social_media": {
+        "linkedin": "https://linkedin.com/in/mariagarcia",
+        "twitter": "https://twitter.com/mariaghospitality"
+      },
+      "expertise": [],
+      "is_active": true,
+      "createdAt": "2025-09-15T14:44:47.838Z",
+      "updatedAt": "2025-09-15T14:44:47.838Z"
+    },
+    "assignedEditor": null
+  }
+}
+[2025-09-20T07:33:40.748Z] [INFO] Testing with minimal data...
+[2025-09-20T07:33:41.386Z] [INFO] ✅ Minimal update successful
+[2025-09-20T07:33:41.387Z] [INFO] 🧪 Testing invalid JSON handling...
+[2025-09-20T07:33:41.723Z] [INFO] ℹ️ Invalid JSON test error (expected): Request failed with status code 400
+[2025-09-20T07:33:41.723Z] [INFO] Response: {
+  "success": false,
+  "message": "Invalid JSON data in request",
+  "error": "Unexpected token 'i', \"invalid-json-string{\" is not valid JSON",
+  "details": {
+    "co_authors": "invalid-json-string{",
+    "tags": "also-invalid-json}",
+    "seo_keywords": "null"
+  }
+}
+[2025-09-20T07:33:41.724Z] [INFO] 🧪 Testing foreign key validation...
+[2025-09-20T07:33:42.354Z] [INFO] ⚠️ Foreign key validation test - should have failed but succeeded
+[2025-09-20T07:33:42.355Z] [INFO] 🧪 Testing invalid article ID format...
+[2025-09-20T07:33:42.694Z] [INFO] ✅ Invalid ID validation working correctly: Request failed with status code 500
+[2025-09-20T07:33:42.694Z] [INFO] Response: {
+  "success": false,
+  "message": "Failed to update article",
+  "error": "invalid input syntax for type uuid: \"invalid-id-format\"",
+  "stack": "Error\n    at Query.run (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\dialects\\postgres\\query.js:50:25)\n    at c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\sequelize.js:315:28\n    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)\n    at async PostgresQueryInterface.select (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\dialects\\abstract\\query-interface.js:407:12)\n    at async Article.findAll (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\model.js:1140:21)\n    at async Article.findOne (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\model.js:1240:12)\n    at async Article.findByPk (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\node_modules\\sequelize\\lib\\model.js:1221:12)\n    at async ArticleController.updateArticle (c:\\Users\\DELL\\OneDrive\\Desktop\\Magazine_Website\\Backend\\controllers\\articleController.js:625:23)"
+}
+[2025-09-20T07:33:42.695Z] [INFO] 🧪 Testing published article permission restrictions...
+[2025-09-20T07:33:43.002Z] [INFO] ℹ️ Published status update error: Request failed with status code 400
+[2025-09-20T07:33:43.002Z] [INFO] Response: {
+  "success": false
+}

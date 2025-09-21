@@ -1,0 +1,102 @@
+{
+  "News": [
+    "#BreakingNews",
+    "#Trending",
+    "#Exclusive",
+    "#Interview",
+    "#BehindTheScenes",
+    "#Analysis",
+    "#Opinion",
+    "#Editorial",
+    "#Report",
+    "#Top100",
+    "#PowerList",
+    "#EditorPick"
+  ],
+  "Geographic Coverage": [
+    "#GlobalImpact",
+    "#RegionalFocus",
+    "#CountrySpotlight",
+    "#LocalNews",
+    "#CrossBorder",
+    "#EmergingMarkets",
+    "#GlobalTrends"
+  ],
+  "Real Estate": [
+    "#Residential",
+    "#Commercial",
+    "#Industrial",
+    "#LuxuryLiving",
+    "#SmartHomes",
+    "#PropertyTech",
+    "#MarketTrends",
+    "#Investments"
+  ],
+  "Industries": [
+    "#Innovation",
+    "#TechTrends",
+    "#StartupLife",
+    "#Entrepreneurship",
+    "#WomenInLeadership",
+    "#Sustainability",
+    "#GreenFuture",
+    "#MarketMovers",
+    "#IndustryInsights",
+    "#FutureOfWork",
+    "#Trailblazer"
+  ],
+  "Finance": [
+    "#Finance",
+    "#Banking",
+    "#Fintech",
+    "#CapitalMarkets",
+    "#Investors",
+    "#PrivateEquity",
+    "#VentureCapital",
+    "#HedgeFunds",
+    "#IPO",
+    "#FundingRounds",
+    "#SeriesA",
+    "#SeriesB",
+    "#SeriesC"
+  ],
+  "Consumer": [
+    "#Inspiration",
+    "#Lifestyle",
+    "#Luxury",
+    "#HealthFirst",
+    "#Wellbeing",
+    "#YoungLeaders",
+    "#GenerationalTrends",
+    "#DiversityMatters",
+    "#ConsumerBehavior",
+    "#SuccessStories"
+  ],
+  "Web3": [
+    "#Blockchain",
+    "#Crypto",
+    "#NFTs",
+    "#DeFi",
+    "#DAOs",
+    "#SmartContracts",
+    "#Web3Gaming",
+    "#Metaverse",
+    "#Tokenization",
+    "#Layer1",
+    "#Layer2",
+    "#DigitalAssets"
+  ],
+  "Hospitality": [
+    "#Travel",
+    "#Tourism",
+    "#Hotels",
+    "#LuxuryTravel",
+    "#FoodAndDining",
+    "#HospitalityTech",
+    "#EventHighlights",
+    "#Resorts",
+    "#Cruises",
+    "#GuestExperience",
+    "#CultureShift"
+  ]
+}
