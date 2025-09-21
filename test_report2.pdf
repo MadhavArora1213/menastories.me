@@ -1,0 +1,42 @@
+
+      <!DOCTYPE html>
+      <html>
+      <head>
+        <title>Test Report</title>
+        <style>
+          body { font-family: Arial, sans-serif; margin: 20px; }
+          h1 { color: #333; border-bottom: 2px solid #007bff; padding-bottom: 10px; }
+          h2 { color: #666; margin-top: 30px; }
+          .metric { margin: 10px 0; padding: 10px; background: #f8f9fa; border-radius: 5px; }
+          .metric strong { color: #007bff; }
+          table { width: 100%; border-collapse: collapse; margin-top: 20px; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th { background-color: #007bff; color: white; }
+          .footer { margin-top: 40px; font-size: 12px; color: #666; }
+        </style>
+      </head>
+      <body>
+        <h1>Test Report</h1>
+        <p><strong>Description:</strong> Test analytics report</p>
+        <p><strong>Generated:</strong> 2025-09-18T02:13:02.723Z</p>
+
+        <h2>Report Data</h2>
+        
+          <div class="metric">
+            <strong>generatedAt:</strong> "2025-09-18T02:13:02.722Z"
+          </div>
+        
+          <div class="metric">
+            <strong>dateRange:</strong> {
+  "startDate": "2024-01-01",
+  "endDate": "2024-12-31"
+}
+          </div>
+        
+
+        <div class="footer">
+          <p>This report was generated automatically by the Analytics System.</p>
+        </div>
+      </body>
+      </html>
+    

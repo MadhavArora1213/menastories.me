@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"
+        xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"
+        xsi:schemaLocation="http://www.sitemaps.org/schemas/sitemap/0.9
+        http://www.sitemaps.org/schemas/sitemap/0.9/sitemap.xsd">
+
+  <!-- Homepage -->
+  <url>
+    <loc>https://your-domain.com/</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>1.0</priority>
+  </url>
+
+  <!-- Main Pages -->
+  <url>
+    <loc>https://your-domain.com/about</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/contact</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/events</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.9</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/flipbook</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+
+  <!-- Static Pages -->
+  <url>
+    <loc>https://your-domain.com/our-team</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/careers</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/advertise</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.6</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/privacy-policy</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/terms-and-conditions</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>yearly</changefreq>
+    <priority>0.3</priority>
+  </url>
+
+  <!-- Media Kit and Downloads Pages -->
+  <url>
+    <loc>https://your-domain.com/media-kit</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://your-domain.com/images/media-kit-featured.jpg</image:loc>
+      <image:caption>Media Kit - Advertising Resources</image:caption>
+    </image:image>
+  </url>
+
+  <url>
+    <loc>https://your-domain.com/downloads</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+    <image:image>
+      <image:loc>https://your-domain.com/images/downloads-featured.jpg</image:loc>
+      <image:caption>Free Downloads and Resources</image:caption>
+    </image:image>
+  </url>
+
+  <!-- Dynamic Content Placeholders -->
+  <!-- Articles will be added here dynamically -->
+  <!-- Example article entry:
+  <url>
+    <loc>https://your-domain.com/articles/sample-article</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <image:image>
+      <image:loc>https://your-domain.com/images/sample-article.jpg</image:loc>
+      <image:caption>Sample Article Image</image:caption>
+    </image:image>
+  </url>
+  -->
+
+  <!-- Categories will be added here dynamically -->
+  <!-- Example category entry:
+  <url>
+    <loc>https://your-domain.com/technology</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.7</priority>
+  </url>
+  -->
+
+  <!-- Video Articles will be added here dynamically -->
+  <!-- Example video entry:
+  <url>
+    <loc>https://your-domain.com/videos/sample-video</loc>
+    <lastmod>2025-01-16</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+    <video:video>
+      <video:thumbnail_loc>https://your-domain.com/videos/sample-video-thumb.jpg</video:thumbnail_loc>
+      <video:title>Sample Video Article</video:title>
+      <video:description>Video article description</video:description>
+      <video:content_loc>https://your-domain.com/videos/sample-video.mp4</video:content_loc>
+      <video:duration>300</video:duration>
+    </video:video>
+  </url>
+  -->
+
+</urlset>
