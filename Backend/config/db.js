@@ -4,8 +4,27 @@ require('dotenv').config();
 
 let sequelize;
 
+// Environment variable validation
+const validateEnvironmentVariables = () => {
+  const requiredVars = ['DB_HOST', 'DB_NAME', 'DB_USER', 'DB_PASSWORD'];
+  const missingVars = requiredVars.filter(varName => !process.env[varName]);
+
+  if (missingVars.length > 0) {
+    console.error('❌ Missing required environment variables:', missingVars.join(', '));
+    console.error('Please check your .env file and ensure all required variables are set.');
+    return false;
+  }
+
+  return true;
+};
+
 // Database configuration with SQLite fallback for development
 const createConnection = () => {
+  // Validate environment variables first
+  if (!validateEnvironmentVariables()) {
+    throw new Error('Environment variables validation failed');
+  }
+
   // Check if SQLite fallback is enabled
   if (process.env.USE_SQLITE === 'true') {
     console.log('🔄 Using SQLite for local development...');
@@ -64,7 +83,13 @@ const createConnection = () => {
 };
 
 // Create the connection
-sequelize = createConnection();
+try {
+  sequelize = createConnection();
+} catch (error) {
+  console.error('❌ Failed to create database connection:', error.message);
+  console.error('Please check your environment variables and database configuration.');
+  // Don't exit the process, but sequelize will be undefined
+}
 
 // Create Pool instance with same configuration
 let pool;
@@ -108,6 +133,12 @@ const createPool = () => {
 pool = createPool();
 
 const testConnection = async (retries = 3) => {
+  // Check if sequelize is available
+  if (!sequelize) {
+    console.error('❌ Sequelize instance is not available. Check environment variables.');
+    return false;
+  }
+
   for (let i = 0; i < retries; i++) {
     try {
       // Test Sequelize connection
