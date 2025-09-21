@@ -1,4 +1,5 @@
 const { Sequelize } = require('sequelize');
+const { Pool } = require('pg');
 require('dotenv').config();
 
 let sequelize;
@@ -65,33 +66,83 @@ const createConnection = () => {
 // Create the connection
 sequelize = createConnection();
 
+// Create Pool instance with same configuration
+let pool;
+const createPool = () => {
+  // Check if SQLite fallback is enabled
+  if (process.env.USE_SQLITE === 'true') {
+    console.log('🔄 Using SQLite for local development (Pool not available)...');
+    return null; // Pool not available for SQLite
+  }
+
+  // PostgreSQL Pool configuration
+  console.log('🔄 Creating PostgreSQL Pool connection...');
+
+  // Determine if SSL should be used (only for remote connections)
+  const isLocalConnection = process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1';
+  // Disable SSL for servers that don't support it (e.g., specific IP addresses)
+  const disableSSLHosts = ['72.60.108.85', 'localhost', '127.0.0.1']; // Add hosts that don't support SSL
+  const shouldUseSSL = !isLocalConnection && !disableSSLHosts.includes(process.env.DB_HOST);
+
+  const sslConfig = shouldUseSSL ? {
+    require: true,
+    rejectUnauthorized: false // Set to true in production with proper certificates
+  } : false;
+
+  pool = new Pool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    database: process.env.DB_NAME,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    ssl: sslConfig,
+    max: 20,
+    idleTimeoutMillis: 30000,
+    connectionTimeoutMillis: 2000,
+  });
+
+  return pool;
+};
+
+// Create the pool
+pool = createPool();
+
 const testConnection = async (retries = 3) => {
   for (let i = 0; i < retries; i++) {
     try {
+      // Test Sequelize connection
       await sequelize.authenticate();
-      console.log('✅ Database connection established successfully.');
+      console.log('✅ Sequelize connection established successfully.');
+
+      // Test Pool connection if available (not SQLite)
+      if (pool) {
+        const client = await pool.connect();
+        console.log('✅ Pool connection established successfully.');
+        client.release();
+      }
+
       return true;
     } catch (error) {
       console.error(`❌ Database connection attempt ${i + 1} failed:`, error.message);
-      
+
       if (i < retries - 1) {
         console.log(`⏳ Retrying in 2 seconds...`);
         await new Promise(resolve => setTimeout(resolve, 2000));
       }
     }
   }
-  
+
   console.error('❌ All database connection attempts failed.');
   console.log('\n🔧 Troubleshooting tips:');
   console.log('1. Check if your database is running and accessible');
   console.log('2. Verify your database credentials in .env file');
   console.log('3. If using Neon, check if your database is paused (visit neon.tech dashboard)');
   console.log('4. Try using SQLite for local development (see documentation)');
-  
+
   return false;
 };
 
 // Test connection when module loads
 testConnection();
 
-module.exports = sequelize;
+module.exports = { sequelize, pool };

@@ -5,33 +5,32 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const cookieParser = require('cookie-parser');
 const xss = require('xss-clean');
-const { Pool } = require('pg');
 const path = require('path');
 
 const app = express();
 
-// Database connection setup
-const pool = new Pool({
-  host: process.env.DB_HOST,
-  port: process.env.DB_PORT,
-  database: process.env.DB_NAME,
-  user: process.env.DB_USER,
-  password: process.env.DB_PASSWORD,
-  ssl: process.env.NODE_ENV === 'production' ? { rejectUnauthorized: false } : false,
-  max: 20,
-  idleTimeoutMillis: 30000,
-  connectionTimeoutMillis: 2000,
-});
+// ✅ Import unified DB config
+const { sequelize, pool } = require('./config/db');
 
-// Test database connection
+// Test pool connection
 pool.connect((err, client, release) => {
   if (err) {
-    console.error('Error acquiring client from pool:', err.stack);
+    console.error('❌ Error acquiring client from pool:', err.stack);
   } else {
-    console.log('✅ Database connected successfully');
+    console.log('✅ Database connected successfully (pg Pool)');
     release();
   }
 });
+
+// Test Sequelize connection
+(async () => {
+  try {
+    await sequelize.authenticate();
+    console.log('✅ Database connected successfully (Sequelize)');
+  } catch (err) {
+    console.error('❌ Sequelize connection failed:', err.message);
+  }
+})();
 
 // Middleware
 app.use(helmet({
@@ -79,18 +78,11 @@ app.use((err, req, res, next) => {
   next(err);
 });
 
-// Import database models and sync
-const sequelize = require('./config/db');
+// ✅ Sync database models
 const models = require('./models');
-
-// Sync database models - use alter for development to add new columns
 sequelize.sync({ alter: false, force: false })
-  .then(() => {
-    console.log('✅ Database models synchronized successfully');
-  })
-  .catch((error) => {
-    console.error('❌ Database synchronization failed:', error);
-  });
+  .then(() => console.log('✅ Database models synchronized'))
+  .catch(err => console.error('❌ Sequelize sync failed:', err.message));
 
 // Import controllers
 const adminAuthController = require('./controllers/adminAuthController');
@@ -625,39 +617,13 @@ app.get('/api/categories/:id/articles', async (req, res) => {
   }
 });
 
-// Debug endpoint to check database connection
+// Example route using pool
 app.get('/api/debug/database', async (req, res) => {
-try {
-  const queries = [
-    { name: 'tags', query: 'SELECT COUNT(*) as count FROM "Tags"' },
-    { name: 'categories', query: 'SELECT COUNT(*) as count FROM "Categories"' },
-    { name: 'articles', query: 'SELECT COUNT(*) as count FROM "Articles"' },
-    { name: 'article_tags', query: 'SELECT COUNT(*) as count FROM "ArticleTags"' }
-  ];
-    
-    const results = {};
-    
-    for (const { name, query } of queries) {
-      try {
-        const result = await pool.query(query);
-        results[name] = parseInt(result.rows[0].count);
-      } catch (error) {
-        results[name] = `Error: ${error.message}`;
-      }
-    }
-    
-    res.json({
-      success: true,
-      database_counts: results,
-      connection: 'active'
-    });
+  try {
+    const result = await pool.query('SELECT COUNT(*) as total FROM "Articles"');
+    res.json({ success: true, articles: result.rows[0].total });
   } catch (error) {
-    console.error('Database debug error:', error);
-    res.status(500).json({
-      success: false,
-      message: 'Database connection failed',
-      error: error.message
-    });
+    res.status(500).json({ success: false, error: error.message });
   }
 });
 
