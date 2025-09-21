@@ -42,8 +42,8 @@ jobs:
             
             # Create storage directories if they don't exist
             mkdir -p storage/images storage/pdfs storage/flipbooks storage/flipbooks/pages storage/docs storage/downloads
-            sudo chown -R deploy:deploy storage/
-            sudo chmod -R 755 storage/
+            # Set permissions (should already be owned by deploy user)
+            chmod -R 755 storage/
 
             # Restart backend with PM2
             echo "Restarting backend..."
@@ -59,7 +59,7 @@ jobs:
             sudo chown -R deploy:deploy dist/
             sudo chmod -R 755 dist/
 
-            # Reload nginx to pick up any changes
+            # Reload nginx to pick up any changes (needs sudo permission)
             echo "Reloading nginx..."
             sudo systemctl reload nginx
 
