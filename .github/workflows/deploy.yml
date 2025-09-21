@@ -52,7 +52,7 @@ jobs:
             # Frontend: Install, build, and deploy
             echo "Building frontend..."
             cd ../Magazine_Website
-            npm ci
+            npm ci --legacy-peer-deps
             npm run build
 
             # Ensure build directory has correct ownership
