@@ -34,7 +34,7 @@ const VerifyEmail = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/verify-email', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/auth/verify-email`, {
         email: email,
         otp: otp
       });
@@ -62,7 +62,7 @@ const VerifyEmail = () => {
     setIsLoading(true);
 
     try {
-      const response = await axios.post('http://localhost:5000/api/auth/resend-otp', {
+      const response = await axios.post(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/auth/resend-otp`, {
         email: email
       });
 

@@ -3,15 +3,15 @@
 <channel>
 <title>Magazine RSS Feed</title>
 <description>Latest articles and videos from our magazine</description>
-<link>http://localhost:5000</link>
-<atom:link href="http://localhost:5000/rss.xml" rel="self" type="application/rss+xml" />
+<link>https://menastories.me</link>
+<atom:link href="https://menastories.me/rss.xml" rel="self" type="application/rss+xml" />
 <lastBuildDate>Sat, 20 Sep 2025 11:40:24 GMT</lastBuildDate>
 <language>en-us</language>
 <item>
 <title><![CDATA[Test Foreign Key Validation]]></title>
 <description><![CDATA[Test excerpt for enhanced validation testing]]></description>
-<link>http://localhost:5000/article/80c3b12e-dba4-4a2f-92b4-bd2f13726fba</link>
-<guid>http://localhost:5000/article/80c3b12e-dba4-4a2f-92b4-bd2f13726fba</guid>
+<link>https://menastories.me/article/80c3b12e-dba4-4a2f-92b4-bd2f13726fba</link>
+<guid>https://menastories.me/article/80c3b12e-dba4-4a2f-92b4-bd2f13726fba</guid>
 <pubDate>Sat, 20 Sep 2025 04:59:08 GMT</pubDate>
 <author><![CDATA[Maria Garcia]]></author>
 <category><![CDATA[Geographic Coverage]]></category>
@@ -25,8 +25,8 @@
 <item>
 <title><![CDATA[SDFhbm,n]]></title>
 <description><![CDATA[adsfhjklk;]]></description>
-<link>http://localhost:5000/media-kit/sdfhbmn</link>
-<guid>http://localhost:5000/media-kit/sdfhbmn</guid>
+<link>https://menastories.me/media-kit/sdfhbmn</link>
+<guid>https://menastories.me/media-kit/sdfhbmn</guid>
 <pubDate>Wed, 17 Sep 2025 17:11:02 GMT</pubDate>
 <category><![CDATA[Media Kit]]></category>
 <category><![CDATA[Media Kit]]></category>
@@ -35,8 +35,8 @@
 <item>
 <title><![CDATA[Test Media Kit]]></title>
 <description><![CDATA[Test description]]></description>
-<link>http://localhost:5000/media-kit/test-media-kit</link>
-<guid>http://localhost:5000/media-kit/test-media-kit</guid>
+<link>https://menastories.me/media-kit/test-media-kit</link>
+<guid>https://menastories.me/media-kit/test-media-kit</guid>
 <pubDate>Wed, 17 Sep 2025 16:41:42 GMT</pubDate>
 <category><![CDATA[Media Kit]]></category>
 <category><![CDATA[Media Kit]]></category>
@@ -44,8 +44,8 @@
 <item>
 <title><![CDATA[dfhjk]]></title>
 <description><![CDATA[dfdaxcvbnm]]></description>
-<link>http://localhost:5000/media-kit/dfhjk</link>
-<guid>http://localhost:5000/media-kit/dfhjk</guid>
+<link>https://menastories.me/media-kit/dfhjk</link>
+<guid>https://menastories.me/media-kit/dfhjk</guid>
 <pubDate>Wed, 17 Sep 2025 16:35:27 GMT</pubDate>
 <category><![CDATA[Media Kit]]></category>
 <category><![CDATA[Media Kit]]></category>
@@ -54,16 +54,16 @@
 <item>
 <title><![CDATA[AFSGHFJ]]></title>
 <description><![CDATA[SDAFSDXFSadfxfhfcjh]]></description>
-<link>http://localhost:5000/list/afsghfj</link>
-<guid>http://localhost:5000/list/afsghfj</guid>
+<link>https://menastories.me/list/afsghfj</link>
+<guid>https://menastories.me/list/afsghfj</guid>
 <pubDate>Wed, 17 Sep 2025 14:55:37 GMT</pubDate>
 <category><![CDATA[Entertainment]]></category>
 </item>
 <item>
 <title><![CDATA[AFSGHFJ]]></title>
 <description><![CDATA[SDAFSDXFSadfxfhfcjh]]></description>
-<link>http://localhost:5000/power-list/afsghfj</link>
-<guid>http://localhost:5000/power-list/afsghfj</guid>
+<link>https://menastories.me/power-list/afsghfj</link>
+<guid>https://menastories.me/power-list/afsghfj</guid>
 <pubDate>Wed, 17 Sep 2025 14:55:37 GMT</pubDate>
 <category><![CDATA[Entertainment]]></category>
 <media:description><![CDATA[Top entries from this power list:
@@ -79,8 +79,8 @@
 <item>
 <title><![CDATA[bsjchjdcbscuvcscb b dj jb ]]></title>
 <description><![CDATA[afsd]]></description>
-<link>http://localhost:5000/events/bsjchjdcbscuvcscb-b-dj-jb</link>
-<guid>http://localhost:5000/events/bsjchjdcbscuvcscb-b-dj-jb</guid>
+<link>https://menastories.me/events/bsjchjdcbscuvcscb-b-dj-jb</link>
+<guid>https://menastories.me/events/bsjchjdcbscuvcscb-b-dj-jb</guid>
 <pubDate>Wed, 17 Sep 2025 07:23:14 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Events]]></category>
@@ -91,8 +91,8 @@
 <item>
 <title><![CDATA[Dubai Future Forum 2025]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/dubai-future-forum-2025</link>
-<guid>http://localhost:5000/events/dubai-future-forum-2025</guid>
+<link>https://menastories.me/events/dubai-future-forum-2025</link>
+<guid>https://menastories.me/events/dubai-future-forum-2025</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:30 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Future]]></category>
@@ -104,8 +104,8 @@
 <item>
 <title><![CDATA[The Dubai Fixed Income Alternatives Conference]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/the-dubai-fixed-income-alternatives-conference</link>
-<guid>http://localhost:5000/events/the-dubai-fixed-income-alternatives-conference</guid>
+<link>https://menastories.me/events/the-dubai-fixed-income-alternatives-conference</link>
+<guid>https://menastories.me/events/the-dubai-fixed-income-alternatives-conference</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:30 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Banking and Capital Markets]]></category>
@@ -117,8 +117,8 @@
 <item>
 <title><![CDATA[Middle East Cosmetics Show]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/middle-east-cosmetics-show</link>
-<guid>http://localhost:5000/events/middle-east-cosmetics-show</guid>
+<link>https://menastories.me/events/middle-east-cosmetics-show</link>
+<guid>https://menastories.me/events/middle-east-cosmetics-show</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:30 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Lifestyle (Beauty and Cosmetics)]]></category>
@@ -130,8 +130,8 @@
 <item>
 <title><![CDATA[Watch & Jewellery Middle East Show]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/watch-jewellery-middle-east-show</link>
-<guid>http://localhost:5000/events/watch-jewellery-middle-east-show</guid>
+<link>https://menastories.me/events/watch-jewellery-middle-east-show</link>
+<guid>https://menastories.me/events/watch-jewellery-middle-east-show</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:30 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Lifestyle (Watches and Jewelery / Jewellery and gems)]]></category>
@@ -143,8 +143,8 @@
 <item>
 <title><![CDATA[International Real Estate & Investment Show]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/international-real-estate-investment-show</link>
-<guid>http://localhost:5000/events/international-real-estate-investment-show</guid>
+<link>https://menastories.me/events/international-real-estate-investment-show</link>
+<guid>https://menastories.me/events/international-real-estate-investment-show</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:29 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Real Estate]]></category>
@@ -156,8 +156,8 @@
 <item>
 <title><![CDATA[Paper Arabia]]></title>
 <description><![CDATA[]]></description>
-<link>http://localhost:5000/events/paper-arabia</link>
-<guid>http://localhost:5000/events/paper-arabia</guid>
+<link>https://menastories.me/events/paper-arabia</link>
+<guid>https://menastories.me/events/paper-arabia</guid>
 <pubDate>Mon, 15 Sep 2025 17:41:29 GMT</pubDate>
 <category><![CDATA[business]]></category>
 <category><![CDATA[Industry: Paper, Packaging and Printing]]></category>
@@ -169,8 +169,8 @@
 <item>
 <title><![CDATA[Renewable Energy Transition in the GCC]]></title>
 <description><![CDATA[GCC countries are accelerating their renewable energy transition with ambitious projects and innovative technologies.]]></description>
-<link>http://localhost:5000/article/d55220b2-ddcb-4d95-bea5-e9831734bfdd</link>
-<guid>http://localhost:5000/article/d55220b2-ddcb-4d95-bea5-e9831734bfdd</guid>
+<link>https://menastories.me/article/d55220b2-ddcb-4d95-bea5-e9831734bfdd</link>
+<guid>https://menastories.me/article/d55220b2-ddcb-4d95-bea5-e9831734bfdd</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:59 GMT</pubDate>
 <author><![CDATA[Carlos Mendoza]]></author>
 <category><![CDATA[Industries]]></category>
@@ -181,8 +181,8 @@
 <item>
 <title><![CDATA[Fintech Innovation in Emerging Markets]]></title>
 <description><![CDATA[Fintech innovations are democratizing financial services in emerging markets, improving access and driving economic growth.]]></description>
-<link>http://localhost:5000/article/76c2e876-8c31-484e-ae40-081dc995da84</link>
-<guid>http://localhost:5000/article/76c2e876-8c31-484e-ae40-081dc995da84</guid>
+<link>https://menastories.me/article/76c2e876-8c31-484e-ae40-081dc995da84</link>
+<guid>https://menastories.me/article/76c2e876-8c31-484e-ae40-081dc995da84</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:55 GMT</pubDate>
 <author><![CDATA[Lisa Park]]></author>
 <category><![CDATA[Finance]]></category>
@@ -193,8 +193,8 @@
 <item>
 <title><![CDATA[The Rise of Luxury Hospitality in Dubai]]></title>
 <description><![CDATA[Dubai's luxury hospitality sector is setting new global standards with innovative concepts and unparalleled guest experiences.]]></description>
-<link>http://localhost:5000/article/844fe7d7-dd47-4adc-be3b-b4521a9391f5</link>
-<guid>http://localhost:5000/article/844fe7d7-dd47-4adc-be3b-b4521a9391f5</guid>
+<link>https://menastories.me/article/844fe7d7-dd47-4adc-be3b-b4521a9391f5</link>
+<guid>https://menastories.me/article/844fe7d7-dd47-4adc-be3b-b4521a9391f5</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:55 GMT</pubDate>
 <author><![CDATA[David Thompson]]></author>
 <category><![CDATA[Hospitality]]></category>
@@ -205,8 +205,8 @@
 <item>
 <title><![CDATA[Cryptocurrency Regulation: Global Perspectives]]></title>
 <description><![CDATA[Governments worldwide are developing regulatory frameworks for cryptocurrencies, balancing innovation with consumer protection and financial stability.]]></description>
-<link>http://localhost:5000/article/283a256c-b848-4220-a5ea-0005a583282b</link>
-<guid>http://localhost:5000/article/283a256c-b848-4220-a5ea-0005a583282b</guid>
+<link>https://menastories.me/article/283a256c-b848-4220-a5ea-0005a583282b</link>
+<guid>https://menastories.me/article/283a256c-b848-4220-a5ea-0005a583282b</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:55 GMT</pubDate>
 <author><![CDATA[Dr. Emily Rodriguez]]></author>
 <category><![CDATA[Web3]]></category>
@@ -217,8 +217,8 @@
 <item>
 <title><![CDATA[Sustainable Real Estate Development in the Middle East]]></title>
 <description><![CDATA[Middle Eastern cities are leading the way in sustainable real estate development with innovative green technologies and eco-friendly building practices.]]></description>
-<link>http://localhost:5000/article/de04dfdb-7bb5-48f0-a080-88446a8a3760</link>
-<guid>http://localhost:5000/article/de04dfdb-7bb5-48f0-a080-88446a8a3760</guid>
+<link>https://menastories.me/article/de04dfdb-7bb5-48f0-a080-88446a8a3760</link>
+<guid>https://menastories.me/article/de04dfdb-7bb5-48f0-a080-88446a8a3760</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:54 GMT</pubDate>
 <author><![CDATA[Michael Chen]]></author>
 <category><![CDATA[Real Estate]]></category>
@@ -229,8 +229,8 @@
 <item>
 <title><![CDATA[The Future of Artificial Intelligence in Healthcare]]></title>
 <description><![CDATA[Artificial Intelligence is transforming healthcare through advanced diagnostics, personalized treatments, and innovative medical technologies.]]></description>
-<link>http://localhost:5000/article/424e2448-6128-4a27-9ee7-b8f31e176e50</link>
-<guid>http://localhost:5000/article/424e2448-6128-4a27-9ee7-b8f31e176e50</guid>
+<link>https://menastories.me/article/424e2448-6128-4a27-9ee7-b8f31e176e50</link>
+<guid>https://menastories.me/article/424e2448-6128-4a27-9ee7-b8f31e176e50</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:53 GMT</pubDate>
 <author><![CDATA[Sarah Johnson]]></author>
 <category><![CDATA[Industries]]></category>
@@ -241,8 +241,8 @@
 <item>
 <title><![CDATA[Renewable Energy Transition in the GCC]]></title>
 <description><![CDATA[GCC countries are accelerating their renewable energy transition with ambitious projects and innovative technologies.]]></description>
-<link>http://localhost:5000/article/c7871093-6aba-458b-b123-c06c88be8b04</link>
-<guid>http://localhost:5000/article/c7871093-6aba-458b-b123-c06c88be8b04</guid>
+<link>https://menastories.me/article/c7871093-6aba-458b-b123-c06c88be8b04</link>
+<guid>https://menastories.me/article/c7871093-6aba-458b-b123-c06c88be8b04</guid>
 <pubDate>Tue, 16 Sep 2025 15:21:50 GMT</pubDate>
 <author><![CDATA[Carlos Mendoza]]></author>
 <category><![CDATA[Industries]]></category>
@@ -253,8 +253,8 @@
 <item>
 <title><![CDATA[Fintech Innovation in Emerging Markets]]></title>
 <description><![CDATA[Fintech innovations are democratizing financial services in emerging markets, improving access and driving economic growth.]]></description>
-<link>http://localhost:5000/article/09415d7b-af2d-484e-a69f-76950c4f38b4</link>
-<guid>http://localhost:5000/article/09415d7b-af2d-484e-a69f-76950c4f38b4</guid>
+<link>https://menastories.me/article/09415d7b-af2d-484e-a69f-76950c4f38b4</link>
+<guid>https://menastories.me/article/09415d7b-af2d-484e-a69f-76950c4f38b4</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:07 GMT</pubDate>
 <author><![CDATA[Lisa Park]]></author>
 <category><![CDATA[Finance]]></category>
@@ -265,8 +265,8 @@
 <item>
 <title><![CDATA[The Rise of Luxury Hospitality in Dubai]]></title>
 <description><![CDATA[Dubai's luxury hospitality sector is setting new global standards with innovative concepts and unparalleled guest experiences.]]></description>
-<link>http://localhost:5000/article/e741d5a8-de83-4b13-89e7-9c9691cbaae0</link>
-<guid>http://localhost:5000/article/e741d5a8-de83-4b13-89e7-9c9691cbaae0</guid>
+<link>https://menastories.me/article/e741d5a8-de83-4b13-89e7-9c9691cbaae0</link>
+<guid>https://menastories.me/article/e741d5a8-de83-4b13-89e7-9c9691cbaae0</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:06 GMT</pubDate>
 <author><![CDATA[David Thompson]]></author>
 <category><![CDATA[Hospitality]]></category>
@@ -277,8 +277,8 @@
 <item>
 <title><![CDATA[Cryptocurrency Regulation: Global Perspectives]]></title>
 <description><![CDATA[Governments worldwide are developing regulatory frameworks for cryptocurrencies, balancing innovation with consumer protection and financial stability.]]></description>
-<link>http://localhost:5000/article/0f6201a1-f95c-4b58-b041-ef055b80094f</link>
-<guid>http://localhost:5000/article/0f6201a1-f95c-4b58-b041-ef055b80094f</guid>
+<link>https://menastories.me/article/0f6201a1-f95c-4b58-b041-ef055b80094f</link>
+<guid>https://menastories.me/article/0f6201a1-f95c-4b58-b041-ef055b80094f</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:05 GMT</pubDate>
 <author><![CDATA[Dr. Emily Rodriguez]]></author>
 <category><![CDATA[Web3]]></category>
@@ -289,8 +289,8 @@
 <item>
 <title><![CDATA[Sustainable Real Estate Development in the Middle East]]></title>
 <description><![CDATA[Middle Eastern cities are leading the way in sustainable real estate development with innovative green technologies and eco-friendly building practices.]]></description>
-<link>http://localhost:5000/article/7d834b05-7a34-4787-a107-16e4781b3b53</link>
-<guid>http://localhost:5000/article/7d834b05-7a34-4787-a107-16e4781b3b53</guid>
+<link>https://menastories.me/article/7d834b05-7a34-4787-a107-16e4781b3b53</link>
+<guid>https://menastories.me/article/7d834b05-7a34-4787-a107-16e4781b3b53</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:05 GMT</pubDate>
 <author><![CDATA[Michael Chen]]></author>
 <category><![CDATA[Real Estate]]></category>
@@ -301,8 +301,8 @@
 <item>
 <title><![CDATA[The Future of Artificial Intelligence in Healthcare]]></title>
 <description><![CDATA[Artificial Intelligence is transforming healthcare through advanced diagnostics, personalized treatments, and innovative medical technologies.]]></description>
-<link>http://localhost:5000/article/afe98c0b-6762-4898-852d-0bc008a78aff</link>
-<guid>http://localhost:5000/article/afe98c0b-6762-4898-852d-0bc008a78aff</guid>
+<link>https://menastories.me/article/afe98c0b-6762-4898-852d-0bc008a78aff</link>
+<guid>https://menastories.me/article/afe98c0b-6762-4898-852d-0bc008a78aff</guid>
 <pubDate>Mon, 15 Sep 2025 15:21:05 GMT</pubDate>
 <author><![CDATA[Sarah Johnson]]></author>
 <category><![CDATA[Industries]]></category>

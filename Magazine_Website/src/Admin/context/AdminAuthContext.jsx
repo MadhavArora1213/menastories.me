@@ -48,7 +48,7 @@ export const AdminAuthProvider = ({ children }) => {
         return;
       }
 
-      const response = await fetch('http://localhost:5000/api/admin/auth/status', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/admin/auth/status`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json',
@@ -83,7 +83,7 @@ export const AdminAuthProvider = ({ children }) => {
       setError(null);
       setLoading(true);
 
-      const response = await fetch('http://localhost:5000/api/admin/auth/login', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/admin/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -125,7 +125,7 @@ export const AdminAuthProvider = ({ children }) => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      await fetch('http://localhost:5000/api/admin/auth/logout', {
+      await fetch(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/admin/auth/logout`, {
         method: 'POST',
         headers,
         credentials: 'include' // Include cookies
@@ -153,7 +153,7 @@ export const AdminAuthProvider = ({ children }) => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:5000/api/admin/profile', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/admin/profile`, {
         method: 'PUT',
         headers,
         credentials: 'include', // Include cookies
@@ -187,7 +187,7 @@ export const AdminAuthProvider = ({ children }) => {
         headers['Authorization'] = `Bearer ${token}`;
       }
 
-      const response = await fetch('http://localhost:5000/api/admin/auth/change-password', {
+      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://menastories.me'}/api/admin/auth/change-password`, {
         method: 'PUT',
         headers,
         credentials: 'include', // Include cookies

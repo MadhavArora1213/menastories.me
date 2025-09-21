@@ -228,7 +228,7 @@ const Loading = ({ isLoading, setIsLoading }) => {
                         fontWeight="800"
                         letterSpacing="-0.02em"
                       >
-                        NEONPULSE
+                        MENASTORIES
                       </text>
                     </clipPath>
                     

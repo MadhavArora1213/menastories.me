@@ -147,8 +147,8 @@ class ImageUploadService {
    * @returns {string} - Public URL
    */
   generateImageUrl(filename) {
-    // Use local server URL for images
-    const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+    // Use server URL for images
+    const serverUrl = process.env.SERVER_URL || 'https://menastories.me';
     const url = `${serverUrl}/api/storage/images/${filename}`;
     console.log('🔗 Generated image URL:', url);
     return url;
