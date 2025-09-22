@@ -1,15 +1,16 @@
 const cron = require('node-cron');
-const { Article, Tag } = require('../models');
 const { Op } = require('sequelize');
 
 class SchedulingService {
   constructor() {
+    this.isInitialized = false;
+    this.cronJob = null;
     this.initializeScheduler();
   }
 
   initializeScheduler() {
     // Run every minute to check for articles to publish
-    cron.schedule('* * * * *', async () => {
+    this.cronJob = cron.schedule('* * * * *', async () => {
       await this.checkScheduledArticles();
     });
 
@@ -18,6 +19,31 @@ class SchedulingService {
 
   async checkScheduledArticles() {
     try {
+      // Import models dynamically to avoid initialization issues
+      const models = require('../models');
+      
+      // Check if models are available
+      if (!models || !models.Article) {
+        if (!this.isInitialized) {
+          console.log('Models not available yet, skipping scheduled articles check');
+        }
+        return;
+      }
+
+      const { Article } = models;
+      
+      // Additional safety check
+      if (!Article.findAll || typeof Article.findAll !== 'function') {
+        console.error('Article.findAll method not available');
+        return;
+      }
+
+      // Mark as initialized after first successful model access
+      if (!this.isInitialized) {
+        this.isInitialized = true;
+        console.log('✅ Scheduling service models initialized');
+      }
+
       const now = new Date();
       
       // Find articles that are scheduled and ready to publish
@@ -29,6 +55,10 @@ class SchedulingService {
           }
         }
       });
+
+      if (articlesToPublish.length > 0) {
+        console.log(`📅 Found ${articlesToPublish.length} articles ready to publish`);
+      }
 
       for (const article of articlesToPublish) {
         await this.publishScheduledArticle(article);
@@ -51,7 +81,7 @@ class SchedulingService {
         await this.addTagsToDatabase(article.tags, article.category_id);
       }
 
-      console.log(`Article "${article.title}" published automatically`);
+      console.log(`✅ Article "${article.title}" published automatically`);
 
       // Here you can add additional actions like:
       // - Send notifications
@@ -60,18 +90,30 @@ class SchedulingService {
       // - Update analytics
 
     } catch (error) {
-      console.error(`Error publishing scheduled article ${article.id}:`, error);
+      console.error(`❌ Error publishing scheduled article ${article.id}:`, error);
       
       // Mark as failed or retry later
-      await article.update({
-        status: 'approved', // Revert to approved status
-        review_notes: `Auto-publish failed: ${error.message}`
-      });
+      try {
+        await article.update({
+          status: 'approved', // Revert to approved status
+          review_notes: `Auto-publish failed: ${error.message}`
+        });
+      } catch (updateError) {
+        console.error('Failed to update article status after error:', updateError);
+      }
     }
   }
 
   async addTagsToDatabase(tags, categoryId) {
     try {
+      const models = require('../models');
+      const { Tag } = models;
+
+      if (!Tag) {
+        console.error('Tag model not available');
+        return;
+      }
+
       for (const tagName of tags) {
         await Tag.findOrCreate({
           where: { 
@@ -92,6 +134,13 @@ class SchedulingService {
 
   async scheduleArticle(articleId, publishDate) {
     try {
+      const models = require('../models');
+      const { Article } = models;
+
+      if (!Article) {
+        throw new Error('Article model not available');
+      }
+
       const article = await Article.findByPk(articleId);
       if (!article) {
         throw new Error('Article not found');
@@ -110,6 +159,20 @@ class SchedulingService {
     } catch (error) {
       return { success: false, message: error.message };
     }
+  }
+
+  // Method to stop the scheduler
+  stop() {
+    if (this.cronJob) {
+      this.cronJob.stop();
+      console.log('🛑 Article scheduler stopped');
+    }
+  }
+
+  // Method to restart the scheduler
+  restart() {
+    this.stop();
+    this.initializeScheduler();
   }
 }
 
