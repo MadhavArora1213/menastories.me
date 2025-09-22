@@ -67,6 +67,7 @@ Category.hasMany(Category, {
   foreignKey: 'parentId',
   onDelete: 'CASCADE'
 });
+
 Category.belongsTo(Category, {
   as: 'parent',
   foreignKey: 'parentId',
@@ -74,9 +75,16 @@ Category.belongsTo(Category, {
 });
 
 // Association with Articles
-Category.hasMany(require('./Article')(require('../config/db')), {
+const Article = require('./Article');
+
+Category.hasMany(Article, {
   foreignKey: 'categoryId',
   as: 'articles'
+});
+
+Article.belongsTo(Category, {
+  foreignKey: 'categoryId',
+  as: 'category'
 });
 
 module.exports = Category;
