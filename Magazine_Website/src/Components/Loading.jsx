@@ -251,7 +251,7 @@ const Loading = ({ isLoading, setIsLoading }) => {
                     letterSpacing="-0.02em"
                     fill="#333333"
                   >
-                    NEONPULSE
+                MENASTORIES
                   </text>
                   
                   {/* Fill container with clip path */}
@@ -407,7 +407,7 @@ const Loading = ({ isLoading, setIsLoading }) => {
                       animate={{ opacity: 0.3 }}
                       transition={{ duration: 0.8 }}
                     >
-                      NEONPULSE
+                      MENASTORIES
                     </motion.text>
                   )}
                 </svg>
