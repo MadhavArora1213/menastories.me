@@ -33,6 +33,21 @@ pool.connect((err, client, release) => {
   }
 })();
 
+// Debug middleware to log all requests
+app.use((req, res, next) => {
+  console.log('🔍 Request received:', {
+    method: req.method,
+    path: req.path,
+    url: req.url,
+    originalUrl: req.originalUrl,
+    baseUrl: req.baseUrl,
+    headers: req.headers,
+    body: req.method === 'POST' || req.method === 'PUT' ? req.body : undefined,
+    timestamp: new Date().toISOString()
+  });
+  next();
+});
+
 // Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },

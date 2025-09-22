@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { Op, fn, col, literal } = require('sequelize');
+const { v4: uuidv4 } = require('uuid');
 const {
   WebsiteAnalytics,
   UserEngagementAnalytics,
@@ -28,6 +29,12 @@ router.post('/track', async (req, res) => {
         success: false,
         message: 'Category and data are required'
       });
+    }
+
+    // Generate sessionId if not provided
+    if (!data.sessionId) {
+      data.sessionId = uuidv4();
+      console.log('🔄 Generated new sessionId:', data.sessionId);
     }
 
     let eventData;
