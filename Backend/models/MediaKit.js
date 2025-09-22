@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const slugify = require('slugify');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const MediaKit = sequelize.define('MediaKit', {
+const MediaKit = sequelize.define('MediaKit', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -183,5 +183,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return MediaKit;
-};
+module.exports = MediaKit;

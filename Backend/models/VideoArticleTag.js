@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const VideoArticleTag = sequelize.define('VideoArticleTag', {
+const VideoArticleTag = sequelize.define('VideoArticleTag', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -56,5 +56,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return VideoArticleTag;
-};
+module.exports = VideoArticleTag;

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const VideoArticleView = sequelize.define('VideoArticleView', {
+const VideoArticleView = sequelize.define('VideoArticleView', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -111,5 +111,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return VideoArticleView;
-};
+module.exports = VideoArticleView;

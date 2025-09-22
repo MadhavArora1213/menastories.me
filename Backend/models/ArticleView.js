@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const ArticleView = sequelize.define('ArticleView', {
+const ArticleView = sequelize.define('ArticleView', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -85,5 +85,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return ArticleView;
-};
+module.exports = ArticleView;

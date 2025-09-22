@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const slugify = require('slugify');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const Download = sequelize.define('Download', {
+const Download = sequelize.define('Download', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -227,5 +227,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return Download;
-};
+module.exports = Download;

@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const CommentOTP = sequelize.define('CommentOTP', {
+const CommentOTP = sequelize.define('CommentOTP', {
     id: {
       type: DataTypes.UUID,
       defaultValue: DataTypes.UUIDV4,
@@ -144,5 +144,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return CommentOTP;
-};
+module.exports = CommentOTP;

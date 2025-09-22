@@ -1,8 +1,8 @@
 const { DataTypes } = require('sequelize');
 const slugify = require('slugify');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const ListEntry = sequelize.define('ListEntry', {
+const ListEntry = sequelize.define('ListEntry', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -180,5 +180,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return ListEntry;
-};
+module.exports = ListEntry;

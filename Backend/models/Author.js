@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const Author = sequelize.define('Author', {
+const Author = sequelize.define('Author', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -73,5 +73,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return Author;
-};
+module.exports = Author;

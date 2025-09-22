@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const PowerListEntry = sequelize.define('PowerListEntry', {
+const PowerListEntry = sequelize.define('PowerListEntry', {
     id: {
       type: DataTypes.UUID,
       primaryKey: true,
@@ -110,5 +110,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return PowerListEntry;
-};
+module.exports = PowerListEntry;

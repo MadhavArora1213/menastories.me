@@ -1,7 +1,7 @@
 const { DataTypes } = require('sequelize');
+const sequelize = require('../config/db');
 
-module.exports = (sequelize) => {
-  const ArticleWorkflowHistory = sequelize.define('ArticleWorkflowHistory', {
+const ArticleWorkflowHistory = sequelize.define('ArticleWorkflowHistory', {
     id: {
       type: DataTypes.INTEGER,
       primaryKey: true,
@@ -57,5 +57,4 @@ module.exports = (sequelize) => {
     });
   };
 
-  return ArticleWorkflowHistory;
-};
+module.exports = ArticleWorkflowHistory;
