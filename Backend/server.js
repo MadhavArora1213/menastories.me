@@ -48,6 +48,15 @@ app.use((req, res, next) => {
   next();
 });
 
+// Debug middleware specifically for video-articles and categories routes
+app.use('*', (req, res, next) => {
+  if (req.originalUrl.includes('video-articles') || req.originalUrl.includes('categories')) {
+    console.log(`🔍 Route Request: ${req.method} ${req.originalUrl}`);
+    console.log(`🎯 Base URL: ${req.baseUrl}, Path: ${req.path}`);
+  }
+  next();
+});
+
 // Middleware
 app.use(helmet({
   crossOriginResourcePolicy: { policy: "cross-origin" },
@@ -506,6 +515,73 @@ app.post('/api/subcategories', adminAuthMiddleware, upload.single('image'), vali
 app.put('/api/subcategories/:id', subcategoryController.updateSubcategory);
 app.delete('/api/subcategories/:id', subcategoryController.deleteSubcategory);
 app.patch('/api/subcategories/:id/status', subcategoryController.toggleSubcategoryStatus);
+
+// ========================================
+// NON-API ROUTES (without /api prefix)
+// ========================================
+
+// Video article routes without /api prefix
+app.use('/video-articles', videoArticleRoutes);
+
+// Category routes without /api prefix
+app.use('/categories', categoryRoutes);
+
+// Articles by category without /api prefix
+app.get('/categories/:id/articles', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 12;
+    const offset = (page - 1) * limit;
+
+    const query = `
+      SELECT a.*, c.name as category_name, c.slug as category_slug,
+               array_agg(DISTINCT t.name) as tags
+      FROM "Articles" a
+      LEFT JOIN "Categories" c ON a."categoryId" = c.id
+      LEFT JOIN "ArticleTags" at ON a.id = at."articleId"
+      LEFT JOIN "Tags" t ON at."tagId" = t.id
+      WHERE a."categoryId" = $1 AND a.status = 'published'
+      GROUP BY a.id, c.name, c.slug
+      ORDER BY a."createdAt" DESC
+      LIMIT $2 OFFSET $3
+    `;
+
+    const countQuery = `
+      SELECT COUNT(*) as total
+      FROM "Articles"
+      WHERE "categoryId" = $1 AND status = 'published'
+    `;
+
+    const [result, countResult] = await Promise.all([
+      pool.query(query, [id, limit, offset]),
+      pool.query(countQuery, [id])
+    ]);
+
+    const total = parseInt(countResult.rows[0].total);
+    const totalPages = Math.ceil(total / limit);
+
+    res.json({
+      success: true,
+      data: result.rows,
+      pagination: {
+        currentPage: page,
+        totalPages,
+        totalItems: total,
+        itemsPerPage: limit,
+        hasNext: page < totalPages,
+        hasPrev: page > 1
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching articles by category:', error);
+    res.status(500).json({
+      success: false,
+      message: 'Failed to fetch articles',
+      error: error.message
+    });
+  }
+});
 
 // Tags routes - using the tagRoutes module
 
