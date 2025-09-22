@@ -61,7 +61,7 @@ const Category = sequelize.define('Category', {
   ]
 });
 
-// Self-reference for subcategories with CASCADE delete
+// Self-reference for subcategories
 Category.hasMany(Category, {
   as: 'subcategories',
   foreignKey: 'parentId',
@@ -74,7 +74,7 @@ Category.belongsTo(Category, {
   onDelete: 'CASCADE'
 });
 
-// Association with Articles
+// ✅ Only define one side of Article relation here
 const Article = require('./Article');
 
 Category.hasMany(Article, {
@@ -82,9 +82,6 @@ Category.hasMany(Article, {
   as: 'articles'
 });
 
-Article.belongsTo(Category, {
-  foreignKey: 'categoryId',
-  as: 'category'
-});
+
 
 module.exports = Category;
