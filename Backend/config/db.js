@@ -177,8 +177,9 @@ if (sequelize && pool) {
   });
 }
 
-// Export with safety checks
-module.exports = { 
-  sequelize: sequelize || null, 
-  pool: pool || null 
-};
+// FIXED: Export sequelize instance directly for models to use
+module.exports = sequelize;
+
+// If you need both sequelize and pool elsewhere, create a separate export
+module.exports.sequelize = sequelize;
+module.exports.pool = pool;
