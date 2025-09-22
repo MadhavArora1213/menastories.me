@@ -8,6 +8,7 @@ const xss = require('xss-clean');
 const path = require('path');
 
 const app = express();
+app.set('trust proxy', 1); // trust first proxy
 
 // ✅ Import unified DB config
 const { sequelize, pool } = require('./config/db');
