@@ -6,8 +6,8 @@ const Admin = require('./Admin');
 const AdminLoginLog = require('./AdminLoginLog');
 const Role = require('./Role');
 const Permission = require('./Permission');
-const Article = require('./Article')(sequelize);
-const Author = require('./Author')(sequelize);
+const Article = require('./Article');
+const Author = require('./Author');
 const ArticleAssignment = require('./ArticleAssignment');
 const ArticleRevision = require('./ArticleRevision');
 const ArticleComment = require('./ArticleComment');
@@ -54,7 +54,7 @@ const Sitemap = require('./Sitemap');
 const SchemaMarkup = require('./SchemaMarkup');
 
 // Video models
-const VideoArticle = require('./VideoArticle')(sequelize);
+const VideoArticle = require('./VideoArticle');
 const VideoPlaylist = require('./VideoPlaylist');
 const VideoAnalytics = require('./VideoAnalytics');
 const VideoComment = require('./VideoComment');
@@ -71,22 +71,22 @@ const NewsletterAnalytics = require('./NewsletterAnalytics');
 const WhatsAppCampaign = require('./WhatsAppCampaign');
 
 // Initialize new models with the proper pattern
-const Comment = require('./Comment')(sequelize);
-const ArticleView = require('./ArticleView')(sequelize);
-const ArticleShare = require('./ArticleShare')(sequelize);
-const CommentVote = require('./CommentVote')(sequelize);
-const CommentReport = require('./CommentReport')(sequelize);
-const CommentOTP = require('./CommentOTP')(sequelize);
-const VideoArticleView = require('./VideoArticleView')(sequelize);
-const VideoArticleTag = require('./VideoArticleTag')(sequelize);
-const MediaKit = require('./MediaKit')(sequelize);
-const Download = require('./Download')(sequelize);
+const Comment = require('./Comment');
+const ArticleView = require('./ArticleView');
+const ArticleShare = require('./ArticleShare');
+const CommentVote = require('./CommentVote');
+const CommentReport = require('./CommentReport');
+const CommentOTP = require('./CommentOTP');
+const VideoArticleView = require('./VideoArticleView');
+const VideoArticleTag = require('./VideoArticleTag');
+const MediaKit = require('./MediaKit');
+const Download = require('./Download');
 const File = require('./File');
 
 // List management models
-const List = require('./List')(sequelize);
-const ListEntry = require('./ListEntry')(sequelize);
-const PowerListEntry = require('./PowerListEntry')(sequelize);
+const List = require('./List');
+const ListEntry = require('./ListEntry');
+const PowerListEntry = require('./PowerListEntry');
 
 // Create junction tables
 const ArticleCategory = sequelize.define('ArticleCategory', {
