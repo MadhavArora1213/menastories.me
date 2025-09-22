@@ -1,55 +1,55 @@
 import { categoryService } from '../../services/cmsService';
-import api from '../../services/api';
+import adminApi from '../../services/adminApi';
 
 // SubCategory Services - works with dedicated Subcategory API
 export const subcategoryService = {
   // Get all subcategories
   getSubcategories: (params = {}) => {
     console.log('Frontend sending params to /subcategories:', params);
-    return api.get('/subcategories', { params });
+    return adminApi.get('/subcategories', { params });
   },
 
   // Get subcategories for a specific parent category
   getSubcategoriesByParent: (categoryId) => {
-    return api.get(`/subcategories/category/${categoryId}`);
+    return adminApi.get(`/subcategories/category/${categoryId}`);
   },
 
   // Get single subcategory
   getSubcategory: (id) => {
-    return api.get(`/subcategories/${id}`);
+    return adminApi.get(`/subcategories/${id}`);
   },
 
   // Create subcategory
   createSubcategory: (data) => {
     // Always use FormData for consistency
     if (data instanceof FormData) {
-      return api.post('/subcategories', data, {
+      return adminApi.post('/subcategories', data, {
         headers: {
           'Content-Type': 'multipart/form-data'
         }
       });
     }
-    return api.post('/subcategories', data);
+    return adminApi.post('/subcategories', data);
   },
 
   // Update subcategory
   updateSubcategory: (id, data) => {
-    return api.put(`/subcategories/${id}`, data);
+    return adminApi.put(`/subcategories/${id}`, data);
   },
 
   // Delete subcategory
   deleteSubcategory: (id) => {
-    return api.delete(`/subcategories/${id}`);
+    return adminApi.delete(`/subcategories/${id}`);
   },
 
   // Get subcategory tree (hierarchical structure)
   getSubcategoryTree: (params = {}) => {
-    return api.get('/subcategories', { params });
+    return adminApi.get('/subcategories', { params });
   },
 
   // Toggle subcategory status
   toggleSubcategoryStatus: (id) => {
-    return api.patch(`/subcategories/${id}/status`);
+    return adminApi.patch(`/subcategories/${id}/status`);
   },
 
   // Get all parent categories (for dropdown selection)

@@ -1,44 +1,44 @@
-import api from './api';
+import adminApi from './adminApi';
 
 // Category Services
 const categoryService = {
   // Get all categories
-  getCategories: () => api.get('/categories'),
+  getCategories: () => adminApi.get('/categories'),
 
   // Get single category
-  getCategory: (id) => api.get(`/categories/${id}`),
+  getCategory: (id) => adminApi.get(`/categories/${id}`),
 
   // Create category
-  createCategory: (data) => api.post('/categories', data),
+  createCategory: (data) => adminApi.post('/categories', data),
 
   // Update category
-  updateCategory: (id, data) => api.put(`/categories/${id}`, data),
+  updateCategory: (id, data) => adminApi.put(`/categories/${id}`, data),
 
   // Delete category
-  deleteCategory: (id) => api.delete(`/categories/${id}`),
+  deleteCategory: (id) => adminApi.delete(`/categories/${id}`),
 
   // Get category tree
-  getCategoryTree: () => api.get('/categories/tree'),
+  getCategoryTree: () => adminApi.get('/categories/tree'),
 
   // Reorder categories
-  reorderCategories: (data) => api.post('/categories/reorder', data),
+  reorderCategories: (data) => adminApi.post('/categories/reorder', data),
 
   // Toggle category status
-  toggleCategoryStatus: (id) => api.patch(`/categories/${id}/status`, {}),
+  toggleCategoryStatus: (id) => adminApi.patch(`/categories/${id}/status`, {}),
 
   // Update category design
-  updateCategoryDesign: (id, design) => api.patch(`/categories/${id}/design`, { design }),
+  updateCategoryDesign: (id, design) => adminApi.patch(`/categories/${id}/design`, { design }),
 
   // Get all categories (alias for backward compatibility)
-  getAllCategories: () => api.get('/categories'),
+  getAllCategories: () => adminApi.get('/categories'),
 
   // Get category by ID (alias for backward compatibility)
-  getCategoryById: (id) => api.get(`/categories/${id}`),
+  getCategoryById: (id) => adminApi.get(`/categories/${id}`),
 
   // Get articles by category
   getArticlesByCategory: (categoryId, params = {}) => {
     const queryString = new URLSearchParams(params).toString();
-    return api.get(`/categories/${categoryId}/articles${queryString ? `?${queryString}` : ''}`);
+    return adminApi.get(`/categories/${categoryId}/articles${queryString ? `?${queryString}` : ''}`);
   }
 };
 

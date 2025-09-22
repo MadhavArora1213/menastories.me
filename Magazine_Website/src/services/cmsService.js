@@ -1,7 +1,7 @@
-import api from './api';
+import adminApi from './adminApi';
 
-// Use the existing api instance instead of creating a new one
-const cmsAPI = api;
+// Use the admin API instance for all CMS operations
+const cmsAPI = adminApi;
 
 // Article Services
 export const articleService = {
