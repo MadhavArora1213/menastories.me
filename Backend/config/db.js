@@ -3,6 +3,7 @@ const { Pool } = require('pg');
 require('dotenv').config();
 
 let sequelize;
+let pool;
 
 // Environment variable validation
 const validateEnvironmentVariables = () => {
@@ -43,13 +44,13 @@ const createConnection = () => {
 
   // Determine if SSL should be used (only for remote connections)
   const isLocalConnection = process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1';
-  // Disable SSL for servers that don't support it (e.g., specific IP addresses)
-  const disableSSLHosts = ['72.60.108.85', 'localhost', '127.0.0.1']; // Add hosts that don't support SSL
+  // Disable SSL for servers that don't support it
+  const disableSSLHosts = ['72.60.108.85', 'localhost', '127.0.0.1'];
   const shouldUseSSL = !isLocalConnection && !disableSSLHosts.includes(process.env.DB_HOST);
 
   const sslConfig = shouldUseSSL ? {
     require: true,
-    rejectUnauthorized: false // Set to true in production with proper certificates
+    rejectUnauthorized: false
   } : false;
 
   console.log('🔐 SSL Configuration Debug:');
@@ -75,46 +76,33 @@ const createConnection = () => {
         idle: 10000
       },
       logging: process.env.NODE_ENV === 'development' ? console.log : false,
-      timezone: '+05:30' // Set to India timezone
+      timezone: '+05:30'
     }
   );
 
   return sequelize;
 };
 
-// Create the connection
-try {
-  sequelize = createConnection();
-} catch (error) {
-  console.error('❌ Failed to create database connection:', error.message);
-  console.error('Please check your environment variables and database configuration.');
-  // Don't exit the process, but sequelize will be undefined
-}
-
-// Create Pool instance with same configuration
-let pool;
 const createPool = () => {
   // Check if SQLite fallback is enabled
   if (process.env.USE_SQLITE === 'true') {
     console.log('🔄 Using SQLite for local development (Pool not available)...');
-    return null; // Pool not available for SQLite
+    return null;
   }
 
   // PostgreSQL Pool configuration
   console.log('🔄 Creating PostgreSQL Pool connection...');
 
-  // Determine if SSL should be used (only for remote connections)
   const isLocalConnection = process.env.DB_HOST === 'localhost' || process.env.DB_HOST === '127.0.0.1';
-  // Disable SSL for servers that don't support it (e.g., specific IP addresses)
-  const disableSSLHosts = ['72.60.108.85', 'localhost', '127.0.0.1']; // Add hosts that don't support SSL
+  const disableSSLHosts = ['72.60.108.85', 'localhost', '127.0.0.1'];
   const shouldUseSSL = !isLocalConnection && !disableSSLHosts.includes(process.env.DB_HOST);
 
   const sslConfig = shouldUseSSL ? {
     require: true,
-    rejectUnauthorized: false // Set to true in production with proper certificates
+    rejectUnauthorized: false
   } : false;
 
-  pool = new Pool({
+  const poolInstance = new Pool({
     host: process.env.DB_HOST,
     port: process.env.DB_PORT,
     database: process.env.DB_NAME,
@@ -126,14 +114,25 @@ const createPool = () => {
     connectionTimeoutMillis: 2000,
   });
 
-  return pool;
+  return poolInstance;
 };
 
-// Create the pool
-pool = createPool();
+// Initialize connections
+try {
+  sequelize = createConnection();
+  pool = createPool();
+  
+  console.log('✅ Database configuration initialized successfully');
+} catch (error) {
+  console.error('❌ Failed to create database connection:', error.message);
+  console.error('Please check your environment variables and database configuration.');
+  
+  // Create fallback instances to prevent undefined errors
+  sequelize = null;
+  pool = null;
+}
 
 const testConnection = async (retries = 3) => {
-  // Check if sequelize is available
   if (!sequelize) {
     console.error('❌ Sequelize instance is not available. Check environment variables.');
     return false;
@@ -141,11 +140,9 @@ const testConnection = async (retries = 3) => {
 
   for (let i = 0; i < retries; i++) {
     try {
-      // Test Sequelize connection
       await sequelize.authenticate();
       console.log('✅ Sequelize connection established successfully.');
 
-      // Test Pool connection if available (not SQLite)
       if (pool) {
         const client = await pool.connect();
         console.log('✅ Pool connection established successfully.');
@@ -167,13 +164,21 @@ const testConnection = async (retries = 3) => {
   console.log('\n🔧 Troubleshooting tips:');
   console.log('1. Check if your database is running and accessible');
   console.log('2. Verify your database credentials in .env file');
-  console.log('3. If using Neon, check if your database is paused (visit neon.tech dashboard)');
-  console.log('4. Try using SQLite for local development (see documentation)');
+  console.log('3. If using Neon, check if your database is paused');
+  console.log('4. Try using SQLite for local development');
 
   return false;
 };
 
-// Test connection when module loads
-testConnection();
+// Test connection when module loads (but don't block)
+if (sequelize && pool) {
+  testConnection().catch(err => {
+    console.error('Connection test failed on module load:', err.message);
+  });
+}
 
-module.exports = { sequelize, pool };
+// Export with safety checks
+module.exports = { 
+  sequelize: sequelize || null, 
+  pool: pool || null 
+};
