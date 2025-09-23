@@ -7,17 +7,20 @@ const sharp = require('sharp');
 const rssService = require('../services/rssService');
 const taxonomyService = require('../services/taxonomyService');
 
-// Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, '/var/www/menastories/menastories.me/Backend/storage/images/');
-  },
+// Configure multer for file uploads using ImageUploadService paths
+ const { ImageUploadService } = require('../services/imageUploadService');
+ const imageService = new ImageUploadService();
 
-  filename: function (req, file, cb) {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
-  }
-});
+ const storage = multer.diskStorage({
+   destination: function (req, file, cb) {
+     cb(null, imageService.tempPath);
+   },
+
+   filename: function (req, file, cb) {
+     const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
+     cb(null, file.fieldname + '-' + uniqueSuffix + path.extname(file.originalname));
+   }
+ });
 
 const upload = multer({ 
   storage: storage,
@@ -414,29 +417,30 @@ class ArticleController {
       }
 
       // Handle featured image upload
-      let featuredImagePath = null;
-      if (req.file) {
-        const { ImageUploadService } = require('../services/imageUploadService');
-        const imageService = new ImageUploadService();
-        const processedFilename = await imageService.processImage(req.file.path, {
-          width: 1200,
-          height: 800,
-          quality: 85,
-          format: 'webp'
-        });
-        featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${processedFilename}`;
-      }
+       let featuredImagePath = null;
+       if (req.file) {
+         const { ImageUploadService } = require('../services/imageUploadService');
+         const imageService = new ImageUploadService();
+         const processedFilename = await imageService.processImage(req.file.path, {
+           width: 1200,
+           height: 800,
+           quality: 85,
+           format: 'webp'
+         });
+         // Use the ImageUploadService to generate proper public URL
+         featuredImagePath = imageService.generateImageUrl(processedFilename);
+       }
 
       // Handle gallery images
-      let galleryImages = [];
-      if (req.body.gallery_images && Array.isArray(req.body.gallery_images)) {
-        // Gallery images are already processed and uploaded by frontend
-        galleryImages = req.body.gallery_images.map(filename => ({
-          url: `/var/www/menastories/menastories.me/Backend/storage/images/${filename}`,
-          alt: '',
-          caption: ''
-        }));
-      }
+       let galleryImages = [];
+       if (req.body.gallery_images && Array.isArray(req.body.gallery_images)) {
+         // Gallery images are already processed and uploaded by frontend
+         galleryImages = req.body.gallery_images.map(filename => ({
+           url: imageService.generateImageUrl(filename),
+           alt: '',
+           caption: ''
+         }));
+       }
 
       // Parse JSON strings with error handling
       let parsedCoAuthors = [];
@@ -688,20 +692,31 @@ class ArticleController {
       }
 
       // Handle featured image upload
-      let featuredImagePath = article.featuredImage;
-      if (req.file) {
-        const fileName = req.file.filename;
-        featuredImagePath = `/var/www/menastories/menastories.me/Backend/storage/images/${fileName}`;
+       let featuredImagePath = article.featuredImage;
+       if (req.file) {
+         const { ImageUploadService } = require('../services/imageUploadService');
+         const imageService = new ImageUploadService();
+         const processedFilename = await imageService.processImage(req.file.path, {
+           width: 1200,
+           height: 800,
+           quality: 85,
+           format: 'webp'
+         });
+         // Use the ImageUploadService to generate proper public URL
+         featuredImagePath = imageService.generateImageUrl(processedFilename);
 
-        // Delete old image if exists
-        if (article.featuredImage) {
-          try {
-            await fs.unlink(path.join(__dirname, '..', article.featuredImage));
-          } catch (err) {
-            console.warn('Could not delete old image:', err.message);
-          }
-        }
-      }
+         // Delete old image if exists
+         if (article.featuredImage) {
+           try {
+             // Extract filename from the old URL to delete the file
+             const oldUrl = new URL(article.featuredImage);
+             const oldFilename = oldUrl.pathname.split('/').pop();
+             await imageService.deleteImage(oldFilename);
+           } catch (err) {
+             console.warn('Could not delete old image:', err.message);
+           }
+         }
+       }
 
       // Parse JSON strings
       console.log('🔄 Preparing update data...');
