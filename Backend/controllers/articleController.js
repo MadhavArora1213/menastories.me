@@ -433,9 +433,9 @@ class ArticleController {
 
       // Handle gallery images
        let galleryImages = [];
-       if (req.body.gallery_images && Array.isArray(req.body.gallery_images)) {
+       if (req.body.gallery && Array.isArray(req.body.gallery)) {
          // Gallery images are already processed and uploaded by frontend
-         galleryImages = req.body.gallery_images.map(filename => ({
+         galleryImages = req.body.gallery.map(filename => ({
            url: imageService.generateImageUrl(filename),
            alt: '',
            caption: ''
