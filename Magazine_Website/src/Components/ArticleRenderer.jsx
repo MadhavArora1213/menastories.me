@@ -232,11 +232,14 @@ const ArticleRenderer = () => {
     try {
       if (typeof article.gallery === 'string' && article.gallery.trim() !== '') {
         galleryImages = JSON.parse(article.gallery);
+        console.log('Parsed gallery from string:', galleryImages);
       } else if (Array.isArray(article.gallery)) {
         galleryImages = article.gallery;
+        console.log('Gallery is already array:', galleryImages);
       }
     } catch (e) {
       console.warn('Failed to parse article gallery JSON:', e);
+      console.warn('Raw gallery data:', article.gallery);
       galleryImages = [];
     }
   }
@@ -251,6 +254,7 @@ const ArticleRenderer = () => {
 
   // Enhanced helper function to construct proper image URLs with validation and security
   const constructImageUrl = (imagePath) => {
+    console.log('constructImageUrl called with:', imagePath);
     if (!imagePath || typeof imagePath !== 'string') {
       console.warn('constructImageUrl: Invalid input:', imagePath);
       return null;
@@ -448,25 +452,45 @@ const ArticleRenderer = () => {
 
   // Process gallery images with better error handling and external image detection
   // Fetch all available gallery images (up to 5 total including featured image)
-  const allGalleryImages = galleryImages.slice(0, 4) // Get up to 4 gallery images
-    .map((img, index) => {
-      const processedUrl = constructImageUrl(img);
-      const isExternal = img && (img.startsWith('http://') || img.startsWith('https://'));
-      console.log(`Gallery image ${index + 1} processing:`, {
-        original: img,
-        processed: processedUrl,
-        isExternal,
-        type: isExternal ? 'external' : 'internal'
+  console.log('Processing gallery images:', galleryImages);
+  let allGalleryImages = [];
+
+  if (galleryImages && galleryImages.length > 0) {
+    allGalleryImages = galleryImages.slice(0, 4) // Get up to 4 gallery images
+      .map((img, index) => {
+        const processedUrl = constructImageUrl(img);
+        const isExternal = img && (img.startsWith('http://') || img.startsWith('https://'));
+        console.log(`Gallery image ${index + 1} processing:`, {
+          original: img,
+          processed: processedUrl,
+          isExternal,
+          type: isExternal ? 'external' : 'internal'
+        });
+        return { url: processedUrl, isExternal };
+      })
+      .filter((item, index) => {
+        if (!item.url) {
+          console.warn(`Gallery image ${index + 1} failed to process:`, item);
+          return false;
+        }
+        return true;
       });
-      return { url: processedUrl, isExternal };
-    })
-    .filter((item, index) => {
-      if (!item.url) {
-        console.warn(`Gallery image ${index + 1} failed to process`);
-        return false;
-      }
-      return true;
-    });
+  }
+
+  // Fallback: if no gallery images were processed but we have raw gallery data, try to use it directly
+  if (allGalleryImages.length === 0 && galleryImages && galleryImages.length > 0) {
+    console.log('No gallery images processed, trying fallback approach');
+    allGalleryImages = galleryImages.slice(0, 4)
+      .filter(img => img && typeof img === 'string' && img.trim() !== '')
+      .map((img, index) => {
+        const isExternal = img.startsWith('http://') || img.startsWith('https://');
+        return {
+          url: isExternal ? img : `${import.meta.env.VITE_API_URL || 'http://localhost:5000/api'}/images/${img}`,
+          isExternal
+        };
+      });
+    console.log('Fallback gallery images:', allGalleryImages);
+  }
 
   console.log('Processed gallery images:', allGalleryImages);
 
@@ -510,6 +534,8 @@ const ArticleRenderer = () => {
   // Show all available images (up to 5 total: 1 featured + 4 gallery)
   const finalDisplayImages = displayImages.slice(0, 5);
   console.log('Final display images array:', finalDisplayImages);
+  console.log('Final display images count:', finalDisplayImages.length);
+  console.log('Should show gallery images?', finalDisplayImages.length >= 2);
 
    // Prepare alt text fallbacks
    const getImageAlt = (index) => {
@@ -538,8 +564,19 @@ const ArticleRenderer = () => {
     allGalleryImages: allGalleryImages,
     finalDisplayImagesLength: finalDisplayImages.length,
     hasImages: finalDisplayImages.length > 0,
-    firstImage: finalDisplayImages[0] || 'No first image'
+    firstImage: finalDisplayImages[0] || 'No first image',
+    rawGalleryData: article?.gallery,
+    galleryType: typeof article?.gallery
   });
+
+  // Debug: Show gallery data in UI for troubleshooting
+  const debugInfo = {
+    hasGallery: !!(article?.gallery),
+    galleryLength: galleryImages?.length || 0,
+    finalDisplayImagesLength: finalDisplayImages.length,
+    hasFeaturedImage: !!(article?.featuredImage),
+    featuredImage: article?.featuredImage
+  };
 
   // Split content into sections for the layout
   const contentSections = article?.content ? article.content.split('\n\n') : [];
@@ -722,6 +759,7 @@ const ArticleRenderer = () => {
                   <p className="lead-text">{article.excerpt}</p>
                 </div>
               )}
+
             </section>
 
             {/* Main Story - 2 Column Layout */}
@@ -734,7 +772,7 @@ const ArticleRenderer = () => {
                   }} />
 
                   {/* Dynamic Image Layout Based on Count */}
-                  {finalDisplayImages.length >= 2 && (
+                  {(finalDisplayImages.length >= 2 || (galleryImages && galleryImages.length > 0)) && (
                     <div className="article-images">
                       {finalDisplayImages.length >= 5 && (
                         <div className="image-grid-5">

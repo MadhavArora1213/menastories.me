@@ -918,7 +918,9 @@ const CreateArticle = () => {
             toast.error(`Failed to upload ${file.name}`);
           }
         }
-        submitData.gallery_images = galleryImagePaths;
+        // Store gallery images as JSON array in the gallery field
+        submitData.gallery = galleryImagePaths;
+        console.log('Gallery images stored as:', submitData.gallery);
       }
 
       console.log('=== FRONTEND SUBMIT DEBUG ===');
