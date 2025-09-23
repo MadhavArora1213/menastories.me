@@ -526,6 +526,37 @@ app.use('/video-articles', videoArticleRoutes);
 // Category routes without /api prefix
 app.use('/categories', categoryRoutes);
 
+// Article routes without /api prefix
+app.use('/articles', articleRoutes);
+
+// Author routes without /api prefix (using videoArticleRoutes which contains author management)
+app.use('/authors', videoArticleRoutes);
+
+// Subcategory routes without /api prefix
+app.get('/subcategories/stats', subcategoryController.getSubcategoryStatistics);
+app.get('/subcategories/category/:categoryId', subcategoryController.getSubcategoriesByCategory);
+app.get('/subcategories', subcategoryController.getAllSubcategories);
+app.get('/subcategories/:id', subcategoryController.getSubcategoryById);
+
+// Additional common endpoints without /api prefix
+app.use('/tags', tagRoutes);
+app.use('/search', searchRoutes);
+app.use('/lists', listRoutes);
+app.use('/media-kits', mediaKitRoutes);
+app.use('/downloads', downloadRoutes);
+app.use('/events', eventRoutes);
+app.use('/newsletter', newsletterRoutes);
+
+// Health check without /api prefix
+app.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'OK',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    environment: process.env.NODE_ENV
+  });
+});
+
 // Articles by category without /api prefix
 app.get('/categories/:id/articles', async (req, res) => {
   try {
