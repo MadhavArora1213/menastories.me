@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import articleService from '../../services/articleService';
+import imageUploadService from '../../services/imageUploadService';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -950,6 +951,35 @@ const CreateArticle = () => {
 
         if (uploadErrors.length > 0) {
           toast.error(`Failed to upload ${uploadErrors.length} images: ${uploadErrors.join(', ')}`);
+        }
+      }
+
+      // Handle featured image upload
+      if (formData.featuredImage instanceof File) {
+        try {
+          // Validate and optimize the featured image
+          const validation = imageUploadService.validateImageFile(formData.featuredImage);
+          if (!validation.isValid) {
+            toast.error(`Invalid featured image: ${validation.errors.join(', ')}`);
+            return;
+          }
+
+          // Optimize the image
+          const optimizedFile = await imageUploadService.optimizeImage(formData.featuredImage);
+
+          // Upload the image using the proper service
+          const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
+          if (uploadResponse.success && uploadResponse.data?.filename) {
+            submitData.featuredImage = uploadResponse.data.filename;
+            toast.success('Featured image uploaded successfully');
+          } else {
+            toast.error(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
+            return;
+          }
+        } catch (uploadError) {
+          console.error('Error uploading featured image:', uploadError);
+          toast.error(`Failed to upload featured image: ${uploadError.message}`);
+          return;
         }
       }
 
