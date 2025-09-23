@@ -24,8 +24,11 @@ const Captcha = ({ onVerify, onExpired, siteKey }) => {
 
   const handleVerify = (token) => {
     try {
+      console.log('=== CAPTCHA VERIFIED ===');
+      console.log('Token received:', token);
       if (onVerify) {
         onVerify(token);
+        console.log('Token passed to onVerify callback');
       }
     } catch (error) {
       console.error('Captcha verification error:', error);
