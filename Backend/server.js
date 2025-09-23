@@ -1,4 +1,13 @@
 require('dotenv').config();
+
+// Load local development environment if it exists
+if (require('fs').existsSync('.env.local')) {
+  require('dotenv').config({ path: '.env.local' });
+  console.log('✅ Loaded local development environment configuration');
+} else {
+  console.log('ℹ️  Using production environment configuration');
+}
+
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
