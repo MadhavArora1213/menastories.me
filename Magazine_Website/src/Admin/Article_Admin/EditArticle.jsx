@@ -144,7 +144,7 @@ const EditArticle = () => {
                    return `${year}-${month}-${day}T${hours}:${minutes}`;
                  })()
                : '',
-             featuredImage: prevFormData.featuredImage, // Preserve uploaded file
+             featuredImage: prevFormData.featuredImage || (articleData.featuredImage ? articleData.featuredImage : null), // Preserve uploaded file or set existing image
              imageCaption: articleData.imageCaption || '',
              gallery: prevFormData.gallery || [], // Preserve uploaded gallery files
              authorBioOverride: articleData.authorBioOverride || '',
