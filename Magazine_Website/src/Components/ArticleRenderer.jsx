@@ -29,20 +29,29 @@ const ArticleRenderer = () => {
     fetchArticle();
   }, [id]);
 
-  // Enhanced image fetching with loading states
-  const fetchImageWithState = async (imageUrl, imageIndex) => {
+  // Enhanced image fetching with loading states and CORS support
+  const fetchImageWithState = async (imageUrl, imageIndex, isExternal = false) => {
     return new Promise((resolve, reject) => {
       const img = new Image();
       setImageLoadingStates(prev => ({ ...prev, [imageIndex]: true }));
+
+      // Handle CORS for external images
+      if (isExternal) {
+        img.crossOrigin = 'anonymous';
+      }
 
       img.onload = () => {
         setImageLoadingStates(prev => ({ ...prev, [imageIndex]: false }));
         resolve(imageUrl);
       };
 
-      img.onerror = () => {
+      img.onerror = (e) => {
         setImageLoadingStates(prev => ({ ...prev, [imageIndex]: false }));
-        console.warn(`Failed to load image: ${imageUrl}`);
+        console.warn(`Failed to load image: ${imageUrl}`, {
+          isExternal,
+          error: e,
+          imageIndex
+        });
         reject(new Error(`Failed to load image: ${imageUrl}`));
       };
 
@@ -150,19 +159,21 @@ const ArticleRenderer = () => {
 
   const openGallery = (startIndex = 0) => {
     // Prepare gallery images in the format expected by ImageGallery component
-    const images = finalDisplayImages.map((imageUrl, index) => ({
+    const images = finalDisplayImages.map((imageItem, index) => ({
       id: `article-image-${index}`,
-      url: imageUrl,
+      url: imageItem.url,
       type: 'image',
       displayName: `Article Image ${index + 1}`,
       altText: getImageAlt(index),
       caption: index === 0 ? 'Featured Image' : `Gallery Image ${index}`,
-      thumbnailUrl: imageUrl, // Use same URL for thumbnail
+      thumbnailUrl: imageItem.url, // Use same URL for thumbnail
       format: 'jpg', // Default format
       size: 0, // Unknown size
-      createdAt: article?.createdAt || new Date().toISOString()
+      createdAt: article?.createdAt || new Date().toISOString(),
+      isExternal: imageItem.isExternal // Pass external flag for better handling
     }));
 
+    console.log('Opening gallery with images:', images);
     setGalleryImageList(images);
     setCurrentGalleryIndex(startIndex);
     setShowGallery(true);
@@ -238,7 +249,7 @@ const ArticleRenderer = () => {
     galleryLength: galleryImages.length
   });
 
-  // Enhanced helper function to construct proper image URLs with validation
+  // Enhanced helper function to construct proper image URLs with validation and security
   const constructImageUrl = (imagePath) => {
     if (!imagePath || typeof imagePath !== 'string') {
       console.warn('constructImageUrl: Invalid input:', imagePath);
@@ -255,11 +266,40 @@ const ArticleRenderer = () => {
     // If it's already a full URL, validate and return as is
     if (trimmedPath.startsWith('http://') || trimmedPath.startsWith('https://')) {
       try {
-        new URL(trimmedPath); // Validate URL format
-        console.log('constructImageUrl: Valid full URL:', trimmedPath);
-        return trimmedPath;
-      } catch {
-        console.warn('constructImageUrl: Invalid image URL format:', trimmedPath);
+        const url = new URL(trimmedPath);
+
+        // Enhanced security validation for external URLs
+        const allowedDomains = [
+          'images.unsplash.com',
+          'picsum.photos',
+          'via.placeholder.com',
+          'dummyimage.com',
+          'loremflickr.com',
+          'jsonplaceholder.typicode.com',
+          'httpbin.org',
+          'menastories.me',
+          'localhost',
+          '127.0.0.1'
+        ];
+
+        // Check if domain is in allowed list or if it's a relative protocol URL
+        const isAllowedDomain = allowedDomains.some(domain =>
+          url.hostname.includes(domain) || url.hostname === domain
+        );
+
+        // Allow relative protocol URLs (//example.com/image.jpg)
+        const isRelativeProtocol = trimmedPath.startsWith('//');
+
+        if (isAllowedDomain || isRelativeProtocol) {
+          console.log('constructImageUrl: Valid external URL:', trimmedPath);
+          return trimmedPath;
+        } else {
+          console.warn('constructImageUrl: External URL from untrusted domain:', trimmedPath);
+          // Return a placeholder for untrusted external images
+          return 'https://via.placeholder.com/800x600/e2e8f0/64748b?text=External+Image+Blocked';
+        }
+      } catch (error) {
+        console.warn('constructImageUrl: Invalid image URL format:', trimmedPath, error);
         return null;
       }
     }
@@ -279,7 +319,7 @@ const ArticleRenderer = () => {
     return fullUrl;
   };
 
-  // Enhanced image preloader with priority loading
+  // Enhanced image preloader with priority loading and retry mechanism
   const preloadImages = async (imageUrls) => {
     if (!imageUrls || imageUrls.length === 0) return;
 
@@ -287,12 +327,29 @@ const ArticleRenderer = () => {
     const [featuredImage, ...galleryImages] = imageUrls;
 
     const preloadPromises = [];
+    const maxRetries = 2;
+    const retryDelay = 1000; // 1 second
+
+    // Helper function to preload with retry
+    const preloadWithRetry = async (url, index, isExternal = false, retryCount = 0) => {
+      try {
+        return await fetchImageWithState(url, index, isExternal);
+      } catch (error) {
+        if (retryCount < maxRetries) {
+          console.log(`Retrying image ${index + 1} (attempt ${retryCount + 1}/${maxRetries})`);
+          await new Promise(resolve => setTimeout(resolve, retryDelay * (retryCount + 1)));
+          return preloadWithRetry(url, index, isExternal, retryCount + 1);
+        }
+        throw error;
+      }
+    };
 
     // Priority load featured image first
     if (featuredImage) {
+      const isExternal = featuredImage.startsWith('http://') || featuredImage.startsWith('https://');
       preloadPromises.push(
-        fetchImageWithState(featuredImage, 0).catch((error) => {
-          console.warn('Featured image failed to preload:', error);
+        preloadWithRetry(featuredImage, 0, isExternal).catch((error) => {
+          console.warn('Featured image failed to preload after retries:', error);
           return null;
         })
       );
@@ -304,10 +361,11 @@ const ArticleRenderer = () => {
         preloadPromises.push(
           new Promise((resolve) => {
             setTimeout(() => {
-              fetchImageWithState(url, index + 1)
+              const isExternal = url.startsWith('http://') || url.startsWith('https://');
+              preloadWithRetry(url, index + 1, isExternal)
                 .then(resolve)
                 .catch((error) => {
-                  console.warn(`Gallery image ${index + 1} failed to preload:`, error);
+                  console.warn(`Gallery image ${index + 1} failed to preload after retries:`, error);
                   resolve(null);
                 });
             }, index * 100); // Stagger loading by 100ms
@@ -317,8 +375,9 @@ const ArticleRenderer = () => {
     }
 
     try {
-      await Promise.allSettled(preloadPromises);
-      console.log(`Successfully preloaded ${preloadPromises.length} images`);
+      const results = await Promise.allSettled(preloadPromises);
+      const successful = results.filter(result => result.status === 'fulfilled').length;
+      console.log(`Successfully preloaded ${successful}/${preloadPromises.length} images`);
     } catch (error) {
       console.warn('Some images failed to preload:', error);
     }
@@ -387,31 +446,44 @@ const ArticleRenderer = () => {
     articleFeaturedImageType: typeof article?.featuredImage
   });
 
-  // Process gallery images with better error handling
-  const limitedGalleryImages = galleryImages.slice(0, 3)
+  // Process gallery images with better error handling and external image detection
+  // Fetch all available gallery images (up to 5 total including featured image)
+  const allGalleryImages = galleryImages.slice(0, 4) // Get up to 4 gallery images
     .map((img, index) => {
       const processedUrl = constructImageUrl(img);
-      console.log(`Gallery image ${index + 1} processing:`, { original: img, processed: processedUrl });
-      return processedUrl;
+      const isExternal = img && (img.startsWith('http://') || img.startsWith('https://'));
+      console.log(`Gallery image ${index + 1} processing:`, {
+        original: img,
+        processed: processedUrl,
+        isExternal,
+        type: isExternal ? 'external' : 'internal'
+      });
+      return { url: processedUrl, isExternal };
     })
-    .filter((url, index) => {
-      if (!url) {
+    .filter((item, index) => {
+      if (!item.url) {
         console.warn(`Gallery image ${index + 1} failed to process`);
         return false;
       }
       return true;
     });
 
-  console.log('Processed gallery images:', limitedGalleryImages);
+  console.log('Processed gallery images:', allGalleryImages);
 
   // Always prioritize featured image as the lead photo
   let displayImages = [];
   if (article?.featuredImage) {
     const featuredUrl = constructImageUrl(article?.featuredImage);
-    console.log('Featured image processing:', { original: article.featuredImage, processed: featuredUrl });
+    const isExternal = article.featuredImage && (article.featuredImage.startsWith('http://') || article.featuredImage.startsWith('https://'));
+    console.log('Featured image processing:', {
+      original: article.featuredImage,
+      processed: featuredUrl,
+      isExternal,
+      type: isExternal ? 'external' : 'internal'
+    });
 
     if (featuredUrl) {
-      displayImages.push(featuredUrl);
+      displayImages.push({ url: featuredUrl, isExternal });
       console.log('Added featured image as lead photo:', displayImages);
     } else {
       console.warn('Featured image failed to process:', article.featuredImage);
@@ -419,24 +491,24 @@ const ArticleRenderer = () => {
   }
 
   // Add gallery images, but filter out the featured image if it exists in gallery
-  if (limitedGalleryImages.length > 0) {
-    const featuredUrl = displayImages[0]; // Get the featured image URL for comparison
+  if (allGalleryImages.length > 0) {
+    const featuredUrl = displayImages[0]?.url; // Get the featured image URL for comparison
     const filteredGalleryImages = featuredUrl
-      ? limitedGalleryImages.filter(img => {
-          const isDuplicate = img === featuredUrl;
+      ? allGalleryImages.filter(img => {
+          const isDuplicate = img.url === featuredUrl;
           if (isDuplicate) {
-            console.log('Filtered out duplicate gallery image:', img);
+            console.log('Filtered out duplicate gallery image:', img.url);
           }
           return !isDuplicate;
         })
-      : limitedGalleryImages;
+      : allGalleryImages;
 
     displayImages.push(...filteredGalleryImages);
     console.log('Added filtered gallery images:', displayImages);
   }
 
-  // Limit total images to 4 max for cleaner layout (1 featured + 3 gallery max)
-  const finalDisplayImages = displayImages.slice(0, 4);
+  // Show all available images (up to 5 total: 1 featured + 4 gallery)
+  const finalDisplayImages = displayImages.slice(0, 5);
   console.log('Final display images array:', finalDisplayImages);
 
    // Prepare alt text fallbacks
@@ -453,8 +525,8 @@ const ArticleRenderer = () => {
    // Preload images for better performance after image processing is complete
    useEffect(() => {
      if (finalDisplayImages.length > 0) {
-       // finalDisplayImages already contains processed URLs, no need to call constructImageUrl again
-       const imageUrls = finalDisplayImages.filter(Boolean);
+       // finalDisplayImages already contains processed URLs with external flags
+       const imageUrls = finalDisplayImages.filter(item => item && item.url);
        preloadImages(imageUrls);
      }
    }, [finalDisplayImages]);
@@ -463,7 +535,7 @@ const ArticleRenderer = () => {
     gallery: galleryImages,
     featured: article?.featuredImage || null,
     displayImages: finalDisplayImages,
-    limitedGallery: limitedGalleryImages,
+    allGalleryImages: allGalleryImages,
     finalDisplayImagesLength: finalDisplayImages.length,
     hasImages: finalDisplayImages.length > 0,
     firstImage: finalDisplayImages[0] || 'No first image'
@@ -625,19 +697,21 @@ const ArticleRenderer = () => {
               {displayImages[0] && (
                 <div className="lead-photo">
                   <img
-                    src={displayImages[0]}
+                    src={displayImages[0].url}
                     alt={getImageAlt(0)}
                     onClick={() => openGallery(0)}
                     className="photo-image cursor-pointer hover:opacity-95 transition-opacity"
                     onError={(e) => handleImageError(e, 'image', 0, getImageAlt(0))}
                     onLoad={(e) => handleImageLoad(e, 0)}
                     loading="lazy"
+                    crossOrigin={displayImages[0].isExternal ? 'anonymous' : undefined}
                   />
                   <div className="photo-caption">
                     {article?.imageCaption || 'Lead photo'}
                   </div>
                   <div className="photo-credit">
                     Photo by {article?.primaryAuthor?.name || 'Staff Photographer'}
+                    {displayImages[0].isExternal && ' (External Source)'}
                   </div>
                 </div>
               )}
@@ -662,48 +736,52 @@ const ArticleRenderer = () => {
                   {/* Dynamic Image Layout Based on Count */}
                   {finalDisplayImages.length >= 2 && (
                     <div className="article-images">
-                      {finalDisplayImages.length === 5 && (
+                      {finalDisplayImages.length >= 5 && (
                         <div className="image-grid-5">
                           {/* 5-image layout: 2x2 grid + 1 large */}
                           <div className="image-row">
                             <div className="image-item small">
                               <img
-                                src={finalDisplayImages[1]}
+                                src={finalDisplayImages[1].url}
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 1, getImageAlt(1))}
                                 onLoad={(e) => handleImageLoad(e, 1)}
                                 loading="lazy"
+                                crossOrigin={finalDisplayImages[1].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                             <div className="image-item small">
                               <img
-                                src={finalDisplayImages[2]}
+                                src={finalDisplayImages[2].url}
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
+                                crossOrigin={finalDisplayImages[2].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
                           <div className="image-row">
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[3]}
+                                src={finalDisplayImages[3].url}
                                 alt={getImageAlt(3)}
                                 onClick={() => openGallery(3)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 3, getImageAlt(3))}
+                                crossOrigin={finalDisplayImages[3].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[4]}
+                                src={finalDisplayImages[4].url}
                                 alt={getImageAlt(4)}
                                 onClick={() => openGallery(4)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 4, getImageAlt(4))}
+                                crossOrigin={finalDisplayImages[4].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
@@ -716,38 +794,41 @@ const ArticleRenderer = () => {
                           <div className="image-row">
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[1]}
+                                src={finalDisplayImages[1].url}
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[1]);
+                                  console.error('Image failed to load:', finalDisplayImages[1].url);
                                   e.target.style.display = 'none';
                                   const altDiv = document.createElement('div');
                                   altDiv.className = 'photo-alt-fallback medium';
                                   altDiv.textContent = getImageAlt(1);
                                   e.target.parentNode.appendChild(altDiv);
                                 }}
+                                crossOrigin={finalDisplayImages[1].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[2]}
+                                src={finalDisplayImages[2].url}
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
+                                crossOrigin={finalDisplayImages[2].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
                           <div className="image-row">
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[3]}
+                                src={finalDisplayImages[3].url}
                                 alt={getImageAlt(3)}
                                 onClick={() => openGallery(3)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 3, getImageAlt(3))}
+                                crossOrigin={finalDisplayImages[3].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
@@ -760,22 +841,24 @@ const ArticleRenderer = () => {
                           <div className="image-row">
                             <div className="image-item large">
                               <img
-                                src={finalDisplayImages[1]}
+                                src={finalDisplayImages[1].url}
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 1, getImageAlt(1))}
+                                crossOrigin={finalDisplayImages[1].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
                           <div className="image-row">
                             <div className="image-item small">
                               <img
-                                src={finalDisplayImages[2]}
+                                src={finalDisplayImages[2].url}
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
+                                crossOrigin={finalDisplayImages[2].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
@@ -788,11 +871,12 @@ const ArticleRenderer = () => {
                           <div className="image-row">
                             <div className="image-item medium">
                               <img
-                                src={finalDisplayImages[1]}
+                                src={finalDisplayImages[1].url}
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 1, getImageAlt(1))}
+                                crossOrigin={finalDisplayImages[1].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>
@@ -805,11 +889,12 @@ const ArticleRenderer = () => {
                           <div className="image-row">
                             <div className="image-item large">
                               <img
-                                src={finalDisplayImages[0]}
+                                src={finalDisplayImages[0].url}
                                 alt={getImageAlt(0)}
                                 onClick={() => openGallery(0)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
                                 onError={(e) => handleImageError(e, 'image', 0, getImageAlt(0))}
+                                crossOrigin={finalDisplayImages[0].isExternal ? 'anonymous' : undefined}
                               />
                             </div>
                           </div>

@@ -200,6 +200,7 @@ const ImageGallery = ({
                   e.target.src = '/api/placeholder/800/600';
                   setLoading(false);
                 }}
+                crossOrigin={currentImage.isExternal ? 'anonymous' : undefined}
               />
             ) : currentImage.type === 'video' ? (
               <VideoPlayer
