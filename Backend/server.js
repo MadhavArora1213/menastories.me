@@ -2,10 +2,14 @@ require('dotenv').config();
 
 // Load local development environment if it exists
 if (require('fs').existsSync('.env.local')) {
-  require('dotenv').config({ path: '.env.local' });
+  require('dotenv').config({ path: '.env.local', override: true });
   console.log('✅ Loaded local development environment configuration');
+  console.log('🔍 Debug: NODE_ENV =', process.env.NODE_ENV);
+  console.log('🔍 Debug: USE_SQLITE =', process.env.USE_SQLITE);
+  console.log('🔍 Debug: SERVER_URL =', process.env.SERVER_URL);
 } else {
   console.log('ℹ️  Using production environment configuration');
+  console.log('🔍 Debug: .env.local file not found');
 }
 
 const express = require('express');
@@ -22,15 +26,19 @@ app.set('trust proxy', 1); // trust first proxy
 // ✅ Import unified DB config
 const { sequelize, pool } = require('./config/db');
 
-// Test pool connection
-pool.connect((err, client, release) => {
-  if (err) {
-    console.error('❌ Error acquiring client from pool:', err.stack);
-  } else {
-    console.log('✅ Database connected successfully (pg Pool)');
-    release();
-  }
-});
+// Test pool connection (only if pool is available)
+if (pool) {
+  pool.connect((err, client, release) => {
+    if (err) {
+      console.error('❌ Error acquiring client from pool:', err.stack);
+    } else {
+      console.log('✅ Database connected successfully (pg Pool)');
+      release();
+    }
+  });
+} else {
+  console.log('ℹ️  Pool not available (using SQLite)');
+}
 
 // Test Sequelize connection
 (async () => {
