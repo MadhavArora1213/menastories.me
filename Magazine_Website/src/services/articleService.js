@@ -269,6 +269,21 @@ class ArticleService {
       return [];
     }
   }
+
+  // Upload file (generic file upload method)
+  async uploadFile(endpoint, formData) {
+    try {
+      const response = await api.post(endpoint, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      console.error('File upload error:', error);
+      throw new Error(error.response?.data?.message || 'Failed to upload file');
+    }
+  }
 }
 
 export default new ArticleService();
