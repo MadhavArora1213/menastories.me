@@ -495,18 +495,32 @@ exports.updateSubcategory = async (req, res) => {
       finalFeatureImage = featureImage;
     }
 
-    await subcategory.update({
-      name: name || subcategory.name,
-      slug,
-      description: description !== undefined ? description : subcategory.description,
-      categoryId: categoryId || subcategory.categoryId,
-      type: type || subcategory.type,
-      status: status || subcategory.status,
-      order: order !== undefined ? order : subcategory.order,
-      featureImage: finalFeatureImage,
-      metaTitle: metaTitle !== undefined ? metaTitle : subcategory.metaTitle,
-      metaDescription: metaDescription !== undefined ? metaDescription : subcategory.metaDescription
+    // Prepare update object - handle empty strings properly
+    const updateData = {};
+
+    // Only set fields that are explicitly provided (including empty strings)
+    if (name !== undefined) updateData.name = name;
+    if (slug !== undefined) updateData.slug = slug;
+    if (description !== undefined) updateData.description = description;
+    if (categoryId !== undefined) updateData.categoryId = categoryId;
+    if (type !== undefined) updateData.type = type;
+    if (status !== undefined) updateData.status = status;
+    if (order !== undefined) updateData.order = order;
+    if (metaTitle !== undefined) updateData.metaTitle = metaTitle;
+    if (metaDescription !== undefined) updateData.metaDescription = metaDescription;
+
+    // Always set featureImage since it's calculated above
+    updateData.featureImage = finalFeatureImage;
+
+    console.log('🔄 Update data being applied:', updateData);
+    console.log('📝 Original subcategory values:', {
+      name: subcategory.name,
+      description: subcategory.description,
+      metaTitle: subcategory.metaTitle,
+      metaDescription: subcategory.metaDescription
     });
+
+    await subcategory.update(updateData);
 
     // Fetch updated subcategory with category info
     const updatedSubcategory = await Subcategory.findByPk(id, {
