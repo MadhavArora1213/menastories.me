@@ -501,8 +501,7 @@ const EditArticle = () => {
         }
 
         showSuccess(successMessage);
-        // Fetch fresh data from server to ensure UI is in sync
-        fetchArticle();
+        // State is already updated with server response above, no need to fetch again
       }
     } catch (error) {
       console.error('Update error:', error);
