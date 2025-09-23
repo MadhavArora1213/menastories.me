@@ -216,28 +216,29 @@ const SubCategoryPage = () => {
           console.log('Subcategory featureImage:', subcategory.featureImage);
           console.log('Subcategory object:', subcategory);
           return subcategory.featureImage ? (
-            <div
-              className="w-full h-[70vh] min-h-[500px] bg-cover bg-center bg-no-repeat relative"
-              style={{
-                backgroundImage: `url(${subcategory.featureImage})`,
-                backgroundSize: 'cover',
-                backgroundPosition: 'center',
-                backgroundRepeat: 'no-repeat'
-              }}
-              onError={(e) => {
-                console.error('Featured image failed to load:', subcategory.featureImage);
-                e.target.style.backgroundImage = 'linear-gradient(135deg, #162048 0%, #1a1a1a 50%, #162048 100%)';
-              }}
-            >
-            {/* Enhanced overlay with better gradient */}
-            <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
-            <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/30"></div>
-          </div>
-        ) : (
-          <div className="w-full h-[70vh] min-h-[500px] bg-gradient-to-br from-[#162048] via-[#1a1a1a] to-[#162048] relative">
-            <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
-          </div>
-        )})()}
+            <div className="w-full h-[70vh] min-h-[500px] bg-cover bg-center bg-no-repeat relative">
+              <img
+                src={subcategory.featureImage}
+                alt={subcategory.name}
+                className="w-full h-full object-cover absolute inset-0"
+                onError={(e) => {
+                  console.error('Featured image failed to load:', subcategory.featureImage);
+                  e.target.style.display = 'none';
+                  e.target.parentElement.style.backgroundImage = 'linear-gradient(135deg, #162048 0%, #1a1a1a 50%, #162048 100%)';
+                }}
+                onLoad={(e) => {
+                  console.log('Featured image loaded successfully:', subcategory.featureImage);
+                }}
+              />
+              {/* Enhanced overlay with better gradient */}
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-black/20"></div>
+              <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-transparent to-black/30"></div>
+            </div>
+          ) : (
+            <div className="w-full h-[70vh] min-h-[500px] bg-gradient-to-br from-[#162048] via-[#1a1a1a] to-[#162048] relative">
+              <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent"></div>
+            </div>
+          )})()}
 
         {/* Enhanced Content Overlay */}
         <div className="absolute inset-0 flex items-center justify-center">
@@ -311,6 +312,20 @@ const SubCategoryPage = () => {
                         src={article.featuredImage}
                         alt={article.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Article image failed to load:', article.featuredImage);
+                          e.target.style.display = 'none';
+                          e.target.parentElement.innerHTML = `
+                            <div class="w-full h-full bg-gradient-to-br from-[#e3e7f7] to-[#162048] flex items-center justify-center">
+                              <svg class="w-16 h-16 text-[#162048]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                              </svg>
+                            </div>
+                          `;
+                        }}
+                        onLoad={(e) => {
+                          console.log('Article image loaded successfully:', article.featuredImage);
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-[#e3e7f7] to-[#162048] flex items-center justify-center">
@@ -439,6 +454,20 @@ const SubCategoryPage = () => {
                         src={videoArticle.thumbnailUrl}
                         alt={videoArticle.title}
                         className="w-full h-full object-cover"
+                        onError={(e) => {
+                          console.error('Video thumbnail failed to load:', videoArticle.thumbnailUrl);
+                          e.target.style.display = 'none';
+                          e.target.parentElement.innerHTML = `
+                            <div class="w-full h-full bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center">
+                              <svg class="w-16 h-16 text-red-500" fill="currentColor" viewBox="0 0 24 24">
+                                <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                              </svg>
+                            </div>
+                          `;
+                        }}
+                        onLoad={(e) => {
+                          console.log('Video thumbnail loaded successfully:', videoArticle.thumbnailUrl);
+                        }}
                       />
                     ) : (
                       <div className="w-full h-full bg-gradient-to-br from-red-100 to-pink-100 flex items-center justify-center">

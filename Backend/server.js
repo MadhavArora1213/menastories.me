@@ -167,17 +167,17 @@ app.use('/api/public/comments/*', (req, res, next) => {
 });
 
 // Serve static files from storage directory
-app.use('/api/storage', express.static('/var/www/menastories/menastories.me/Backend/storage', {
+app.use('/api/storage', express.static(path.join(__dirname, 'storage'), {
   maxAge: '1d', // Cache for 1 day
   etag: true,
   lastModified: true,
-  setHeaders: (res, path) => {
+  setHeaders: (res, filePath) => {
     // Set proper content type for images
-    if (path.endsWith('.webp')) {
+    if (filePath.endsWith('.webp')) {
       res.setHeader('Content-Type', 'image/webp');
-    } else if (path.endsWith('.jpg') || path.endsWith('.jpeg')) {
+    } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
       res.setHeader('Content-Type', 'image/jpeg');
-    } else if (path.endsWith('.png')) {
+    } else if (filePath.endsWith('.png')) {
       res.setHeader('Content-Type', 'image/png');
     }
 
@@ -189,11 +189,11 @@ app.use('/api/storage', express.static('/var/www/menastories/menastories.me/Back
 }));
 
 // Serve download files with appropriate headers
-app.use('/api/storage/downloads', express.static('/var/www/menastories/menastories.me/Backend/storage/downloads', {
+app.use('/api/storage/downloads', express.static(path.join(__dirname, 'storage', 'downloads'), {
   maxAge: '7d', // Cache downloads for 7 days
   etag: true,
   lastModified: true,
-  setHeaders: (res, path) => {
+  setHeaders: (res, filePath) => {
     // Add CORS headers for downloads
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
@@ -204,11 +204,10 @@ app.use('/api/storage/downloads', express.static('/var/www/menastories/menastori
 // Specific route for images as fallback
 app.get('/api/storage/images/:filename', (req, res) => {
   const { filename } = req.params;
-  const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images', filename);
+  const imagePath = path.join(__dirname, 'storage', 'images', filename);
 
   console.log('🖼️  Image request:', filename);
   console.log('📁 Image path:', imagePath);
-  console.log('🔍 __dirname:', __dirname);
 
   const fs = require('fs');
   if (fs.existsSync(imagePath)) {
@@ -232,20 +231,9 @@ app.get('/api/storage/images/:filename', (req, res) => {
 
     res.sendFile(imagePath);
   } else {
-    console.log('❌ Image not found at path');
-    // List files in the images directory for debugging
-    try {
-      const files = fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images'));
-      console.log('📂 Files in images directory:', files);
-    } catch (error) {
-      console.log('❌ Error reading images directory:', error.message);
-    }
-    res.status(404).json({
-      success: false,
-      message: 'Image not found',
-      requestedFile: filename,
-      availableFiles: fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
-    });
+    console.log('❌ Image not found at path, returning 404 with fallback');
+    // Return a 404 status but don't send JSON - let the frontend handle the error gracefully
+    res.status(404).end();
   }
 });
 
@@ -279,12 +267,16 @@ app.get('/health', (req, res) => {
 // Image health check endpoint
 app.get('/api/images/health', (req, res) => {
   const fs = require('fs');
-  const path = require('path');
 
   try {
-    const imagesDir = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images');
-    const files = fs.readdirSync(imagesDir);
-    const imageFiles = files.filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file));
+    const imagesDir = path.join(__dirname, 'storage', 'images');
+    let files = [];
+    let imageFiles = [];
+
+    if (fs.existsSync(imagesDir)) {
+      files = fs.readdirSync(imagesDir);
+      imageFiles = files.filter(file => /\.(jpg|jpeg|png|webp)$/i.test(file));
+    }
 
     res.json({
       success: true,
@@ -309,7 +301,7 @@ app.get('/api/images/health', (req, res) => {
 // Test image serving endpoint
 app.get('/api/images/test/:filename', (req, res) => {
   const { filename } = req.params;
-  const imagePath = path.join('/var/www/menastories/menastories.me/Backend/storage', 'images', filename);
+  const imagePath = path.join(__dirname, 'storage', 'images', filename);
 
   console.log('🧪 Test image request:', filename);
   console.log('📁 Test image path:', imagePath);
@@ -335,12 +327,19 @@ app.get('/api/images/test/:filename', (req, res) => {
     res.sendFile(imagePath);
   } else {
     console.log('❌ Test image not found');
+    const imagesDir = path.join(__dirname, 'storage', 'images');
+    let availableFiles = [];
+
+    if (fs.existsSync(imagesDir)) {
+      availableFiles = fs.readdirSync(imagesDir).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f));
+    }
+
     res.status(404).json({
       success: false,
       message: 'Test image not found',
       requestedFile: filename,
       fullPath: imagePath,
-      availableFiles: fs.readdirSync(path.join('/var/www/menastories/menastories.me/Backend/storage', 'images')).filter(f => /\.(jpg|jpeg|png|webp)$/i.test(f))
+      availableFiles: availableFiles
     });
   }
 });
