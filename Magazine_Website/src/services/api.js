@@ -18,6 +18,12 @@ api.interceptors.request.use(
     console.log('Request headers:', config.headers);
     console.log('Request data:', config.data);
 
+    // For FormData requests, don't set Content-Type - let axios set it automatically
+    if (config.data instanceof FormData) {
+      console.log('FormData detected - removing default Content-Type header');
+      delete config.headers['Content-Type'];
+    }
+
     // Check for regular user token first
     const userToken = localStorage.getItem('authToken');
     if (userToken) {
@@ -38,8 +44,8 @@ api.interceptors.request.use(
          !config.url.includes('/events/types') &&
          !config.url.includes('/events/locations') &&
          !config.url.includes('/events/user/submit/send-otp')) ||
-        (config.url.includes('/articles') && 
-         !config.url.includes('/public/homepage') && 
+        (config.url.includes('/articles') &&
+         !config.url.includes('/public/homepage') &&
          !config.url.includes('/comments') &&
          !config.url.includes('/user/submit') &&
          !config.url.includes('/send-otp') &&
@@ -49,7 +55,7 @@ api.interceptors.request.use(
         config.url.includes('/analytics') ||
         config.url.includes('/flipbook') ||
         config.url.includes('/lists')
-      ) && 
+      ) &&
       // Explicitly exclude ALL user-facing routes from admin authentication
       !config.url.includes('/public/') &&
       !config.url.includes('/comments') &&
