@@ -873,16 +873,14 @@ const CreateArticle = () => {
     const validationErrors = validateForm();
     console.log('Validation errors:', validationErrors);
 
-    // TEMPORARILY BYPASS VALIDATION FOR DEBUGGING
-    if (Object.keys(validationErrors).length > 0 && status !== 'draft') {
-      console.log('Bypassing validation errors for debugging...');
-      // setErrors(validationErrors);
-      // toast.error('Please fix the validation errors before submitting');
-      // return;
-    }
-
-    if (status !== 'draft' && !validateForm()) {
-      return;
+    // Validate form for non-draft submissions
+    if (status !== 'draft') {
+      const validationErrors = validateForm();
+      if (Object.keys(validationErrors).length > 0) {
+        setErrors(validationErrors);
+        toast.error('Please fix the validation errors before submitting');
+        return;
+      }
     }
 
     setSaving(true);
@@ -1600,7 +1598,7 @@ const CreateArticle = () => {
                     disabled={saving}
                     className={`w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
-                    {saving ? 'Publishing...' : 'Publish Now (TEMPORARILY BYPASSED)'}
+                    {saving ? 'Publishing...' : 'Publish Now'}
                   </button>
 
                   <button

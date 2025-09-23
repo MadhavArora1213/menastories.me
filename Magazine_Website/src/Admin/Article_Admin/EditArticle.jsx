@@ -403,6 +403,7 @@ const EditArticle = () => {
           const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
           if (uploadResponse.success && uploadResponse.data?.filename) {
             submitData.featuredImage = uploadResponse.data.filename;
+            showInfo('Featured image uploaded successfully');
           } else {
             showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
             return;
@@ -463,9 +464,11 @@ const EditArticle = () => {
             ...prevFormData,
             status: response.data.status || prevFormData.status,
             reviewNotes: response.data.reviewNotes || prevFormData.reviewNotes,
-            // Preserve any local changes that weren't sent to server
-            featuredImage: prevFormData.featuredImage,
-            custom_tags: prevFormData.custom_tags
+            // Use server response for featuredImage if available, otherwise preserve local changes
+            featuredImage: response.data.featuredImage || prevFormData.featuredImage,
+            custom_tags: prevFormData.custom_tags,
+            // Clear the uploaded file after successful save to prevent re-uploading
+            ...(response.data.featuredImage && { featuredImageFile: null })
           }));
         }
 
