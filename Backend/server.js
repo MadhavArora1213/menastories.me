@@ -555,7 +555,8 @@ app.use('/articles', articleRoutes);
 // Author routes without /api prefix (using videoArticleRoutes which contains author management)
 app.use('/authors', videoArticleRoutes);
 
-// Subcategory routes without /api prefix are handled by mounted routes
+// Subcategory routes without /api prefix
+app.use('/subcategories', subcategoryRoutes);
 
 // Additional common endpoints without /api prefix
 app.use('/tags', tagRoutes);
