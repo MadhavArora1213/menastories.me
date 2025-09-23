@@ -49,6 +49,7 @@ const EditArticle = () => {
     publishDate: '',
     featuredImage: null,
     imageCaption: '',
+    gallery: [],
     authorBioOverride: '',
     status: 'draft',
     reviewNotes: '',
@@ -144,6 +145,7 @@ const EditArticle = () => {
                : '',
              featuredImage: prevFormData.featuredImage, // Preserve uploaded file
              imageCaption: articleData.imageCaption || '',
+             gallery: prevFormData.gallery || [], // Preserve uploaded gallery files
              authorBioOverride: articleData.authorBioOverride || '',
              status: articleData.status || 'draft',
              custom_tags: prevFormData.custom_tags || '', // Preserve custom tags input
@@ -269,6 +271,41 @@ const EditArticle = () => {
     }
   };
 
+  const handleGalleryImageChange = (e) => {
+    const files = Array.from(e.target.files);
+    const maxImages = 5;
+
+    if (formData.gallery.length + files.length > maxImages) {
+      showError(`Maximum ${maxImages} images allowed in gallery`);
+      return;
+    }
+
+    // Validate each file
+    const validFiles = files.filter(file => {
+      if (file.size > 5 * 1024 * 1024) {
+        showError(`${file.name} is too large. Max size is 5MB`);
+        return false;
+      }
+      if (!file.type.startsWith('image/')) {
+        showError(`${file.name} is not an image file`);
+        return false;
+      }
+      return true;
+    });
+
+    setFormData(prev => ({
+      ...prev,
+      gallery: [...prev.gallery, ...validFiles]
+    }));
+  };
+
+  const removeGalleryImage = (index) => {
+    setFormData(prev => ({
+      ...prev,
+      gallery: prev.gallery.filter((_, i) => i !== index)
+    }));
+  };
+
   const handleTagToggle = (tag) => {
     setFormData(prev => ({
       ...prev,
@@ -347,6 +384,26 @@ const EditArticle = () => {
          tags: formData.tags,
          keywords: formData.keywords
        };
+
+      // Handle gallery images upload
+      if (formData.gallery.length > 0) {
+        const galleryImagePaths = [];
+        for (const file of formData.gallery) {
+          try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('image', file);
+
+            const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
+            if (uploadResponse.success && uploadResponse.data?.filename) {
+              galleryImagePaths.push(uploadResponse.data.filename);
+            }
+          } catch (uploadError) {
+            console.error('Error uploading gallery image:', uploadError);
+            showError(`Failed to upload ${file.name}`);
+          }
+        }
+        submitData.gallery = galleryImagePaths;
+      }
 
       const response = await articleService.updateArticle(id, submitData);
 
@@ -608,7 +665,7 @@ const EditArticle = () => {
               {/* Featured Image */}
               <div className={`${cardBg} p-6 rounded-lg border`}>
                 <h2 className={`text-xl font-semibold ${textMain} mb-4`}>Featured Image</h2>
-                
+
                 <div className="space-y-4">
                   {article.featuredImage && !formData.featuredImage && (
                     <div>
@@ -659,6 +716,95 @@ const EditArticle = () => {
                         alt="Preview"
                         className="max-w-full h-48 object-cover rounded-lg"
                       />
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* Image Gallery */}
+              <div className={`${cardBg} p-6 rounded-lg border`}>
+                <h2 className={`text-xl font-semibold ${textMain} mb-4`}>Image Gallery</h2>
+
+                <div className="space-y-4">
+                  <div>
+                    <label className={`block text-sm font-medium ${textMain} mb-2`}>
+                      Image Display Mode
+                    </label>
+                    <select
+                      name="imageDisplayMode"
+                      value={formData.imageDisplayMode}
+                      onChange={handleInputChange}
+                      className={`w-full p-3 border rounded-lg ${inputBg}`}
+                    >
+                      <option value="single">Single Image</option>
+                      <option value="multiple">Multiple Images (In Article)</option>
+                      <option value="slider">Image Slider</option>
+                    </select>
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                      Choose how images should be displayed in the article
+                    </div>
+                  </div>
+
+                  {/* Current Gallery Images */}
+                  {article.gallery && article.gallery.length > 0 && formData.gallery.length === 0 && (
+                    <div>
+                      <label className={`block text-sm font-medium ${textMain} mb-2`}>
+                        Current Gallery Images ({article.gallery.length})
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {article.gallery.map((image, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={typeof image === 'string' ? image : image.url}
+                              alt={`Gallery ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg"
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  <div>
+                    <label className={`block text-sm font-medium ${textMain} mb-2`}>
+                      {article.gallery && article.gallery.length > 0 ? 'Add More Gallery Images' : 'Upload Gallery Images'} (Max 5 total)
+                    </label>
+                    <input
+                      type="file"
+                      multiple
+                      onChange={handleGalleryImageChange}
+                      accept="image/*"
+                      className={`w-full p-3 border rounded-lg ${inputBg}`}
+                    />
+                    <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-1`}>
+                      Select multiple images. Maximum 5 images allowed, each up to 5MB.
+                    </div>
+                  </div>
+
+                  {/* Gallery Preview */}
+                  {formData.gallery.length > 0 && (
+                    <div className="mt-4">
+                      <label className={`block text-sm font-medium ${textMain} mb-2`}>
+                        New Gallery Preview ({formData.gallery.length}/5)
+                      </label>
+                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                        {formData.gallery.map((file, index) => (
+                          <div key={index} className="relative">
+                            <img
+                              src={URL.createObjectURL(file)}
+                              alt={`Gallery ${index + 1}`}
+                              className="w-full h-24 object-cover rounded-lg"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => removeGalleryImage(index)}
+                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
+                            >
+                              ×
+                            </button>
+                          </div>
+                        ))}
+                      </div>
                     </div>
                   )}
                 </div>

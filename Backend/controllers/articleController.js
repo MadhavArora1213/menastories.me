@@ -718,6 +718,17 @@ class ArticleController {
          }
        }
 
+       // Handle gallery images
+       let galleryImages = article.gallery || [];
+       if (req.body.gallery && Array.isArray(req.body.gallery)) {
+         // Gallery images are already processed and uploaded by frontend
+         galleryImages = req.body.gallery.map(filename => ({
+           url: imageService.generateImageUrl(filename),
+           alt: '',
+           caption: ''
+         }));
+       }
+
       // Parse JSON strings
       console.log('🔄 Preparing update data...');
       const updateData = {
@@ -771,6 +782,7 @@ class ArticleController {
       updateData.coAuthors = this.parseJsonField(req.body.co_authors, 'co_authors', []);
       updateData.tags = this.parseJsonField(req.body.tags, 'tags', []);
       updateData.keywords = this.parseJsonField(req.body.seo_keywords, 'seo_keywords', []);
+      updateData.gallery = galleryImages;
 
       // Validate parsed arrays
       if (updateData.coAuthors && !Array.isArray(updateData.coAuthors)) {
