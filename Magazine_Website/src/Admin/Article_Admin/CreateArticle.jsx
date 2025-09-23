@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useAdminAuth } from '../context/AdminAuthContext';
 import articleService from '../../services/articleService';
-import imageUploadService from '../../services/imageUploadService';
 import { toast } from 'react-toastify';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -857,10 +856,6 @@ const CreateArticle = () => {
   const handleSubmit = async (e, status = 'draft') => {
     e.preventDefault();
 
-    console.log('=== HANDLE SUBMIT CALLED ===');
-    console.log('Status:', status);
-    console.log('Event:', e);
-
     // Mark all fields as touched for validation display
     const allFields = Object.keys(formData);
     const touchedFields = allFields.reduce((acc, field) => {
@@ -871,16 +866,14 @@ const CreateArticle = () => {
 
     // Validate form
     const validationErrors = validateForm();
-    console.log('Validation errors:', validationErrors);
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      toast.error('Please fix the validation errors before submitting');
+      return;
+    }
 
-    // Validate form for non-draft submissions
-    if (status !== 'draft') {
-      const validationErrors = validateForm();
-      if (Object.keys(validationErrors).length > 0) {
-        setErrors(validationErrors);
-        toast.error('Please fix the validation errors before submitting');
-        return;
-      }
+    if (status !== 'draft' && !validateForm()) {
+      return;
     }
 
     setSaving(true);
@@ -911,74 +904,23 @@ const CreateArticle = () => {
       // Handle gallery images upload
       if (formData.gallery.length > 0) {
         const galleryImagePaths = [];
-        let uploadErrors = [];
-
         for (const file of formData.gallery) {
           try {
             const formDataUpload = new FormData();
             formDataUpload.append('image', file);
 
-            console.log('Uploading gallery image:', file.name);
             const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
-
-            console.log('Upload response for', file.name, ':', uploadResponse);
-
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
-              console.log('Successfully uploaded:', file.name, '->', uploadResponse.data.filename);
-            } else {
-              const errorMsg = `Upload failed for ${file.name}: ${uploadResponse.message || 'Unknown error'}`;
-              uploadErrors.push(errorMsg);
-              console.error(errorMsg);
             }
           } catch (uploadError) {
-            const errorMsg = `Failed to upload ${file.name}: ${uploadError.message || 'Network error'}`;
-            uploadErrors.push(errorMsg);
-            console.error('Error uploading gallery image:', file.name, uploadError);
+            console.error('Error uploading gallery image:', uploadError);
+            toast.error(`Failed to upload ${file.name}`);
           }
         }
-
         // Store gallery images as JSON array in the gallery field
         submitData.gallery = galleryImagePaths;
         console.log('Gallery images stored as:', submitData.gallery);
-
-        // Show upload results
-        if (galleryImagePaths.length > 0) {
-          toast.success(`Successfully uploaded ${galleryImagePaths.length} gallery images`);
-        }
-
-        if (uploadErrors.length > 0) {
-          toast.error(`Failed to upload ${uploadErrors.length} images: ${uploadErrors.join(', ')}`);
-        }
-      }
-
-      // Handle featured image upload
-      if (formData.featuredImage instanceof File) {
-        try {
-          // Validate and optimize the featured image
-          const validation = imageUploadService.validateImageFile(formData.featuredImage);
-          if (!validation.isValid) {
-            toast.error(`Invalid featured image: ${validation.errors.join(', ')}`);
-            return;
-          }
-
-          // Optimize the image
-          const optimizedFile = await imageUploadService.optimizeImage(formData.featuredImage);
-
-          // Upload the image using the proper service
-          const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
-          if (uploadResponse.success && uploadResponse.data?.filename) {
-            submitData.featuredImage = uploadResponse.data.filename;
-            toast.success('Featured image uploaded successfully');
-          } else {
-            toast.error(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
-            return;
-          }
-        } catch (uploadError) {
-          console.error('Error uploading featured image:', uploadError);
-          toast.error(`Failed to upload featured image: ${uploadError.message}`);
-          return;
-        }
       }
 
       console.log('=== FRONTEND SUBMIT DEBUG ===');
@@ -1549,11 +1491,7 @@ const CreateArticle = () => {
                         type="checkbox"
                         name="guidelinesAccepted"
                         checked={formData.guidelinesAccepted}
-                        onChange={(e) => {
-                          console.log('=== GUIDELINES CHECKBOX CHANGED ===');
-                          console.log('Checked:', e.target.checked);
-                          handleInputChange(e);
-                        }}
+                        onChange={handleInputChange}
                         className="mt-1 h-4 w-4 text-blue-600"
                         required
                       />
@@ -1586,17 +1524,9 @@ const CreateArticle = () => {
 
                   <button
                     type="button"
-                    onClick={(e) => {
-                      console.log('=== PUBLISH NOW CLICKED ===');
-                      console.log('Form data:', formData);
-                      console.log('Saving state:', saving);
-                      console.log('Recaptcha token:', formData.recaptchaToken);
-                      console.log('Guidelines accepted:', formData.guidelinesAccepted);
-                      console.log('Button disabled:', saving || !formData.recaptchaToken || !formData.guidelinesAccepted);
-                      handleSubmit(e, 'published');
-                    }}
-                    disabled={saving}
-                    className={`w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ${saving ? 'opacity-50 cursor-not-allowed' : ''}`}
+                    onClick={(e) => handleSubmit(e, 'published')}
+                    disabled={saving || !formData.recaptchaToken || !formData.guidelinesAccepted}
+                    className={`w-full px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 ${(saving || !formData.recaptchaToken || !formData.guidelinesAccepted) ? 'opacity-50 cursor-not-allowed' : ''}`}
                   >
                     {saving ? 'Publishing...' : 'Publish Now'}
                   </button>

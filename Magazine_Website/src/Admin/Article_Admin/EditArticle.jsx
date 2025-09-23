@@ -144,7 +144,7 @@ const EditArticle = () => {
                    return `${year}-${month}-${day}T${hours}:${minutes}`;
                  })()
                : '',
-             featuredImage: prevFormData.featuredImage || (articleData.featuredImage ? articleData.featuredImage : null), // Preserve uploaded file or set existing image
+             featuredImage: prevFormData.featuredImage, // Preserve uploaded file
              imageCaption: articleData.imageCaption || '',
              gallery: prevFormData.gallery || [], // Preserve uploaded gallery files
              authorBioOverride: articleData.authorBioOverride || '',
@@ -403,7 +403,6 @@ const EditArticle = () => {
           const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
           if (uploadResponse.success && uploadResponse.data?.filename) {
             submitData.featuredImage = uploadResponse.data.filename;
-            showInfo('Featured image uploaded successfully');
           } else {
             showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
             return;
@@ -464,11 +463,9 @@ const EditArticle = () => {
             ...prevFormData,
             status: response.data.status || prevFormData.status,
             reviewNotes: response.data.reviewNotes || prevFormData.reviewNotes,
-            // Use server response for featuredImage if available, otherwise preserve local changes
-            featuredImage: response.data.featuredImage || prevFormData.featuredImage,
-            custom_tags: prevFormData.custom_tags,
-            // Clear the uploaded file after successful save to prevent re-uploading
-            ...(response.data.featuredImage && { featuredImageFile: null })
+            // Preserve any local changes that weren't sent to server
+            featuredImage: prevFormData.featuredImage,
+            custom_tags: prevFormData.custom_tags
           }));
         }
 
@@ -504,7 +501,8 @@ const EditArticle = () => {
         }
 
         showSuccess(successMessage);
-        // State is already updated with server response above, no need to fetch again
+        // Fetch fresh data from server to ensure UI is in sync
+        fetchArticle();
       }
     } catch (error) {
       console.error('Update error:', error);
