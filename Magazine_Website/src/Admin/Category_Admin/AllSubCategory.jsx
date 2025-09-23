@@ -234,58 +234,24 @@ const AllSubCategory = () => {
     }
   };
 
-  const loadStatistics = async () => {
-    try {
-      // Get fresh statistics from API
-      const response = await subcategoryService.getSubcategories({ limit: 1 }); // Just get pagination info
-      const apiResponse = response?.data || response;
+  const loadStatistics = () => {
+    // Calculate statistics from existing loaded data
+    const totalCount = subcategories.length;
+    const regularCount = subcategories.filter(item => item.type === 'regular' || !item.type).length;
+    const parentCount = parentCategories.length;
 
-      let totalCount = 0;
-      let parentCount = parentCategories.length;
+    console.log('Statistics calculation from loaded data:', {
+      totalCount,
+      regularCount,
+      parentCount,
+      subcategoriesLength: subcategories.length
+    });
 
-      // Extract total count from API response
-      if (apiResponse && typeof apiResponse === 'object') {
-        if (apiResponse.pagination && apiResponse.pagination.totalCount) {
-          totalCount = apiResponse.pagination.totalCount;
-        } else if (apiResponse.totalCount) {
-          totalCount = apiResponse.totalCount;
-        } else if (Array.isArray(apiResponse) && apiResponse.length > 0) {
-          // If it's an array, we can't get total count, so use current loaded data
-          totalCount = subcategories.length;
-        }
-      }
-
-      // Calculate regular subcategories from current data
-      const currentSubcategories = subcategories.length > 0 ? subcategories : [];
-      const regularCount = currentSubcategories.filter(item => item.type === 'regular' || !item.type).length;
-
-      console.log('Statistics calculation:', {
-        totalCount,
-        regularCount,
-        parentCount,
-        subcategoriesLength: subcategories.length,
-        apiResponse: apiResponse,
-        paginationData: apiResponse?.pagination
-      });
-
-      setStatistics({
-        totalSubcategories: totalCount,
-        regularSubcategories: regularCount || Math.max(1, Math.floor(totalCount * 0.8)), // At least show some data
-        parentCategories: Math.max(parentCount, 1) // At least show 1 if we have data
-      });
-    } catch (error) {
-      console.error('Failed to calculate statistics:', error);
-      // Fallback to basic calculation from current data
-      const totalCount = subcategories.length;
-      const regularCount = subcategories.filter(item => item.type === 'regular' || !item.type).length;
-      const parentCount = parentCategories.length;
-
-      setStatistics({
-        totalSubcategories: totalCount,
-        regularSubcategories: regularCount,
-        parentCategories: parentCount
-      });
-    }
+    setStatistics({
+      totalSubcategories: totalCount,
+      regularSubcategories: regularCount,
+      parentCategories: parentCount
+    });
   };
 
 
