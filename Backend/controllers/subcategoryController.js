@@ -372,20 +372,36 @@ exports.updateSubcategory = async (req, res) => {
       console.log('Validation errors found:', errors.array());
       console.log('Request body:', req.body);
       console.log('Request file:', req.file ? 'File present' : 'No file');
+      console.log('Request headers:', req.headers);
 
       const errorDetails = errors.array();
-      const formattedErrors = errorDetails.map(err => {
-        if (err && err.msg) {
+      console.log('Error details structure:', errorDetails);
+
+      // More robust error formatting
+      const formattedErrors = errorDetails.map((err, index) => {
+        console.log(`Error ${index}:`, err);
+        if (err && typeof err === 'object' && err.msg) {
           return `${err.param || 'field'}: ${err.msg}`;
+        } else if (err && typeof err === 'string') {
+          return err;
+        } else if (err && err.message) {
+          return `${err.param || 'field'}: ${err.message}`;
         }
-        return 'Validation error occurred';
+        return `Validation error ${index + 1}: ${JSON.stringify(err)}`;
       });
+
+      console.log('Formatted errors:', formattedErrors);
 
       return res.status(400).json({
         success: false,
         message: 'Validation failed',
         errors: errorDetails,
-        formattedMessage: formattedErrors.join(', ')
+        formattedMessage: formattedErrors.join(', '),
+        debug: {
+          bodyKeys: Object.keys(req.body),
+          hasFile: !!req.file,
+          contentType: req.headers['content-type']
+        }
       });
     }
 
