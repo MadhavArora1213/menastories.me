@@ -62,7 +62,7 @@ class ArticleService {
 
       // Add file if exists
       if (articleData.featuredImage instanceof File) {
-        formData.append('featured_image', articleData.featuredImage);
+        formData.append('image', articleData.featuredImage);
       }
 
       console.log('=== FORM DATA DEBUG ===');
@@ -152,7 +152,7 @@ class ArticleService {
 
       // Add file if exists
       if (articleData.featuredImage instanceof File) {
-        formData.append('featured_image', articleData.featuredImage);
+        formData.append('image', articleData.featuredImage);
       }
 
       const response = await api.put(`/articles/${id}`, formData, {

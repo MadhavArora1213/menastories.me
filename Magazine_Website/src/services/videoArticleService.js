@@ -74,7 +74,7 @@ class VideoArticleService {
 
       // Add file if exists
       if (videoArticleData.featuredImage instanceof File) {
-        formData.append('featured_image', videoArticleData.featuredImage);
+        formData.append('image', videoArticleData.featuredImage);
       }
 
       console.log('=== VIDEO ARTICLE FORM DATA DEBUG ===');
@@ -148,7 +148,7 @@ class VideoArticleService {
 
       // Add file if exists
       if (videoArticleData.featuredImage instanceof File) {
-        formData.append('featured_image', videoArticleData.featuredImage);
+        formData.append('image', videoArticleData.featuredImage);
         console.log('Added featured image file:', videoArticleData.featuredImage.name);
       } else {
         console.log('No featured image file to add');
