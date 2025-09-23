@@ -683,14 +683,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[2]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback small';
-                                  altDiv.textContent = getImageAlt(2);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
                               />
                             </div>
                           </div>
@@ -701,14 +694,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(3)}
                                 onClick={() => openGallery(3)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[3]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback medium';
-                                  altDiv.textContent = getImageAlt(3);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 3, getImageAlt(3))}
                               />
                             </div>
                             <div className="image-item medium">
@@ -717,14 +703,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(4)}
                                 onClick={() => openGallery(4)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[4]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback medium';
-                                  altDiv.textContent = getImageAlt(4);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 4, getImageAlt(4))}
                               />
                             </div>
                           </div>
@@ -757,14 +736,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[2]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback medium';
-                                  altDiv.textContent = getImageAlt(2);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
                               />
                             </div>
                           </div>
@@ -775,14 +747,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(3)}
                                 onClick={() => openGallery(3)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[3]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback medium';
-                                  altDiv.textContent = getImageAlt(3);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 3, getImageAlt(3))}
                               />
                             </div>
                           </div>
@@ -799,14 +764,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[1]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback large';
-                                  altDiv.textContent = getImageAlt(1);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 1, getImageAlt(1))}
                               />
                             </div>
                           </div>
@@ -817,14 +775,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(2)}
                                 onClick={() => openGallery(2)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[2]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback small';
-                                  altDiv.textContent = getImageAlt(2);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 2, getImageAlt(2))}
                               />
                             </div>
                           </div>
@@ -841,14 +792,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(1)}
                                 onClick={() => openGallery(1)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[1]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback medium';
-                                  altDiv.textContent = getImageAlt(1);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 1, getImageAlt(1))}
                               />
                             </div>
                           </div>
@@ -865,14 +809,7 @@ const ArticleRenderer = () => {
                                 alt={getImageAlt(0)}
                                 onClick={() => openGallery(0)}
                                 className="grid-image cursor-pointer hover:opacity-95 transition-opacity"
-                                onError={(e) => {
-                                  console.error('Image failed to load:', finalDisplayImages[0]);
-                                  e.target.style.display = 'none';
-                                  const altDiv = document.createElement('div');
-                                  altDiv.className = 'photo-alt-fallback large';
-                                  altDiv.textContent = getImageAlt(0);
-                                  e.target.parentNode.appendChild(altDiv);
-                                }}
+                                onError={(e) => handleImageError(e, 'image', 0, getImageAlt(0))}
                               />
                             </div>
                           </div>
@@ -1005,7 +942,10 @@ const ArticleRenderer = () => {
                           console.error('Suggested article image failed to load:', suggestedArticle.featuredImage);
                           e.target.style.display = 'none';
                           // Show fallback
-                          e.target.nextElementSibling.style.display = 'flex';
+                          const fallback = e.target.nextElementSibling;
+                          if (fallback) {
+                            fallback.style.display = 'flex';
+                          }
                         }}
                       />
                     ) : null}
