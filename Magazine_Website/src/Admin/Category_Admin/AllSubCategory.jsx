@@ -3,7 +3,7 @@ import { useTheme } from "../context/ThemeContext";
 import { useToast } from "../../context/ToastContext";
 import { useAdminAuth } from "../context/AdminAuthContext";
 import { subcategoryService } from "../services/subcategoryService";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useLocation } from "react-router-dom";
 
 const AllSubCategory = () => {
   const { theme } = useTheme();
@@ -11,6 +11,7 @@ const AllSubCategory = () => {
   const { showSuccess, showError } = useToast();
   const { hasPermission } = useAdminAuth();
   const navigate = useNavigate();
+  const location = useLocation();
 
   const [subcategories, setSubcategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -54,6 +55,27 @@ const AllSubCategory = () => {
     };
     loadInitialData();
   }, []);
+
+  // Check for refresh flag when component mounts or location changes
+  useEffect(() => {
+    if (location.state?.refreshData) {
+      console.log('🔄 Refresh flag detected, reloading subcategories...');
+      console.log('📊 Updated subcategory data:', location.state.updatedSubcategory);
+
+      // Show success message if we have updated data
+      if (location.state.updatedSubcategory) {
+        const updatedSub = location.state.updatedSubcategory;
+        showSuccess(`Subcategory "${updatedSub.name}" updated successfully! ${updatedSub.featureImage ? 'Image saved.' : 'No image.'}`);
+      }
+
+      // Reload the data
+      loadSubcategories();
+      loadParentCategories();
+
+      // Clear the location state to prevent repeated refreshes
+      navigate(location.pathname, { replace: true, state: {} });
+    }
+  }, [location.state, location.pathname, navigate, showSuccess]);
 
   // Recalculate statistics whenever subcategories or pagination data changes
   useEffect(() => {
@@ -373,6 +395,19 @@ const AllSubCategory = () => {
     }
   };
 
+  // Manual refresh function for user-triggered updates
+  const handleManualRefresh = async () => {
+    try {
+      console.log('🔄 Manual refresh triggered by user');
+      await loadSubcategories();
+      await loadParentCategories();
+      showSuccess('Data refreshed successfully!');
+    } catch (error) {
+      console.error('Failed to refresh data:', error);
+      showError('Failed to refresh data');
+    }
+  };
+
   const handleDeleteCancel = () => {
     setShowDeleteConfirm(false);
     setDeleteTarget(null);
@@ -415,6 +450,18 @@ const AllSubCategory = () => {
             </p>
           </div>
           <div className="flex gap-3">
+            {/* Refresh button */}
+            <button
+              onClick={handleManualRefresh}
+              className={`px-4 py-3 rounded-lg font-medium transition ${isDark ? "bg-gray-700 text-white hover:bg-gray-600" : "bg-gray-200 text-gray-900 hover:bg-gray-300"}`}
+              title="Refresh data"
+            >
+              <svg className="w-5 h-5 inline mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              Refresh
+            </button>
+
             {/* Only show Create Subcategory button if user has content.create permission */}
             {hasPermission('content.create') && (
               <Link

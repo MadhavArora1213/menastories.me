@@ -68,8 +68,27 @@ const UpdateSubCategory = () => {
       const response = await subcategoryService.updateSubcategory(id, cleanFormData);
       console.log('Update response:', response);
 
+      // Check if the response includes the updated data
+      if (response && response.data && response.data.data) {
+        const updatedSubcategory = response.data.data;
+        console.log('✅ Updated subcategory data received:', {
+          id: updatedSubcategory.id,
+          name: updatedSubcategory.name,
+          featureImage: updatedSubcategory.featureImage,
+          hasImage: !!updatedSubcategory.featureImage
+        });
+      }
+
       showSuccess("Subcategory updated successfully!");
-      navigate("/admin/subcategories");
+
+      // Navigate back with a refresh flag to trigger data reload
+      navigate("/admin/subcategories", {
+        state: {
+          refreshData: true,
+          updatedSubcategory: response?.data?.data,
+          timestamp: Date.now()
+        }
+      });
     } catch (error) {
       if (error.response?.data?.errors && Array.isArray(error.response.data.errors)) {
         const validationErrors = error.response.data.errors.map((err, index) =>
