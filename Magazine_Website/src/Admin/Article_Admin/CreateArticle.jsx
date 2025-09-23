@@ -909,7 +909,7 @@ const CreateArticle = () => {
             const formDataUpload = new FormData();
             formDataUpload.append('image', file);
 
-            const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
+            const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
             }
