@@ -78,8 +78,19 @@ app.use(cors({
     : ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175', 'http://localhost:5176'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'credentials']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With', 'credentials', 'Access-Control-Request-Private-Network'],
+  optionsSuccessStatus: 200 // Support legacy browsers
 }));
+
+// Additional CORS headers for production
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+  if (process.env.NODE_ENV === 'production' && origin === (process.env.FRONTEND_URL || 'https://menastories.me')) {
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Allow-Private-Network', 'true');
+  }
+  next();
+});
 
 const limiter = rateLimit({
   windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 15 * 60 * 1000,
@@ -141,6 +152,7 @@ const securityRoutes = require('./routes/securityRoutes');
 const seoRoutes = require('./routes/seoRoutes');
 const specialFeaturesRoutes = require('./routes/specialFeaturesRoutes');
 const subcategoryController = require('./controllers/subcategoryController');
+const subcategoryRoutes = require('./routes/subcategoryRoutes');
 const tagRoutes = require('./routes/tagRoutes');
 const uploadRoutes = require('./routes/uploadRoutes');
 const userRoutes = require('./routes/userRoutes');
@@ -387,6 +399,9 @@ app.use('/api/upload', uploadRoutes);
 // Category routes
 app.use('/api/categories', categoryRoutes);
 
+// Subcategory routes
+app.use('/api/subcategories', subcategoryRoutes);
+
 // Article routes
 app.use('/api/articles', articleRoutes);
 
@@ -514,15 +529,7 @@ app.use('/api/flipbook', (req, res, next) => {
   next();
 }, flipbookRoutes);
 
-// Subcategory routes (specific routes before parameterized ones)
-app.get('/api/subcategories/stats', subcategoryController.getSubcategoryStatistics);
-app.get('/api/subcategories/category/:categoryId', subcategoryController.getSubcategoriesByCategory);
-app.get('/api/subcategories', subcategoryController.getAllSubcategories);
-app.get('/api/subcategories/:id', subcategoryController.getSubcategoryById);
-app.post('/api/subcategories', adminAuthMiddleware, upload.single('image'), validateSubcategory, subcategoryController.createSubcategory);
-app.put('/api/subcategories/:id', subcategoryController.updateSubcategory);
-app.delete('/api/subcategories/:id', subcategoryController.deleteSubcategory);
-app.patch('/api/subcategories/:id/status', subcategoryController.toggleSubcategoryStatus);
+// Subcategory routes are now handled by the mounted subcategoryRoutes
 
 // ========================================
 // NON-API ROUTES (without /api prefix)
@@ -540,11 +547,7 @@ app.use('/articles', articleRoutes);
 // Author routes without /api prefix (using videoArticleRoutes which contains author management)
 app.use('/authors', videoArticleRoutes);
 
-// Subcategory routes without /api prefix
-app.get('/subcategories/stats', subcategoryController.getSubcategoryStatistics);
-app.get('/subcategories/category/:categoryId', subcategoryController.getSubcategoriesByCategory);
-app.get('/subcategories', subcategoryController.getAllSubcategories);
-app.get('/subcategories/:id', subcategoryController.getSubcategoryById);
+// Subcategory routes without /api prefix are handled by mounted routes
 
 // Additional common endpoints without /api prefix
 app.use('/tags', tagRoutes);
