@@ -275,8 +275,19 @@ exports.validateSubcategory = [
     .isLength({ max: 500 })
     .withMessage('Description must be less than 500 characters'),
   body('categoryId')
-    .isUUID()
-    .withMessage('Category ID must be a valid UUID'),
+    .optional({ nullable: true, checkFalsy: true })
+    .custom((value) => {
+      // Allow null, undefined, or empty string
+      if (!value || value === '') {
+        return true;
+      }
+      // If value is provided, it must be a valid UUID
+      const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+      if (!uuidRegex.test(value)) {
+        throw new Error('Category ID must be a valid UUID');
+      }
+      return true;
+    }),
   body('type')
     .optional()
     .isIn(['regular', 'featured', 'special'])
