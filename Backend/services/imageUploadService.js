@@ -147,9 +147,9 @@ class ImageUploadService {
    * @returns {string} - Public URL
    */
   generateImageUrl(filename) {
-    // Use server URL for images
+    // Use server URL for images without /api prefix (as per user requirement)
     const serverUrl = process.env.SERVER_URL || 'https://menastories.me';
-    const url = `${serverUrl}/api/storage/images/${filename}`;
+    const url = `${serverUrl}/storage/images/${filename}`;
     console.log('🔗 Generated image URL:', url);
     return url;
   }

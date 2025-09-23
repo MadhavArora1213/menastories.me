@@ -266,6 +266,42 @@ app.get('/api/storage/images/:filename', (req, res) => {
   }
 });
 
+// Route for images without /api prefix (for compatibility)
+app.get('/storage/images/:filename', (req, res) => {
+  const { filename } = req.params;
+  const imagePath = path.join(__dirname, 'storage', 'images', filename);
+
+  console.log('🖼️  Image request (no /api prefix):', filename);
+  console.log('📁 Image path:', imagePath);
+
+  const fs = require('fs');
+  if (fs.existsSync(imagePath)) {
+    console.log('✅ Image found, serving file');
+    const stats = fs.statSync(imagePath);
+    console.log('📊 File size:', stats.size, 'bytes');
+
+    // Set proper headers for image serving
+    let contentType = 'image/webp';
+    if (filename.endsWith('.jpg') || filename.endsWith('.jpeg')) {
+      contentType = 'image/jpeg';
+    } else if (filename.endsWith('.png')) {
+      contentType = 'image/png';
+    }
+
+    res.setHeader('Content-Type', contentType);
+    res.setHeader('Cache-Control', 'public, max-age=86400'); // 24 hours
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+
+    res.sendFile(imagePath);
+  } else {
+    console.log('❌ Image not found at path, returning 404 with fallback');
+    // Return a 404 status but don't send JSON - let the frontend handle the error gracefully
+    res.status(404).end();
+  }
+});
+
 // RSS feed endpoint
 app.get('/rss.xml', async (req, res) => {
   try {
