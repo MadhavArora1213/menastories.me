@@ -360,6 +360,9 @@ exports.createSubcategory = async (req, res) => {
 
 // Update subcategory
 exports.updateSubcategory = async (req, res) => {
+  let uploadedImagePath = null;
+  let tempFilePath = null;
+
   try {
     const { id } = req.params;
     const errors = validationResult(req);
@@ -420,6 +423,48 @@ exports.updateSubcategory = async (req, res) => {
       }
     }
 
+    // Store temp file path for later processing (don't process yet)
+    if (req.file) {
+      tempFilePath = req.file.path;
+    }
+
+    // Process image first if provided
+    let finalFeatureImage = subcategory.featureImage; // Keep existing image by default
+    if (tempFilePath && require('fs').existsSync(tempFilePath)) {
+      try {
+        console.log('🔄 Processing uploaded image with WebP optimization...');
+        const processedFilename = await imageService.processImage(tempFilePath, {
+          width: 1200,
+          quality: 80, // Higher quality for WebP
+          format: 'webp' // Use WebP for better compression
+        });
+
+        finalFeatureImage = imageService.generateImageUrl(processedFilename);
+        uploadedImagePath = processedFilename; // Store for cleanup on error
+
+        console.log('✅ Image processed successfully:', processedFilename);
+        console.log('📸 Generated image URL:', finalFeatureImage);
+
+        // Delete old image if it exists and is different from the new one
+        if (subcategory.featureImage && subcategory.featureImage !== finalFeatureImage) {
+          try {
+            console.log('🗑️ Deleting old image:', subcategory.featureImage);
+            await imageService.deleteImage(subcategory.featureImage);
+            console.log('✅ Old image deleted successfully');
+          } catch (deleteError) {
+            console.error('❌ Error deleting old image:', deleteError);
+            // Don't fail the update if old image deletion fails
+          }
+        }
+      } catch (imageError) {
+        console.error('❌ Error processing image:', imageError);
+        finalFeatureImage = subcategory.featureImage; // Keep existing image on error
+      }
+    } else if (featureImage !== undefined) {
+      // If no new file uploaded but featureImage is provided in body, use it
+      finalFeatureImage = featureImage;
+    }
+
     await subcategory.update({
       name: name || subcategory.name,
       slug,
@@ -428,7 +473,7 @@ exports.updateSubcategory = async (req, res) => {
       type: type || subcategory.type,
       status: status || subcategory.status,
       order: order !== undefined ? order : subcategory.order,
-      featureImage: featureImage !== undefined ? featureImage : subcategory.featureImage,
+      featureImage: finalFeatureImage,
       metaTitle: metaTitle !== undefined ? metaTitle : subcategory.metaTitle,
       metaDescription: metaDescription !== undefined ? metaDescription : subcategory.metaDescription
     });
@@ -442,6 +487,14 @@ exports.updateSubcategory = async (req, res) => {
       }]
     });
 
+    console.log('✅ Subcategory updated successfully with ID:', updatedSubcategory.id);
+    console.log('📝 Final subcategory data:', {
+      id: updatedSubcategory.id,
+      name: updatedSubcategory.name,
+      featureImage: updatedSubcategory.featureImage,
+      hasImage: !!updatedSubcategory.featureImage
+    });
+
     res.json({
       success: true,
       message: 'Subcategory updated successfully',
@@ -449,6 +502,36 @@ exports.updateSubcategory = async (req, res) => {
     });
   } catch (error) {
     console.error('Error updating subcategory:', error);
+
+    // Clean up uploaded image if it was processed but subcategory update failed
+    if (uploadedImagePath) {
+      try {
+        await imageService.deleteImage(uploadedImagePath);
+      } catch (cleanupError) {
+        console.error('Error cleaning up uploaded image:', cleanupError);
+      }
+    }
+
+    // Clean up temp file safely
+    if (tempFilePath && require('fs').existsSync(tempFilePath)) {
+      if (imageService.safeDeleteFile) {
+        try {
+          await imageService.safeDeleteFile(tempFilePath);
+        } catch (cleanupError) {
+          console.error('Error cleaning up temp file:', cleanupError);
+        }
+      } else {
+        // Fallback to synchronous delete if safeDeleteFile is not available
+        try {
+          const fs = require('fs');
+          if (fs.existsSync(tempFilePath)) {
+            fs.unlinkSync(tempFilePath);
+          }
+        } catch (cleanupError) {
+          console.error('Error cleaning up temp file (fallback):', cleanupError);
+        }
+      }
+    }
 
     if (error.name === 'SequelizeUniqueConstraintError') {
       return res.status(409).json({

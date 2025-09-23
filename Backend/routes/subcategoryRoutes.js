@@ -13,7 +13,7 @@ router.get('/:id', subcategoryController.getSubcategoryById);
 
 // Protected routes - require admin authentication
 router.post('/', authenticateAdmin, upload.single('image'), validateSubcategory, subcategoryController.createSubcategory);
-router.put('/:id', authenticateAdmin, validateSubcategory, subcategoryController.updateSubcategory);
+router.put('/:id', authenticateAdmin, upload.single('image'), validateSubcategory, subcategoryController.updateSubcategory);
 router.delete('/:id', authenticateAdmin, subcategoryController.deleteSubcategory);
 
 // Additional subcategory management routes
