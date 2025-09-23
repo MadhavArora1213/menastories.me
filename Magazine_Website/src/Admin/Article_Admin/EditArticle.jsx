@@ -746,7 +746,7 @@ const EditArticle = () => {
                   </div>
 
                   {/* Current Gallery Images */}
-                  {article.gallery && article.gallery.length > 0 && formData.gallery.length === 0 && (
+                  {article.gallery && article.gallery.length > 0 && (
                     <div>
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
                         Current Gallery Images ({article.gallery.length})
