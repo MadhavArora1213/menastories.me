@@ -525,11 +525,26 @@ exports.updateSubcategory = async (req, res) => {
       hasImage: !!updatedSubcategory.featureImage
     });
 
-    res.json({
+    // Ensure the response includes all necessary fields
+    const responseData = {
       success: true,
       message: 'Subcategory updated successfully',
-      data: updatedSubcategory
+      data: updatedSubcategory,
+      debug: {
+        updatedAt: new Date().toISOString(),
+        hasFeatureImage: !!updatedSubcategory.featureImage,
+        featureImageUrl: updatedSubcategory.featureImage
+      }
+    };
+
+    console.log('🔄 Sending response with featureImage:', responseData.data.featureImage);
+    console.log('🔄 Response structure:', {
+      success: responseData.success,
+      hasData: !!responseData.data,
+      dataHasFeatureImage: !!responseData.data?.featureImage
     });
+
+    res.json(responseData);
   } catch (error) {
     console.error('Error updating subcategory:', error);
 
