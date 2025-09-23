@@ -31,7 +31,7 @@ api.interceptors.request.use(
         config.url.includes('/categories') ||
         config.url.includes('/media') ||
         config.url.includes('/tags') ||
-        config.url.includes('/subcategories') ||
+        // config.url.includes('/subcategories') || // Temporarily disable admin auth for subcategories
         (config.url.includes('/events') &&
          !config.url.includes('/events/user/submit') &&
          !config.url.includes('/events/categories') &&

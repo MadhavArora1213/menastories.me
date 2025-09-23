@@ -43,16 +43,23 @@ const AllSubCategory = () => {
 
   useEffect(() => {
     const loadInitialData = async () => {
-      await loadSubcategories();
-      await loadParentCategories();
-      // Statistics will be loaded automatically by the useEffect that watches subcategories/pagination
+      try {
+        await loadSubcategories();
+        await loadParentCategories();
+        // Statistics will be loaded automatically by the useEffect that watches subcategories/pagination
+      } catch (error) {
+        console.error('Error loading initial data:', error);
+        showError('Failed to load initial data');
+      }
     };
     loadInitialData();
   }, []);
 
   // Recalculate statistics whenever subcategories or pagination data changes
   useEffect(() => {
-    loadStatistics();
+    if (subcategories && parentCategories) {
+      loadStatistics();
+    }
   }, [subcategories, pagination, parentCategories]);
 
   const loadSubcategories = async (page = 1) => {
@@ -63,6 +70,11 @@ const AllSubCategory = () => {
       console.log('Subcategories response:', response);
       console.log('Response type:', typeof response);
       console.log('Is array:', Array.isArray(response));
+
+      // Check if response is valid
+      if (!response) {
+        throw new Error('No response received from server');
+      }
 
       // Handle the API response structure - Axios wraps response in .data
       let subcategoriesData = [];
@@ -186,7 +198,14 @@ const AllSubCategory = () => {
       }
     } catch (error) {
       console.error('Failed to load subcategories:', error);
-      showError('Failed to load subcategories');
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      showError(`Failed to load subcategories: ${error.message || 'Unknown error'}`);
       setSubcategories([]);
     } finally {
       setLoading(false);
@@ -229,29 +248,46 @@ const AllSubCategory = () => {
       setParentCategories(categoriesData);
     } catch (error) {
       console.error('Failed to load parent categories:', error);
-      showError('Failed to load parent categories');
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        response: error.response,
+        status: error.response?.status,
+        data: error.response?.data
+      });
+      showError(`Failed to load parent categories: ${error.message || 'Unknown error'}`);
       setParentCategories([]);
     }
   };
 
   const loadStatistics = () => {
-    // Calculate statistics from existing loaded data
-    const totalCount = subcategories.length;
-    const regularCount = subcategories.filter(item => item.type === 'regular' || !item.type).length;
-    const parentCount = parentCategories.length;
+    try {
+      // Calculate statistics from existing loaded data
+      const totalCount = subcategories.length;
+      const regularCount = subcategories.filter(item => item.type === 'regular' || !item.type).length;
+      const parentCount = parentCategories.length;
 
-    console.log('Statistics calculation from loaded data:', {
-      totalCount,
-      regularCount,
-      parentCount,
-      subcategoriesLength: subcategories.length
-    });
+      console.log('Statistics calculation from loaded data:', {
+        totalCount,
+        regularCount,
+        parentCount,
+        subcategoriesLength: subcategories.length
+      });
 
-    setStatistics({
-      totalSubcategories: totalCount,
-      regularSubcategories: regularCount,
-      parentCategories: parentCount
-    });
+      setStatistics({
+        totalSubcategories: totalCount,
+        regularSubcategories: regularCount,
+        parentCategories: parentCount
+      });
+    } catch (error) {
+      console.error('Error calculating statistics:', error);
+      // Set default values to prevent errors
+      setStatistics({
+        totalSubcategories: 0,
+        regularSubcategories: 0,
+        parentCategories: 0
+      });
+    }
   };
 
 
