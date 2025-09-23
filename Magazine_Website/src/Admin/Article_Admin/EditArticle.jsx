@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
 import articleService from '../../services/articleService';
+import imageUploadService from '../../services/imageUploadService';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import Captcha from '../Components/Captcha';
@@ -385,24 +386,70 @@ const EditArticle = () => {
          keywords: formData.keywords
        };
 
+      // Handle featured image upload
+      if (formData.featuredImage instanceof File) {
+        try {
+          // Validate and optimize the featured image
+          const validation = imageUploadService.validateImageFile(formData.featuredImage);
+          if (!validation.isValid) {
+            showError(`Invalid featured image: ${validation.errors.join(', ')}`);
+            return;
+          }
+
+          // Optimize the image
+          const optimizedFile = await imageUploadService.optimizeImage(formData.featuredImage);
+
+          // Upload the image using the proper service
+          const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
+          if (uploadResponse.success && uploadResponse.data?.filename) {
+            submitData.featuredImage = uploadResponse.data.filename;
+          } else {
+            showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
+            return;
+          }
+        } catch (uploadError) {
+          console.error('Error uploading featured image:', uploadError);
+          showError(`Failed to upload featured image: ${uploadError.message}`);
+          return;
+        }
+      }
+
       // Handle gallery images upload
       if (formData.gallery.length > 0) {
         const galleryImagePaths = [];
         for (const file of formData.gallery) {
           try {
-            const formDataUpload = new FormData();
-            formDataUpload.append('image', file);
+            // Validate and optimize the image
+            const validation = imageUploadService.validateImageFile(file);
+            if (!validation.isValid) {
+              showError(`Invalid image ${file.name}: ${validation.errors.join(', ')}`);
+              continue;
+            }
 
-            const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
+            // Optimize the image
+            const optimizedFile = await imageUploadService.optimizeImage(file);
+
+            // Upload the image using the proper service
+            const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
+            } else {
+              showError(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
             }
           } catch (uploadError) {
             console.error('Error uploading gallery image:', uploadError);
-            showError(`Failed to upload ${file.name}`);
+            showError(`Failed to upload ${file.name}: ${uploadError.message}`);
           }
         }
-        submitData.gallery = galleryImagePaths;
+
+        // Convert filenames to gallery objects as expected by backend
+        if (galleryImagePaths.length > 0) {
+          submitData.gallery = galleryImagePaths.map(filename => ({
+            url: filename,
+            alt: '',
+            caption: ''
+          }));
+        }
       }
 
       const response = await articleService.updateArticle(id, submitData);
