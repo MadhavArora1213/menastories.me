@@ -4,7 +4,7 @@ import imageCompression from 'browser-image-compression';
 class ImageUploadService {
 
   constructor() {
-    this.baseURL = '/upload';
+    this.baseURL = '/api/upload';
   }
 
   /**

@@ -904,23 +904,45 @@ const CreateArticle = () => {
       // Handle gallery images upload
       if (formData.gallery.length > 0) {
         const galleryImagePaths = [];
+        let uploadErrors = [];
+
         for (const file of formData.gallery) {
           try {
             const formDataUpload = new FormData();
             formDataUpload.append('image', file);
 
+            console.log('Uploading gallery image:', file.name);
             const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
+
+            console.log('Upload response for', file.name, ':', uploadResponse);
+
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
+              console.log('Successfully uploaded:', file.name, '->', uploadResponse.data.filename);
+            } else {
+              const errorMsg = `Upload failed for ${file.name}: ${uploadResponse.message || 'Unknown error'}`;
+              uploadErrors.push(errorMsg);
+              console.error(errorMsg);
             }
           } catch (uploadError) {
-            console.error('Error uploading gallery image:', uploadError);
-            toast.error(`Failed to upload ${file.name}`);
+            const errorMsg = `Failed to upload ${file.name}: ${uploadError.message || 'Network error'}`;
+            uploadErrors.push(errorMsg);
+            console.error('Error uploading gallery image:', file.name, uploadError);
           }
         }
+
         // Store gallery images as JSON array in the gallery field
         submitData.gallery = galleryImagePaths;
         console.log('Gallery images stored as:', submitData.gallery);
+
+        // Show upload results
+        if (galleryImagePaths.length > 0) {
+          toast.success(`Successfully uploaded ${galleryImagePaths.length} gallery images`);
+        }
+
+        if (uploadErrors.length > 0) {
+          toast.error(`Failed to upload ${uploadErrors.length} images: ${uploadErrors.join(', ')}`);
+        }
       }
 
       console.log('=== FRONTEND SUBMIT DEBUG ===');
