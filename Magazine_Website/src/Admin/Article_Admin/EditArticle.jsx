@@ -603,9 +603,10 @@ const EditArticle = () => {
 
              if (uploadResponse.success && uploadResponse.file?.filename) {
                galleryImagePaths.push(uploadResponse.file.filename);
+               console.log(`✅ Gallery image uploaded successfully: ${file.name} -> ${uploadResponse.file.filename}`);
                showInfo(`${file.name} uploaded successfully`);
              } else {
-               console.error(`Gallery upload failed for ${file.name}:`, uploadResponse);
+               console.error(`❌ Gallery upload failed for ${file.name}:`, uploadResponse);
                showError(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
              }
            } catch (uploadError) {
@@ -626,11 +627,18 @@ const EditArticle = () => {
            if (oldGalleryImages.length > 0) {
              submitData.oldGalleryImages = oldGalleryImages;
            }
+
+           console.log('New gallery images processed:', {
+             count: galleryImagePaths.length,
+             paths: galleryImagePaths,
+             objects: submitData.gallery
+           });
          }
        } else if (formData.gallery.length === 0 && article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0) {
          // User didn't upload new gallery images - keep existing gallery
          submitData.gallery = article.gallery;
          console.log('Keeping existing gallery images:', article.gallery.length, 'images');
+         console.log('Existing gallery data:', article.gallery);
        }
 
        console.log('=== FINAL SUBMIT DATA DEBUG ===');
@@ -638,6 +646,20 @@ const EditArticle = () => {
        console.log('submitData keys:', Object.keys(submitData));
        console.log('featuredImage value:', submitData.featuredImage);
        console.log('gallery value:', submitData.gallery);
+       console.log('gallery type:', typeof submitData.gallery);
+       console.log('gallery length:', Array.isArray(submitData.gallery) ? submitData.gallery.length : 'Not an array');
+
+       // Ensure gallery is properly formatted
+       if (submitData.gallery && !Array.isArray(submitData.gallery)) {
+         console.warn('Gallery is not an array, converting:', submitData.gallery);
+         if (typeof submitData.gallery === 'string') {
+           try {
+             submitData.gallery = JSON.parse(submitData.gallery);
+           } catch (e) {
+             submitData.gallery = submitData.gallery.split(',').map(url => url.trim()).filter(url => url);
+           }
+         }
+       }
 
       const response = await articleService.updateArticle(id, submitData);
 
@@ -1037,53 +1059,107 @@ const EditArticle = () => {
                   </div>
 
                   {/* Gallery Preview */}
-                  {formData.gallery.length > 0 && (
+                  {(formData.gallery.length > 0 || (article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0)) && (
                     <div className="mt-4">
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                        New Gallery Preview ({formData.gallery.length}/5)
+                        Gallery Preview ({formData.gallery.length + (article.gallery && Array.isArray(article.gallery) ? article.gallery.length : 0)}/5)
                       </label>
-                      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-                        {formData.gallery.map((file, index) => (
-                          <div key={index} className="relative group">
-                            <img
-                              src={URL.createObjectURL(file)}
-                              alt={`Gallery ${index + 1}`}
-                              className={`w-full h-24 object-cover rounded-lg ${
-                                formData.featuredImage === file ? 'ring-2 ring-blue-500' : ''
-                              }`}
-                            />
-                            {/* Featured indicator */}
-                            {formData.featuredImage === file && (
-                              <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
-                                Featured
-                              </div>
-                            )}
-                            {/* Action buttons */}
-                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
-                              <div className="flex gap-1">
-                                <button
-                                  type="button"
-                                  onClick={() => selectGalleryImageAsFeatured(index)}
-                                  className="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700"
-                                  title="Set as Featured"
-                                >
-                                  Featured
-                                </button>
-                                <button
-                                  type="button"
-                                  onClick={() => removeGalleryImage(index)}
-                                  className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
-                                  title="Remove"
-                                >
-                                  Remove
-                                </button>
-                              </div>
-                            </div>
+
+                      {/* Existing Gallery Images */}
+                      {article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0 && (
+                        <div className="mb-4">
+                          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
+                            Existing Images ({article.gallery.length}):
                           </div>
-                        ))}
-                      </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {article.gallery.map((image, index) => (
+                              <div key={`existing-${index}`} className="relative group">
+                                <img
+                                  src={typeof image === 'string' ? image : image.url}
+                                  alt={`Existing Gallery ${index + 1}`}
+                                  className="w-full h-24 object-cover rounded-lg"
+                                  onError={(e) => {
+                                    console.error('Failed to load existing gallery image:', image);
+                                    e.target.style.display = 'none';
+                                    const fallback = e.target.nextElementSibling;
+                                    if (fallback) fallback.style.display = 'flex';
+                                  }}
+                                />
+                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <div className="flex gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        // Remove existing image by setting gallery to empty array to trigger replacement
+                                        setFormData(prev => ({ ...prev, gallery: [] }));
+                                        showInfo('Existing gallery will be replaced with new uploads');
+                                      }}
+                                      className="bg-orange-600 text-white text-xs px-2 py-1 rounded hover:bg-orange-700"
+                                      title="Replace All"
+                                    >
+                                      Replace All
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
+                      {/* New Gallery Images */}
+                      {formData.gallery.length > 0 && (
+                        <div>
+                          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mb-2`}>
+                            New Images ({formData.gallery.length}):
+                          </div>
+                          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                            {formData.gallery.map((file, index) => (
+                              <div key={`new-${index}`} className="relative group">
+                                <img
+                                  src={URL.createObjectURL(file)}
+                                  alt={`New Gallery ${index + 1}`}
+                                  className={`w-full h-24 object-cover rounded-lg ${
+                                    formData.featuredImage === file ? 'ring-2 ring-blue-500' : ''
+                                  }`}
+                                />
+                                {/* Featured indicator */}
+                                {formData.featuredImage === file && (
+                                  <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                    Featured
+                                  </div>
+                                )}
+                                {/* Action buttons */}
+                                <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                                  <div className="flex gap-1">
+                                    <button
+                                      type="button"
+                                      onClick={() => selectGalleryImageAsFeatured(index)}
+                                      className="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700"
+                                      title="Set as Featured"
+                                    >
+                                      Featured
+                                    </button>
+                                    <button
+                                      type="button"
+                                      onClick={() => removeGalleryImage(index)}
+                                      className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
+                                      title="Remove"
+                                    >
+                                      Remove
+                                    </button>
+                                  </div>
+                                </div>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      )}
+
                       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
-                        Click "Featured" on any image to set it as the featured image. The currently featured image is highlighted with a blue border.
+                        {article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0
+                          ? 'Existing images will be preserved unless you upload new ones. Click "Replace All" to remove existing images.'
+                          : 'Click "Featured" on any image to set it as the featured image. The currently featured image is highlighted with a blue border.'}
                       </div>
                     </div>
                   )}

@@ -231,14 +231,21 @@ const ArticleRenderer = () => {
   if (article?.gallery) {
     try {
       if (typeof article.gallery === 'string' && article.gallery.trim() !== '') {
-        galleryImages = JSON.parse(article.gallery);
-        console.log('Parsed gallery from string:', galleryImages);
+        // Try to parse as JSON first
+        try {
+          galleryImages = JSON.parse(article.gallery);
+          console.log('Parsed gallery from JSON string:', galleryImages);
+        } catch (jsonError) {
+          // If JSON parsing fails, treat as comma-separated string
+          galleryImages = article.gallery.split(',').map(url => url.trim()).filter(url => url);
+          console.log('Parsed gallery from comma-separated string:', galleryImages);
+        }
       } else if (Array.isArray(article.gallery)) {
         galleryImages = article.gallery;
         console.log('Gallery is already array:', galleryImages);
       }
     } catch (e) {
-      console.warn('Failed to parse article gallery JSON:', e);
+      console.warn('Failed to parse article gallery:', e);
       console.warn('Raw gallery data:', article.gallery);
       galleryImages = [];
     }
@@ -458,10 +465,23 @@ const ArticleRenderer = () => {
   if (galleryImages && galleryImages.length > 0) {
     allGalleryImages = galleryImages.slice(0, 4) // Get up to 4 gallery images
       .map((img, index) => {
-        const processedUrl = constructImageUrl(img);
-        const isExternal = img && (img.startsWith('http://') || img.startsWith('https://'));
+        // Handle different data structures
+        let imageUrl = '';
+        let isExternal = false;
+
+        if (typeof img === 'string') {
+          imageUrl = img;
+          isExternal = img.startsWith('http://') || img.startsWith('https://');
+        } else if (typeof img === 'object' && img !== null) {
+          // Handle object structure like {url: "...", alt: "...", caption: "..."}
+          imageUrl = img.url || img.src || img.path || '';
+          isExternal = imageUrl.startsWith('http://') || imageUrl.startsWith('https://');
+        }
+
+        const processedUrl = constructImageUrl(imageUrl);
         console.log(`Gallery image ${index + 1} processing:`, {
           original: img,
+          imageUrl,
           processed: processedUrl,
           isExternal,
           type: isExternal ? 'external' : 'internal'

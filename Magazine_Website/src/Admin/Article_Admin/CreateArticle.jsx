@@ -1449,7 +1449,17 @@ const CreateArticle = () => {
                               className={`w-full h-24 object-cover rounded-lg ${
                                 formData.featuredImage === file ? 'ring-2 ring-blue-500' : ''
                               }`}
+                              onError={(e) => {
+                                console.error('Failed to load gallery preview image:', file);
+                                e.target.style.display = 'none';
+                                const fallback = e.target.nextElementSibling;
+                                if (fallback) fallback.style.display = 'flex';
+                              }}
                             />
+                            {/* Fallback for failed images */}
+                            <div className="w-full h-24 bg-gray-200 rounded-lg flex items-center justify-center text-gray-500 text-xs hidden">
+                              Image Preview Failed
+                            </div>
                             {/* Featured indicator */}
                             {formData.featuredImage === file && (
                               <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
