@@ -76,14 +76,14 @@ const CreateMediaKit = () => {
         formDataUpload.append('image', formData.featuredImage);
 
         try {
-          const uploadResponse = await fetch('/api/upload/image', {
+          const uploadResponse = await fetch('/files/upload', {
             method: 'POST',
             body: formDataUpload
           });
 
           if (uploadResponse.ok) {
             const uploadResult = await uploadResponse.json();
-            submitData.featuredImage = uploadResult.filename;
+            submitData.featuredImage = uploadResult.file.filename;
           } else {
             throw new Error('Failed to upload image');
           }

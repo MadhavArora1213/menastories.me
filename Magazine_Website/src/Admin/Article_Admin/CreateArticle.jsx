@@ -985,9 +985,9 @@ const CreateArticle = () => {
             const formDataUpload = new FormData();
             formDataUpload.append('image', file);
 
-            const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
-            if (uploadResponse.success && uploadResponse.data?.filename) {
-              galleryImagePaths.push(uploadResponse.data.filename);
+            const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
+            if (uploadResponse.success && uploadResponse.file?.filename) {
+              galleryImagePaths.push(uploadResponse.file.filename);
             }
           } catch (uploadError) {
             console.error('Error uploading gallery image:', uploadError);

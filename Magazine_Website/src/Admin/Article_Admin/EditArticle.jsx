@@ -488,26 +488,34 @@ const EditArticle = () => {
            formDataUpload.append('image', formData.featuredImage);
 
            // Upload the image using the same method as CreateArticle
-           const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
-           if (uploadResponse.success && uploadResponse.data?.filename) {
+           console.log('=== IMAGE UPLOAD DEBUG ===');
+           console.log('Uploading file:', formDataUpload.featuredImage);
+           console.log('File size:', formDataUpload.featuredImage.size);
+           console.log('File type:', formDataUpload.featuredImage.type);
+
+           const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
+           console.log('Upload response:', uploadResponse);
+
+           if (uploadResponse.success && uploadResponse.file?.filename) {
              // Store the old image path for deletion
              const oldImagePath = article.featuredImage;
-             submitData.featuredImage = uploadResponse.data.filename;
+             submitData.featuredImage = uploadResponse.file.filename;
 
              // If there's an old image, mark it for deletion
-             if (oldImagePath && oldImagePath !== uploadResponse.data.filename) {
+             if (oldImagePath && oldImagePath !== uploadResponse.file.filename) {
                submitData.oldFeaturedImage = oldImagePath;
              }
 
              console.log('Image uploaded successfully:', {
                oldPath: oldImagePath,
-               newPath: uploadResponse.data.filename,
+               newPath: uploadResponse.file.filename,
                willDelete: !!oldImagePath
              });
 
              setImageJustUploaded(true);
              showInfo('Featured image uploaded successfully');
            } else {
+             console.error('Upload failed:', uploadResponse);
              showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
              return;
            }
@@ -556,11 +564,15 @@ const EditArticle = () => {
              formDataUpload.append('image', file);
 
              // Upload the image using the same method as CreateArticle
-             const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
-             if (uploadResponse.success && uploadResponse.data?.filename) {
-               galleryImagePaths.push(uploadResponse.data.filename);
+             console.log(`Uploading gallery image: ${file.name}`);
+             const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
+             console.log(`Gallery upload response for ${file.name}:`, uploadResponse);
+
+             if (uploadResponse.success && uploadResponse.file?.filename) {
+               galleryImagePaths.push(uploadResponse.file.filename);
                showInfo(`${file.name} uploaded successfully`);
              } else {
+               console.error(`Gallery upload failed for ${file.name}:`, uploadResponse);
                showError(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
              }
            } catch (uploadError) {
@@ -596,6 +608,12 @@ const EditArticle = () => {
            submitData.gallery = [];
          }
        }
+
+       console.log('=== FINAL SUBMIT DATA DEBUG ===');
+       console.log('submitData:', submitData);
+       console.log('submitData keys:', Object.keys(submitData));
+       console.log('featuredImage value:', submitData.featuredImage);
+       console.log('gallery value:', submitData.gallery);
 
       const response = await articleService.updateArticle(id, submitData);
 
