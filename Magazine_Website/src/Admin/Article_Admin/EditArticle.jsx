@@ -489,9 +489,9 @@ const EditArticle = () => {
 
            // Upload the image using the same method as CreateArticle
            console.log('=== IMAGE UPLOAD DEBUG ===');
-           console.log('Uploading file:', formDataUpload.featuredImage);
-           console.log('File size:', formDataUpload.featuredImage.size);
-           console.log('File type:', formDataUpload.featuredImage.type);
+           console.log('Uploading file:', formData.featuredImage);
+           console.log('File size:', formData.featuredImage.size);
+           console.log('File type:', formData.featuredImage.type);
 
            const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
            console.log('Upload response:', uploadResponse);
