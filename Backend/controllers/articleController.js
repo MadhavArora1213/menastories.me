@@ -693,6 +693,8 @@ class ArticleController {
 
       // Handle featured image upload
        let featuredImagePath = article.featuredImage;
+
+       // Handle file upload (when a new file is uploaded)
        if (req.file) {
          const { ImageUploadService } = require('../services/imageUploadService');
          const imageService = new ImageUploadService();
@@ -707,6 +709,25 @@ class ArticleController {
 
          // Delete old image if exists
          if (article.featuredImage) {
+           try {
+             // Extract filename from the old URL to delete the file
+             const oldUrl = new URL(article.featuredImage);
+             const oldFilename = oldUrl.pathname.split('/').pop();
+             await imageService.deleteImage(oldFilename);
+           } catch (err) {
+             console.warn('Could not delete old image:', err.message);
+           }
+         }
+       }
+       // Handle filename string (when frontend sends existing filename)
+       else if (req.body.featuredImage && typeof req.body.featuredImage === 'string' && req.body.featuredImage.trim() !== '') {
+         console.log('📸 Using existing filename from frontend:', req.body.featuredImage);
+         const { ImageUploadService } = require('../services/imageUploadService');
+         const imageService = new ImageUploadService();
+         featuredImagePath = imageService.generateImageUrl(req.body.featuredImage);
+
+         // Delete old image if exists and different from new one
+         if (article.featuredImage && article.featuredImage !== featuredImagePath) {
            try {
              // Extract filename from the old URL to delete the file
              const oldUrl = new URL(article.featuredImage);
