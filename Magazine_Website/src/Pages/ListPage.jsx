@@ -1,15 +1,70 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, Award, TrendingUp, Users, Building2, Star, ChevronRight } from 'lucide-react';
+import { Search, Filter, Award, TrendingUp, Users, Building2, Star, ChevronRight, AlertCircle, RefreshCw } from 'lucide-react';
+import listService from '../services/listService';
 
 const ListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [sortBy, setSortBy] = useState('rank');
-  const [isLoading, setIsLoading] = useState(false);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  // Sample data - in a real app, this would come from an API
-  const [listItems, setListItems] = useState([
+  // Dynamic data from API
+  const [listData, setListData] = useState(null);
+  const [listItems, setListItems] = useState([]);
+
+  // Fetch data on component mount
+  useEffect(() => {
+    fetchListData();
+  }, []);
+
+  const fetchListData = async () => {
+    try {
+      setIsLoading(true);
+      setError(null);
+
+      // For now, we'll fetch all lists and use the first one as an example
+      // In a real implementation, you might want to fetch a specific list by slug or ID
+      const response = await listService.getAllLists({ limit: 1, status: 'published' });
+
+      if (response.success && response.data.lists.length > 0) {
+        const list = response.data.lists[0];
+        setListData(list);
+
+        // Transform entries to match the expected format
+        const transformedEntries = list.entries.map(entry => ({
+          id: entry.id,
+          rank: entry.rank || 0,
+          name: entry.name,
+          title: entry.designation || 'Professional',
+          company: entry.company || 'Company',
+          industry: entry.category || 'Business',
+          revenue: 'N/A', // You might want to add revenue field to the model
+          employees: 'N/A', // You might want to add employees field to the model
+          description: entry.description || 'No description available.',
+          image: entry.image ? `${import.meta.env.VITE_API_URL || 'https://menastories.me/api'}/storage/images/${entry.image.split('/').pop()}` : "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=400&h=400&fit=crop&crop=face",
+          verified: true,
+          trend: "stable"
+        }));
+
+        setListItems(transformedEntries);
+      } else {
+        // If no lists found, use sample data as fallback
+        setListItems(getSampleData());
+      }
+    } catch (err) {
+      console.error('Error fetching list data:', err);
+      setError(err.message);
+      // Use sample data as fallback
+      setListItems(getSampleData());
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  // Sample data fallback
+  const getSampleData = () => [
     {
       id: 1,
       rank: 1,
@@ -80,21 +135,22 @@ const ListPage = () => {
       verified: true,
       trend: "up"
     }
-  ]);
+  ];
 
   const categories = [
     { id: 'all', name: 'All Categories', icon: Award },
     { id: 'technology', name: 'Technology', icon: TrendingUp },
     { id: 'finance', name: 'Finance', icon: Building2 },
     { id: 'healthcare', name: 'Healthcare', icon: Users },
-    { id: 'energy', name: 'Energy', icon: Star }
+    { id: 'energy', name: 'Energy', icon: Star },
+    { id: 'business', name: 'Business', icon: Building2 }
   ];
 
   const filteredItems = listItems
-    .filter(item => 
+    .filter(item =>
       selectedCategory === 'all' || item.industry.toLowerCase() === selectedCategory
     )
-    .filter(item => 
+    .filter(item =>
       item.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.company.toLowerCase().includes(searchTerm.toLowerCase()) ||
       item.title.toLowerCase().includes(searchTerm.toLowerCase())
@@ -129,35 +185,59 @@ const ListPage = () => {
       </Helmet>
 
       <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        {/* Header with Forbes-style branding */}
+        <header className="bg-white shadow-sm border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">F</span>
+                </div>
+                <div>
+                  <h1 className="text-xl font-bold text-gray-900">Forbes Middle East</h1>
+                  <p className="text-sm text-gray-600">Business Intelligence</p>
+                </div>
+              </div>
+              <nav className="hidden md:flex items-center gap-8">
+                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Lists</a>
+                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Companies</a>
+                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Leaders</a>
+                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Innovation</a>
+                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">About</a>
+              </nav>
+            </div>
+          </div>
+        </header>
+
         {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white py-20 px-4">
+        <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white py-24 px-4">
           <div className="absolute inset-0 bg-black/20"></div>
           <div className="relative max-w-7xl mx-auto text-center">
             <div className="inline-flex items-center gap-2 bg-blue-600/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
               <Award className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm font-medium">2024 EDITION</span>
+              <span className="text-sm font-medium uppercase tracking-wide">2024 EDITION</span>
             </div>
-            <h1 className="text-5xl md:text-6xl font-bold mb-6 leading-tight">
+            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
               Middle East's Most
               <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
                 Influential Leaders
               </span>
             </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-3xl mx-auto leading-relaxed">
+            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed mb-12">
               Celebrating the visionaries, innovators, and trailblazers who are shaping the future of business across the Middle East region.
             </p>
-            <div className="flex flex-wrap justify-center gap-8 mt-12 text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
-                <div className="text-3xl font-bold text-yellow-400">500+</div>
-                <div className="text-blue-200">Leaders Featured</div>
+            <div className="flex flex-wrap justify-center gap-8 text-center">
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
+                <div className="text-4xl font-bold text-yellow-400 mb-1">500+</div>
+                <div className="text-blue-200 text-sm uppercase tracking-wide">Leaders Featured</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
-                <div className="text-3xl font-bold text-yellow-400">25+</div>
-                <div className="text-blue-200">Industries</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
+                <div className="text-4xl font-bold text-yellow-400 mb-1">25+</div>
+                <div className="text-blue-200 text-sm uppercase tracking-wide">Industries</div>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-6 py-4">
-                <div className="text-3xl font-bold text-yellow-400">12</div>
-                <div className="text-blue-200">Countries</div>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
+                <div className="text-4xl font-bold text-yellow-400 mb-1">12</div>
+                <div className="text-blue-200 text-sm uppercase tracking-wide">Countries</div>
               </div>
             </div>
           </div>
@@ -221,8 +301,22 @@ const ListPage = () => {
         <section className="py-12 px-4">
           <div className="max-w-7xl mx-auto">
             {isLoading ? (
-              <div className="flex justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+              <div className="flex flex-col justify-center items-center py-20">
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                <p className="text-gray-600">Loading leaders...</p>
+              </div>
+            ) : error ? (
+              <div className="flex flex-col justify-center items-center py-20">
+                <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
+                <h3 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Data</h3>
+                <p className="text-gray-600 mb-6 text-center max-w-md">{error}</p>
+                <button
+                  onClick={fetchListData}
+                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                >
+                  <RefreshCw className="w-4 h-4" />
+                  Try Again
+                </button>
               </div>
             ) : (
               <>
@@ -230,6 +324,11 @@ const ListPage = () => {
                 <div className="mb-8">
                   <h2 className="text-2xl font-bold text-gray-900 mb-2">
                     {selectedCategory === 'all' ? 'All Leaders' : categories.find(c => c.id === selectedCategory)?.name}
+                    {listData && (
+                      <span className="text-lg font-normal text-gray-600 ml-2">
+                        - {listData.title}
+                      </span>
+                    )}
                   </h2>
                   <p className="text-gray-600">
                     Showing {filteredItems.length} of {listItems.length} leaders
@@ -340,6 +439,73 @@ const ListPage = () => {
             </button>
           </div>
         </section>
+
+        {/* Footer */}
+        <footer className="bg-gray-900 text-white py-12 px-4">
+          <div className="max-w-7xl mx-auto">
+            <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+              <div className="col-span-1 md:col-span-2">
+                <div className="flex items-center gap-3 mb-4">
+                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-lg">F</span>
+                  </div>
+                  <div>
+                    <h3 className="text-xl font-bold">Forbes Middle East</h3>
+                    <p className="text-gray-400">Business Intelligence</p>
+                  </div>
+                </div>
+                <p className="text-gray-300 leading-relaxed max-w-md">
+                  Your trusted source for business news, financial insights, and leadership intelligence across the Middle East region.
+                </p>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Lists</h4>
+                <ul className="space-y-2 text-gray-300">
+                  <li><a href="#" className="hover:text-white transition-colors">Top Companies</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Richest Individuals</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Most Powerful CEOs</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Innovation Leaders</a></li>
+                </ul>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold mb-4">Company</h4>
+                <ul className="space-y-2 text-gray-300">
+                  <li><a href="#" className="hover:text-white transition-colors">About Us</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Privacy Policy</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Terms of Service</a></li>
+                </ul>
+              </div>
+            </div>
+
+            <div className="border-t border-gray-800 pt-8">
+              <div className="flex flex-col md:flex-row justify-between items-center">
+                <p className="text-gray-400 text-sm">
+                  © 2024 Forbes Middle East. All rights reserved.
+                </p>
+                <div className="flex items-center gap-6 mt-4 md:mt-0">
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 4.557c-.883.392-1.832.656-2.828.775 1.017-.609 1.798-1.574 2.165-2.724-.951.564-2.005.974-3.127 1.195-.897-.957-2.178-1.555-3.594-1.555-3.179 0-5.515 2.966-4.797 6.045-4.091-.205-7.719-2.165-10.148-5.144-1.29 2.213-.669 5.108 1.523 6.574-.806-.026-1.566-.247-2.229-.616-.054 2.281 1.581 4.415 3.949 4.89-.693.188-1.452.232-2.224.084.626 1.956 2.444 3.379 4.6 3.419-2.07 1.623-4.678 2.348-7.29 2.04 2.179 1.397 4.768 2.212 7.548 2.212 9.142 0 14.307-7.721 13.995-14.646.962-.695 1.797-1.562 2.457-2.549z"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M22.46 6c-.77.35-1.6.58-2.46.69.88-.53 1.56-1.37 1.88-2.38-.83.5-1.75.85-2.72 1.05C18.37 4.5 17.26 4 16 4c-2.35 0-4.27 1.92-4.27 4.29 0 .34.04.67.11.98C8.28 9.09 5.11 7.38 3 4.79c-.37.63-.58 1.37-.58 2.15 0 1.49.75 2.81 1.91 3.56-.71 0-1.37-.2-1.95-.5v.03c0 2.08 1.48 3.82 3.44 4.21a4.22 4.22 0 0 1-1.93.07 4.28 4.28 0 0 0 4 2.98 8.521 8.521 0 0 1-5.33 1.84c-.34 0-.68-.02-1.02-.06C3.44 20.29 5.7 21 8.12 21 16 21 20.33 14.46 20.33 8.79c0-.19 0-.37-.01-.56.84-.6 1.56-1.36 2.14-2.23z"/>
+                    </svg>
+                  </a>
+                  <a href="#" className="text-gray-400 hover:text-white transition-colors">
+                    <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.017 0C5.396 0 .029 5.367.029 11.987c0 5.079 3.158 9.417 7.618 11.174-.105-.949-.199-2.403.041-3.439.219-.937 1.406-5.957 1.406-5.957s-.359-.72-.359-1.781c0-1.663.967-2.911 2.168-2.911 1.024 0 1.518.769 1.518 1.688 0 1.029-.653 2.567-.992 3.992-.285 1.193.6 2.165 1.775 2.165 2.128 0 3.768-2.245 3.768-5.487 0-2.861-2.063-4.869-5.008-4.869-3.41 0-5.409 2.562-5.409 5.199 0 1.033.394 2.143.889 2.741.097.118.112.221.085.345-.09.375-.293 1.199-.334 1.363-.053.225-.172.271-.402.165-1.495-.69-2.433-2.878-2.433-4.646 0-3.776 2.748-7.252 7.92-7.252 4.158 0 7.392 2.967 7.392 6.923 0 4.135-2.607 7.462-6.233 7.462-1.214 0-2.357-.629-2.758-1.378l-.749 2.848c-.269 1.045-1.004 2.352-1.498 3.146 1.123.345 2.306.535 3.55.535 6.624 0 11.99-5.367 11.99-11.987C24.007 5.367 18.641.001 12.017.001z"/>
+                    </svg>
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
