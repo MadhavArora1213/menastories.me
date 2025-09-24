@@ -17,13 +17,11 @@ const ListPage = () => {
   const categories = [
     { id: 'all', label: 'All', active: selectedCategory === 'all' },
     { id: 'recommended', label: 'Recommended', active: selectedCategory === 'recommended' },
-    { id: 'rich-lists', label: 'Rich Lists', active: selectedCategory === 'rich-lists' },
-    { id: 'entrepreneurs', label: 'Entrepreneurs', active: selectedCategory === 'entrepreneurs' },
+    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' },
+    { id: 'tfdhhm', label: 'TFDHHM', active: selectedCategory === 'tfdhhm' },
+    { id: 'Entertainment', label: 'Entertainment', active: selectedCategory === 'Entertainment' },
     { id: 'companies', label: 'Companies', active: selectedCategory === 'companies' },
-    { id: 'leaders', label: 'Leaders', active: selectedCategory === 'leaders' },
-    { id: 'entertainment', label: 'Entertainment', active: selectedCategory === 'entertainment' },
-    { id: 'sports', label: 'Sports', active: selectedCategory === 'sports' },
-    { id: 'lifestyle', label: 'Lifestyle', active: selectedCategory === 'lifestyle' }
+    { id: 'leaders', label: 'Leaders', active: selectedCategory === 'leaders' }
   ];
 
   // Fetch data on component mount
@@ -43,6 +41,10 @@ const ListPage = () => {
 
       if (currentYear !== 'all') {
         filterParams.year = currentYear;
+      }
+
+      if (selectedCategory !== 'all') {
+        filterParams.category = selectedCategory;
       }
 
       const response = await listService.getAllLists(filterParams);
@@ -76,6 +78,7 @@ const ListPage = () => {
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
+    fetchListData();
   };
 
   return (
