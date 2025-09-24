@@ -169,9 +169,15 @@ class PlaceholderController {
    * @returns {string} Escaped text
    */
   escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text;
-    return div.innerHTML;
+    const htmlEscapes = {
+      '&': '&',
+      '<': '<',
+      '>': '>',
+      '"': '"',
+      "'": '&#x27;',
+      '/': '&#x2F;'
+    };
+    return text.replace(/[&<>"'\/]/g, (char) => htmlEscapes[char]);
   }
 
   /**
