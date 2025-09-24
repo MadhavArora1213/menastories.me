@@ -70,6 +70,7 @@ const ListPage = () => {
         }
 
         console.log('All Lists:', allLists); // Debug log
+        console.log('Current filters:', { currentYear, selectedCategory }); // Debug log
 
         // Extract unique categories and years from the data
         const categories = [...new Set(allLists.map(list => list.category).filter(Boolean))];
@@ -78,24 +79,40 @@ const ListPage = () => {
         setAvailableCategories(categories);
         setAvailableYears(years);
 
-        // Filter lists based on current selection
-        let filteredLists = allLists;
+        // Start with all lists
+        let filteredLists = [...allLists];
 
-        if (currentYear !== 'all' && currentYear !== 'recommended') {
-          filteredLists = filteredLists.filter(list => list.year === currentYear);
+        // Apply year filter only if it's not 'all' or 'recommended'
+        if (currentYear !== 'all' && currentYear !== 'recommended' && selectedCategory !== 'recommended') {
+          filteredLists = filteredLists.filter(list => {
+            console.log(`Comparing list year ${list.year} with current year ${currentYear}`);
+            return list.year === currentYear;
+          });
         }
 
+        // Apply category filter only if it's not 'all' or 'recommended'
         if (selectedCategory !== 'all' && selectedCategory !== 'recommended') {
-          filteredLists = filteredLists.filter(list => 
-            list.category?.toLowerCase() === selectedCategory.toLowerCase()
-          );
+          filteredLists = filteredLists.filter(list => {
+            const listCategory = list.category?.toLowerCase();
+            const filterCategory = selectedCategory.toLowerCase();
+            console.log(`Comparing list category "${listCategory}" with filter "${filterCategory}"`);
+            return listCategory === filterCategory || 
+                   listCategory?.includes(filterCategory) || 
+                   filterCategory.includes(listCategory);
+          });
         }
+
+        console.log('Filtered Lists:', filteredLists); // Debug log
 
         setLists(filteredLists);
 
-        // Set the most recent list as featured
+        // Set the most recent list as featured from ALL lists (not filtered)
         if (allLists.length > 0) {
-          const latestList = allLists.sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt))[0];
+          const latestList = allLists.sort((a, b) => {
+            const dateA = new Date(b.created_at || b.createdAt || b.updatedAt || '2025-01-01');
+            const dateB = new Date(a.created_at || a.createdAt || a.updatedAt || '2025-01-01');
+            return dateA - dateB;
+          })[0];
           setFeaturedList(latestList);
         } else {
           setFeaturedList(null);
@@ -120,13 +137,23 @@ const ListPage = () => {
   };
 
   const handleYearChange = (year) => {
+    console.log('Year changed to:', year);
     setCurrentYear(year);
-    debouncedFetch(true);
+    // Reset category to 'all' when changing year (except for recommended)
+    if (year !== 'recommended') {
+      setSelectedCategory('all');
+    }
+    setTimeout(() => fetchListData(false), 100); // Small delay to ensure state is updated
   };
 
   const handleCategoryChange = (category) => {
+    console.log('Category changed to:', category);
     setSelectedCategory(category);
-    debouncedFetch(true);
+    // Reset year to 'all' when changing category (except for recommended)
+    if (category !== 'recommended') {
+      setCurrentYear('all');
+    }
+    setTimeout(() => fetchListData(false), 100); // Small delay to ensure state is updated
   };
 
   const handleRefresh = () => {
@@ -255,6 +282,16 @@ const ListPage = () => {
 
               {/* Year Navigation */}
               <div className="flex items-center gap-8 mb-8 border-b border-gray-200 overflow-x-auto">
+                <button
+                  onClick={() => handleYearChange('all')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    currentYear === 'all'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  All
+                </button>
                 {[2026, 2025, 2024, 2023, 2022, 2021].map((year) => (
                   <button
                     key={year}
@@ -272,6 +309,7 @@ const ListPage = () => {
                   onClick={() => {
                     setSelectedCategory('recommended');
                     setCurrentYear('all');
+                    setTimeout(() => fetchListData(false), 100);
                   }}
                   className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                     selectedCategory === 'recommended'
@@ -285,6 +323,16 @@ const ListPage = () => {
 
               {/* Category Navigation */}
               <div className="flex items-center gap-8 mb-12 border-b border-gray-200 overflow-x-auto">
+                <button
+                  onClick={() => handleCategoryChange('all')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'all'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  All
+                </button>
                 <button
                   onClick={() => handleCategoryChange('rich-lists')}
                   className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
@@ -357,16 +405,26 @@ const ListPage = () => {
                 </button>
               </div>
 
+              {/* Debug Info (remove in production) */}
+              <div className="mb-4 p-4 bg-gray-100 rounded text-sm">
+                <p><strong>Debug Info:</strong></p>
+                <p>Total Lists: {lists.length}</p>
+                <p>Current Year: {currentYear}</p>
+                <p>Selected Category: {selectedCategory}</p>
+                <p>Available Categories: {availableCategories.join(', ')}</p>
+                <p>Available Years: {availableYears.join(', ')}</p>
+              </div>
+
               {/* Lists Grid */}
               {lists.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
-                  {lists.map((list) => (
+                  {lists.map((list, index) => (
                     <Link
-                      key={list.id}
+                      key={list.id || index}
                       to={`/lists/${list.slug}`}
                       className="group cursor-pointer block"
                     >
-                      <div className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                      <div className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-200 rounded-lg">
                         {/* Featured Image */}
                         <div className="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
                           {list.featuredImage || list.featured_image || list.image ? (
@@ -381,7 +439,7 @@ const ListPage = () => {
                           ) : (
                             <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
                               <span className="text-white text-lg font-bold opacity-50">
-                                {list.title?.split(' ').slice(0, 2).join(' ')}
+                                {list.title?.split(' ').slice(0, 2).join(' ') || 'List'}
                               </span>
                             </div>
                           )}
@@ -422,19 +480,23 @@ const ListPage = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">No Lists Available</h2>
                   <p className="text-gray-600 text-lg text-center max-w-md mb-4">
                     {selectedCategory === 'all' && currentYear === 'all'
-                      ? 'No lists found in the database.'
-                      : `No lists found for ${selectedCategory !== 'all' ? selectedCategory : ''} ${currentYear !== 'all' ? currentYear : ''}`}
+                      ? 'Click "All" in both Year and Category filters to see all available lists.'
+                      : `No lists found for the selected filters. Try clicking "All" in the filters above.`}
                   </p>
                   <div className="text-sm text-gray-500 mb-6">
                     <p>Available categories: {availableCategories.join(', ') || 'None'}</p>
                     <p>Available years: {availableYears.join(', ') || 'None'}</p>
                   </div>
                   <button
-                    onClick={handleRefresh}
+                    onClick={() => {
+                      setCurrentYear('all');
+                      setSelectedCategory('all');
+                      handleRefresh();
+                    }}
                     className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
                   >
                     <RefreshCw className="h-4 w-4" />
-                    Refresh Lists
+                    Show All Lists
                   </button>
                 </div>
               )}
