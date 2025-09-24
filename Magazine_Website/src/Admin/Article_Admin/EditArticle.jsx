@@ -507,7 +507,7 @@ const EditArticle = () => {
 
            // Create FormData for upload
            const formDataUpload = new FormData();
-           formDataUpload.append('image', formData.featuredImage);
+           formDataUpload.append('featured_image', formData.featuredImage);
 
            // Upload the image using the same method as CreateArticle
            console.log('=== IMAGE UPLOAD DEBUG ===');
@@ -589,7 +589,7 @@ const EditArticle = () => {
 
              // Create FormData for upload
              const formDataUpload = new FormData();
-             formDataUpload.append('image', file);
+             formDataUpload.append('featured_image', file);
 
              // Upload the image using the same method as CreateArticle
              console.log(`Uploading gallery image: ${file.name}`);

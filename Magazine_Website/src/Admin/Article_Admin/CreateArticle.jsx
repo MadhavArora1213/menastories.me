@@ -983,7 +983,7 @@ const CreateArticle = () => {
         for (const file of formData.gallery) {
           try {
             const formDataUpload = new FormData();
-            formDataUpload.append('image', file);
+            formDataUpload.append('featured_image', file);
 
             const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
             if (uploadResponse.success && uploadResponse.file?.filename) {
