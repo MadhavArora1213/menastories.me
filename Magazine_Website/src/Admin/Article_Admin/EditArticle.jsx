@@ -159,7 +159,7 @@ const EditArticle = () => {
               featuredImage: articleData.featuredImage ? null : prevFormData.featuredImage,
               imageCaption: articleData.imageCaption || '',
               // Use database gallery if available, otherwise preserve uploaded files
-              gallery: articleData.gallery && articleData.gallery.length > 0 ? [] : prevFormData.gallery,
+              gallery: articleData.gallery && articleData.gallery.length > 0 ? articleData.gallery : prevFormData.gallery,
               authorBioOverride: articleData.authorBioOverride || '',
               status: articleData.status || 'draft',
               custom_tags: prevFormData.custom_tags || '', // Preserve custom tags input
