@@ -99,19 +99,19 @@ const ListPage = () => {
         }
 
         // Update metadata from featured list data
-        if (featured) {
+        if (latestList) {
           setListMetadata({
-            title: featured.title || "Sustainability Leaders in Government 2025",
-            category: featured.category || "Government",
-            year: featured.created_at ? new Date(featured.created_at).getFullYear().toString() : "2025",
-            description: featured.description || "The most influential sustainability leaders in government across the Middle East.",
-            metaTitle: `${featured.title || "Sustainability Leaders in Government 2025"} | Forbes Middle East`,
-            metaDescription: featured.meta_description || featured.description || "Forbes Middle East curated list."
+            title: latestList.title || "Sustainability Leaders in Government 2025",
+            category: latestList.category || "Government",
+            year: latestList.created_at ? new Date(latestList.created_at).getFullYear().toString() : "2025",
+            description: latestList.description || "The most influential sustainability leaders in government across the Middle East.",
+            metaTitle: `${latestList.title || "Sustainability Leaders in Government 2025"} | Forbes Middle East`,
+            metaDescription: latestList.meta_description || latestList.description || "Forbes Middle East curated list."
           });
         }
 
         // Transform entries for featured list to match the expected format
-        if (featured && featured.entries && featured.entries.length > 0) {
+        if (latestList && latestList.entries && latestList.entries.length > 0) {
           const transformedEntries = featured.entries.map(entry => ({
             id: entry.id,
             rank: entry.rank || 0,
