@@ -402,22 +402,25 @@ const CreateArticle = () => {
     }
   }, [formData.categoryId]);
 
-  // Auto-save functionality
+  // Auto-save functionality - only when user has made changes and not actively typing
   useEffect(() => {
     if (formData.title && formData.content && formData.categoryId && formData.authorId) {
       if (autoSaveRef.current) {
         clearTimeout(autoSaveRef.current);
       }
       autoSaveRef.current = setTimeout(() => {
-        autoSave();
-      }, 30000);
+        // Only auto-save if user has been inactive for 60 seconds and has security verification
+        if (formData.captchaVerified && formData.guidelinesAccepted) {
+          autoSave();
+        }
+      }, 60000); // Increased to 60 seconds
     }
     return () => {
       if (autoSaveRef.current) {
         clearTimeout(autoSaveRef.current);
       }
     };
-  }, [formData.title, formData.content, formData.categoryId, formData.authorId]);
+  }, [formData.title, formData.content, formData.categoryId, formData.authorId, formData.captchaVerified, formData.guidelinesAccepted]);
 
   const fetchInitialData = async () => {
     try {
@@ -497,23 +500,23 @@ const CreateArticle = () => {
 
 
   const autoSave = async () => {
-    if (formData.title && formData.content && formData.categoryId && formData.authorId) {
+    // Only auto-save if user has been inactive and has security verification
+    if (formData.title && formData.content && formData.categoryId && formData.authorId &&
+        formData.captchaVerified && formData.guidelinesAccepted) {
       try {
+        // Only save as draft, never publish automatically
         const response = await articleService.createArticle({ ...formData, status: 'draft' });
         if (response.success) {
           toast.info('Draft auto-saved', { autoClose: 2000 });
-          // Redirect to edit mode after first save
-          navigate(`/admin/articles/edit/${response.data.id}`);
+          // Only redirect to edit mode after first save if user wants to continue editing
+          if (response.data.id && !window.location.pathname.includes('/edit/')) {
+            navigate(`/admin/articles/edit/${response.data.id}`);
+          }
         }
       } catch (error) {
         console.error('Auto-save failed:', error);
-        let errorMessage = 'Auto-save failed. Please save manually.';
-        if (error.message && error.message.toLowerCase().includes('author')) {
-          errorMessage = 'Please select an author before auto-saving.';
-        } else if (error.message) {
-          errorMessage = error.message;
-        }
-        toast.error(errorMessage);
+        // Don't show error for auto-save failures to avoid annoying the user
+        console.warn('Auto-save failed, but user can continue working');
       }
     }
   };
@@ -900,6 +903,42 @@ const CreateArticle = () => {
       return acc;
     }, {});
     setTouched(touchedFields);
+
+    // Enhanced security verification before publishing
+    if (status !== 'draft') {
+      // Double-check security requirements
+      if (!formData.captchaVerified) {
+        toast.error('Security verification expired. Please complete CAPTCHA again.');
+        return;
+      }
+
+      if (!formData.guidelinesAccepted) {
+        toast.error('You must accept the content guidelines before publishing.');
+        return;
+      }
+
+      // Additional security checks
+      if (!formData.title || formData.title.trim().length < 10) {
+        toast.error('Article title must be at least 10 characters long for publishing.');
+        return;
+      }
+
+      if (!formData.content || formData.content.replace(/<[^>]*>/g, '').trim().length < 100) {
+        toast.error('Article content must be at least 100 words for publishing.');
+        return;
+      }
+
+      if (formData.tags.length < 3) {
+        toast.error('At least 3 tags are required for publishing.');
+        return;
+      }
+
+      // Verify admin permissions
+      if (!admin || !isMasterAdmin()) {
+        toast.error('You do not have permission to publish articles.');
+        return;
+      }
+    }
 
     // Validate form
     const validationErrors = validateForm();

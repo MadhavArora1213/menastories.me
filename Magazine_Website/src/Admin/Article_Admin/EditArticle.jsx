@@ -396,6 +396,47 @@ const EditArticle = () => {
 
     const statusToSave = newStatus || formData.status;
 
+    // Enhanced security verification before publishing
+    if (statusToSave !== 'draft') {
+      // Double-check security requirements
+      if (!formData.captchaVerified) {
+        showError('Security verification expired. Please complete CAPTCHA again.');
+        return;
+      }
+
+      if (!formData.guidelinesAccepted) {
+        showError('You must accept the content guidelines before publishing.');
+        return;
+      }
+
+      // Additional security checks
+      if (!formData.title || formData.title.trim().length < 10) {
+        showError('Article title must be at least 10 characters long for publishing.');
+        return;
+      }
+
+      if (!formData.content || formData.content.replace(/<[^>]*>/g, '').trim().length < 100) {
+        showError('Article content must be at least 100 words for publishing.');
+        return;
+      }
+
+      if (formData.tags.length < 3) {
+        showError('At least 3 tags are required for publishing.');
+        return;
+      }
+
+      // Verify admin permissions
+      if (!admin || !isMasterAdmin()) {
+        showError('You do not have permission to publish articles.');
+        return;
+      }
+
+      // Additional validation for status changes
+      if (statusToSave === 'published' && article.status !== 'published') {
+        showWarning('Publishing this article will make it live immediately. Are you sure?');
+      }
+    }
+
     if (statusToSave !== 'draft' && !validateForm()) {
       return;
     }
@@ -410,77 +451,121 @@ const EditArticle = () => {
          keywords: formData.keywords
        };
 
-      // Handle featured image upload
-      if (formData.featuredImage instanceof File) {
-        try {
-          // Validate file size (max 5MB)
-          if (formData.featuredImage.size > 5 * 1024 * 1024) {
-            showError('Featured image size should be less than 5MB');
-            return;
-          }
+      // Handle featured image upload with proper database path update
+       if (formData.featuredImage instanceof File) {
+         try {
+           // Validate file size (max 5MB)
+           if (formData.featuredImage.size > 5 * 1024 * 1024) {
+             showError('Featured image size should be less than 5MB');
+             return;
+           }
 
-          // Create FormData for upload
-          const formDataUpload = new FormData();
-          formDataUpload.append('image', formData.featuredImage);
+           // Create FormData for upload
+           const formDataUpload = new FormData();
+           formDataUpload.append('image', formData.featuredImage);
 
-          // Upload the image using the same method as CreateArticle
-          const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
-          if (uploadResponse.success && uploadResponse.data?.filename) {
-            submitData.featuredImage = uploadResponse.data.filename;
-          } else {
-            showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
-            return;
-          }
-        } catch (uploadError) {
-          console.error('Error uploading featured image:', uploadError);
-          showError(`Failed to upload featured image: ${uploadError.message}`);
-          return;
-        }
-      }
+           // Upload the image using the same method as CreateArticle
+           const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
+           if (uploadResponse.success && uploadResponse.data?.filename) {
+             // Store the old image path for deletion
+             const oldImagePath = article.featuredImage;
+             submitData.featuredImage = uploadResponse.data.filename;
 
-      // Handle gallery images upload
-      if (formData.gallery.length > 0) {
-        const galleryImagePaths = [];
-        for (const file of formData.gallery) {
-          try {
-            // Validate file size (max 5MB)
-            if (file.size > 5 * 1024 * 1024) {
-              showError(`${file.name} is too large. Max size is 5MB`);
-              continue;
-            }
+             // If there's an old image, mark it for deletion
+             if (oldImagePath && oldImagePath !== uploadResponse.data.filename) {
+               submitData.oldFeaturedImage = oldImagePath;
+             }
 
-            // Validate file type
-            if (!file.type.startsWith('image/')) {
-              showError(`${file.name} is not an image file`);
-              continue;
-            }
+             showInfo('Featured image uploaded successfully');
+           } else {
+             showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
+             return;
+           }
+         } catch (uploadError) {
+           console.error('Error uploading featured image:', uploadError);
+           showError(`Failed to upload featured image: ${uploadError.message}`);
+           return;
+         }
+       } else if (formData.featuredImage === null && article.featuredImage) {
+         // User removed the featured image
+         submitData.oldFeaturedImage = article.featuredImage;
+         submitData.featuredImage = null;
+       }
 
-            // Create FormData for upload
-            const formDataUpload = new FormData();
-            formDataUpload.append('image', file);
+      // Handle gallery images upload with proper database path management
+       if (formData.gallery.length > 0) {
+         const galleryImagePaths = [];
+         const oldGalleryImages = [];
 
-            // Upload the image using the same method as CreateArticle
-            const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
-            if (uploadResponse.success && uploadResponse.data?.filename) {
-              galleryImagePaths.push(uploadResponse.data.filename);
-            } else {
-              showError(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
-            }
-          } catch (uploadError) {
-            console.error('Error uploading gallery image:', uploadError);
-            showError(`Failed to upload ${file.name}: ${uploadError.message}`);
-          }
-        }
+         // Collect existing gallery images for potential deletion
+         if (article.gallery && Array.isArray(article.gallery)) {
+           for (const image of article.gallery) {
+             const imagePath = typeof image === 'string' ? image : image.url;
+             if (imagePath) {
+               oldGalleryImages.push(imagePath);
+             }
+           }
+         }
 
-        // Convert filenames to gallery objects as expected by backend
-        if (galleryImagePaths.length > 0) {
-          submitData.gallery = galleryImagePaths.map(filename => ({
-            url: filename,
-            alt: '',
-            caption: ''
-          }));
-        }
-      }
+         for (const file of formData.gallery) {
+           try {
+             // Validate file size (max 5MB)
+             if (file.size > 5 * 1024 * 1024) {
+               showError(`${file.name} is too large. Max size is 5MB`);
+               continue;
+             }
+
+             // Validate file type
+             if (!file.type.startsWith('image/')) {
+               showError(`${file.name} is not an image file`);
+               continue;
+             }
+
+             // Create FormData for upload
+             const formDataUpload = new FormData();
+             formDataUpload.append('image', file);
+
+             // Upload the image using the same method as CreateArticle
+             const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
+             if (uploadResponse.success && uploadResponse.data?.filename) {
+               galleryImagePaths.push(uploadResponse.data.filename);
+               showInfo(`${file.name} uploaded successfully`);
+             } else {
+               showError(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
+             }
+           } catch (uploadError) {
+             console.error('Error uploading gallery image:', uploadError);
+             showError(`Failed to upload ${file.name}: ${uploadError.message}`);
+           }
+         }
+
+         // Convert filenames to gallery objects as expected by backend
+         if (galleryImagePaths.length > 0) {
+           submitData.gallery = galleryImagePaths.map(filename => ({
+             url: filename,
+             alt: '',
+             caption: ''
+           }));
+
+           // Mark old gallery images for deletion if they exist
+           if (oldGalleryImages.length > 0) {
+             submitData.oldGalleryImages = oldGalleryImages;
+           }
+         }
+       } else if (formData.gallery.length === 0 && article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0) {
+         // User removed all gallery images
+         const oldGalleryImages = [];
+         for (const image of article.gallery) {
+           const imagePath = typeof image === 'string' ? image : image.url;
+           if (imagePath) {
+             oldGalleryImages.push(imagePath);
+           }
+         }
+         if (oldGalleryImages.length > 0) {
+           submitData.oldGalleryImages = oldGalleryImages;
+           submitData.gallery = [];
+         }
+       }
 
       const response = await articleService.updateArticle(id, submitData);
 
