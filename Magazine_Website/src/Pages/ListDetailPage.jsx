@@ -282,9 +282,11 @@ const ListDetailPage = () => {
                         {index + 1}
                       </div>
                     </div>
-                    <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{entry.name}</h3>
-                    <p className="text-sm text-blue-600 mb-1 font-medium">{entry.company}</p>
-                    <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                    <Link to={`/lists/${listData.slug}/${entry.slug || entry.id}`} className="block group-hover:scale-105 transition-transform">
+                      <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors cursor-pointer">{entry.name}</h3>
+                      <p className="text-sm text-blue-600 mb-1 font-medium">{entry.company}</p>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                    </Link>
                   </div>
                 ))}
               </div>
@@ -315,9 +317,11 @@ const ListDetailPage = () => {
                       </div>
                     </div>
                     <div className="p-5">
-                      <h3 className="font-bold text-base text-gray-900 mb-2 group-hover:text-green-600 transition-colors">{entry.name}</h3>
-                      <p className="text-sm text-blue-600 mb-2 font-medium">{entry.company}</p>
-                      <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                      <Link to={`/lists/${listData.slug}/${entry.slug || entry.id}`} className="block">
+                        <h3 className="font-bold text-base text-gray-900 mb-2 group-hover:text-green-600 transition-colors cursor-pointer">{entry.name}</h3>
+                        <p className="text-sm text-blue-600 mb-2 font-medium">{entry.company}</p>
+                        <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                      </Link>
                     </div>
                   </div>
                 ))}

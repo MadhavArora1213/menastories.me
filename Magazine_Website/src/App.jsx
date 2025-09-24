@@ -60,6 +60,7 @@ import NewsContentPage from './Pages/NewsContentPage'; // Dedicated News Content
 import VideoPage from './Pages/VideoPage'; // Video article page
 import ListPage from './Pages/ListPage'; // List page
 import ListDetailPage from './Pages/ListDetailPage'; // Individual list detail page
+import ListEntryDetailPage from './Pages/ListEntryDetailPage'; // Individual list entry detail page
 import AdminIndex from './Admin/AdminIndex';
 import NewsletterSubscriptionPopup from './Components/Newsletter/NewsletterSubscriptionPopup';
 import { useAuth } from './context/AuthContext';
@@ -210,9 +211,10 @@ function App() {
                           {/* Video routes */}
                           <Route path="/videos/:slug" element={<VideoPage />} />
 
-                          {/* List page route */}
+                          {/* List page routes */}
                           <Route path="/list" element={<ListPage />} />
                           <Route path="/lists/:slug" element={<ListDetailPage />} />
+                          <Route path="/lists/:listSlug/:entrySlug" element={<ListEntryDetailPage />} />
 
                           {/* Dynamic category and subcategory routes - handle any slug from database */}
                           <Route path="/:categorySlug" element={<CategoryPage />} />
