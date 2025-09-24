@@ -91,34 +91,45 @@ const ListPage = () => {
 
         // Set featured list (latest one from database based on creation date)
         const latestList = allLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-        setFeaturedList(latestList);
+        if (latestList) {
+          setFeaturedList(latestList);
+        } else {
+          // Fallback to first list if sorting fails
+          setFeaturedList(allLists[0]);
+        }
 
         // Update metadata from featured list data
-        setListMetadata({
-          title: featured.title || "Sustainability Leaders in Government 2025",
-          category: featured.category || "Government",
-          year: new Date(featured.created_at).getFullYear().toString(),
-          description: featured.description || "The most influential sustainability leaders in government across the Middle East.",
-          metaTitle: `${featured.title} | Forbes Middle East`,
-          metaDescription: featured.meta_description || featured.description || "Forbes Middle East curated list."
-        });
+        if (featured) {
+          setListMetadata({
+            title: featured.title || "Sustainability Leaders in Government 2025",
+            category: featured.category || "Government",
+            year: featured.created_at ? new Date(featured.created_at).getFullYear().toString() : "2025",
+            description: featured.description || "The most influential sustainability leaders in government across the Middle East.",
+            metaTitle: `${featured.title || "Sustainability Leaders in Government 2025"} | Forbes Middle East`,
+            metaDescription: featured.meta_description || featured.description || "Forbes Middle East curated list."
+          });
+        }
 
         // Transform entries for featured list to match the expected format
-        const transformedEntries = featured.entries.map(entry => ({
-          id: entry.id,
-          rank: entry.rank || 0,
-          name: entry.name,
-          title: entry.designation || 'Leader',
-          company: entry.company || 'Organization',
-          industry: entry.category || 'Government',
-          description: entry.description || 'No description available.',
-          image: entry.image ?
-            `${import.meta.env.VITE_API_URL || 'https://menastories.me/api'}/storage/images/${entry.image.split('/').pop()}` :
-            null,
-          verified: true
-        }));
+        if (featured && featured.entries && featured.entries.length > 0) {
+          const transformedEntries = featured.entries.map(entry => ({
+            id: entry.id,
+            rank: entry.rank || 0,
+            name: entry.name,
+            title: entry.designation || 'Leader',
+            company: entry.company || 'Organization',
+            industry: entry.category || 'Government',
+            description: entry.description || 'No description available.',
+            image: entry.image ?
+              `${import.meta.env.VITE_API_URL || 'https://menastories.me/api'}/storage/images/${entry.image.split('/').pop()}` :
+              null,
+            verified: true
+          }));
 
-        setFeaturedListItems(transformedEntries);
+          setFeaturedListItems(transformedEntries);
+        } else {
+          setFeaturedListItems([]);
+        }
       } else {
         setError('No published lists found matching your criteria');
         setLists([]);
@@ -254,7 +265,7 @@ const ListPage = () => {
                   {/* Portrait Grid */}
                   <div className="absolute inset-0 p-8">
                     <div className="grid grid-cols-5 gap-4 h-full">
-                      {featuredListItems.slice(0, 10).map((item, index) => (
+                      {featuredListItems && featuredListItems.length > 0 ? featuredListItems.slice(0, 10).map((item, index) => (
                         <div key={item.id} className="relative">
                           <div className="w-full h-full rounded-full overflow-hidden border-4 border-white shadow-lg">
                             {item.image ? (
@@ -274,7 +285,11 @@ const ListPage = () => {
                             <span className="font-medium">{item.name}</span>
                           </div>
                         </div>
-                      ))}
+                      )) : (
+                        <div className="col-span-5 flex items-center justify-center h-full">
+                          <span className="text-white text-lg">No featured list items available</span>
+                        </div>
+                      )}
                     </div>
                   </div>
 
