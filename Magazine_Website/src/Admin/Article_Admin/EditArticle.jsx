@@ -289,8 +289,19 @@ const EditArticle = () => {
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
-    if (file) {
+    if (file && file instanceof File) {
+      // Validate file type
+      if (!file.type.startsWith('image/')) {
+        showError('Please select a valid image file');
+        return;
+      }
+      // Validate file size (max 5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        showError('File size should be less than 5MB');
+        return;
+      }
       setFormData(prev => ({ ...prev, featuredImage: file }));
+      showInfo('Featured image selected successfully');
     }
   };
 
@@ -305,6 +316,11 @@ const EditArticle = () => {
 
     // Validate each file
     const validFiles = files.filter(file => {
+      // Check if file is valid
+      if (!file || !(file instanceof File)) {
+        showError('Invalid file detected');
+        return false;
+      }
       if (file.size > 5 * 1024 * 1024) {
         showError(`${file.name} is too large. Max size is 5MB`);
         return false;
@@ -477,6 +493,12 @@ const EditArticle = () => {
       // Handle featured image upload with proper database path update
        if (formData.featuredImage instanceof File) {
          try {
+           // Validate file exists and has required properties
+           if (!formData.featuredImage || typeof formData.featuredImage.size === 'undefined') {
+             showError('Invalid file selected. Please select a valid image file.');
+             return;
+           }
+
            // Validate file size (max 5MB)
            if (formData.featuredImage.size > 5 * 1024 * 1024) {
              showError('Featured image size should be less than 5MB');
@@ -547,6 +569,12 @@ const EditArticle = () => {
 
          for (const file of formData.gallery) {
            try {
+             // Validate file exists and has required properties
+             if (!file || typeof file.size === 'undefined') {
+               showError('Invalid gallery file detected. Skipping...');
+               continue;
+             }
+
              // Validate file size (max 5MB)
              if (file.size > 5 * 1024 * 1024) {
                showError(`${file.name} is too large. Max size is 5MB`);
