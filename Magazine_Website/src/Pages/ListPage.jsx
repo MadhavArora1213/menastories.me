@@ -15,11 +15,7 @@ const ListPage = () => {
     recommended: false,
     richLists: false,
     entrepreneurs: false,
-    companies: false,
-    leaders: false,
-    entertainment: false,
-    sports: false,
-    lifestyle: false
+    companies: false
   });
 
   // Dynamic data from API only
@@ -61,7 +57,29 @@ const ListPage = () => {
       setIsLoading(true);
       setError(null);
 
-      const response = await listService.getAllLists({ limit: 50, status: 'published' });
+      // Build filter parameters based on selected filters
+      const filterParams = {
+        limit: 50,
+        status: 'published'
+      };
+
+      // Add year filter if selected
+      if (selectedYear) {
+        filterParams.year = selectedYear;
+      }
+
+      // Add category filters if any are selected
+      const activeCategories = Object.entries(selectedCategories)
+        .filter(([key, value]) => value)
+        .map(([key, value]) => key);
+
+      if (activeCategories.length > 0) {
+        filterParams.categories = activeCategories.join(',');
+      }
+
+      console.log('Fetching lists with filters:', filterParams);
+
+      const response = await listService.getAllLists(filterParams);
 
       if (response.success && response.data.lists.length > 0) {
         const allLists = response.data.lists;
@@ -98,7 +116,7 @@ const ListPage = () => {
 
         setFeaturedListItems(transformedEntries);
       } else {
-        setError('No published lists found');
+        setError('No published lists found matching your criteria');
         setLists([]);
         setFeaturedListItems([]);
       }
@@ -113,7 +131,7 @@ const ListPage = () => {
   };
 
   const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
-  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021];
 
   const handleYearChange = (year) => {
     setCurrentYear(year);
@@ -130,6 +148,7 @@ const ListPage = () => {
     setSelectedYear(year);
     setCurrentYear(year);
     setIsYearDropdownOpen(false);
+    handleFilterChange();
     console.log('Selected year:', year);
   };
 
@@ -138,7 +157,28 @@ const ListPage = () => {
       ...prev,
       [category]: !prev[category]
     }));
+    // Use setTimeout to ensure state is updated before fetching
+    setTimeout(() => handleFilterChange(), 0);
     console.log('Toggled category:', category);
+  };
+
+  const handleFilterChange = () => {
+    // Refetch data when filters change
+    fetchListData();
+  };
+
+  const clearAllFilters = () => {
+    setSelectedYear(2025);
+    setCurrentYear(2025);
+    setSelectedCategories({
+      recommended: false,
+      richLists: false,
+      entrepreneurs: false,
+      companies: false
+    });
+    // Refetch data after clearing filters
+    setTimeout(() => fetchListData(), 0);
+    console.log('Cleared all filters');
   };
 
   return (
@@ -237,6 +277,19 @@ const ListPage = () => {
                         <span className="text-white text-sm font-medium">Forbes</span>
                         <span className="text-red-300 text-sm">Middle East</span>
                         <div className="w-3 h-3 bg-red-600 rounded-full"></div>
+                      </div>
+    
+                      {/* Filter Actions */}
+                      <div className="mt-6 pt-4 border-t border-gray-200 flex justify-between items-center">
+                        <button
+                          onClick={clearAllFilters}
+                          className="text-sm text-gray-600 hover:text-gray-800 underline"
+                        >
+                          Clear All Filters
+                        </button>
+                        <div className="text-sm text-gray-500">
+                          {Object.values(selectedCategories).filter(Boolean).length + (selectedYear !== 2025 ? 1 : 0)} filter{(Object.values(selectedCategories).filter(Boolean).length + (selectedYear !== 2025 ? 1 : 0)) !== 1 ? 's' : ''} applied
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -343,19 +396,10 @@ const ListPage = () => {
                             <span className="text-sm font-medium text-gray-700 capitalize">
                               {key === 'richLists' ? 'Rich Lists' :
                                key === 'entrepreneurs' ? 'Entrepreneurs' :
-                               key === 'companies' ? 'Companies' :
-                               key === 'lifestyle' ? 'Lifestyle' : key}
+                               key === 'companies' ? 'Companies' : key}
                             </span>
                           </label>
                         ))}
-                      </div>
-
-                      {/* Methodology Section */}
-                      <div className="mt-6 pt-4 border-t border-gray-200">
-                        <h4 className="text-md font-semibold text-gray-900 mb-3">Methodology</h4>
-                        <p className="text-sm text-gray-600">
-                          Our rankings are based on comprehensive research and analysis of various factors including financial performance, innovation, and market impact.
-                        </p>
                       </div>
                     </div>
                   </div>
