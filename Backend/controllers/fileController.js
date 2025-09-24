@@ -140,7 +140,7 @@ exports.uploadFile = [
 
 // Upload image (for frontend compatibility - simpler response format)
 exports.uploadImage = [
-  uploadImage.single('image'),
+  uploadImage.single('featured_image'),
   async (req, res) => {
     try {
       if (!req.file) {
