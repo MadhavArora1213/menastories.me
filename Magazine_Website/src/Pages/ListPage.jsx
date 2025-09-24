@@ -1,7 +1,20 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { AlertCircle } from 'lucide-react';
+import { AlertCircle, RefreshCw } from 'lucide-react';
 import listService from '../services/listService';
+
+// Debounce utility function
+const debounce = (func, wait) => {
+  let timeout;
+  return function executedFunction(...args) {
+    const later = () => {
+      clearTimeout(timeout);
+      func(...args);
+    };
+    clearTimeout(timeout);
+    timeout = setTimeout(later, wait);
+  };
+};
 
 const ListPage = () => {
   const [isLoading, setIsLoading] = useState(true);
@@ -12,6 +25,14 @@ const ListPage = () => {
   // Dynamic data from API
   const [lists, setLists] = useState([]);
   const [featuredList, setFeaturedList] = useState(null);
+
+  // Debounced fetch function to prevent excessive API calls
+  const debouncedFetch = useCallback(
+    debounce((showLoading = true) => {
+      fetchListData(showLoading);
+    }, 300),
+    [currentYear, selectedCategory]
+  );
 
   const years = [2026, 2025, 2024, 2023, 2022, 2021];
   const categories = [
@@ -24,8 +45,7 @@ const ListPage = () => {
     { id: 'entertainment', label: 'Entertainment', active: selectedCategory === 'entertainment' },
     { id: 'sports', label: 'Sports', active: selectedCategory === 'sports' },
     { id: 'lifestyle', label: 'Lifestyle', active: selectedCategory === 'lifestyle' },
-    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' },
-    { id: 'tfdhhm', label: 'TFDHHM', active: selectedCategory === 'tfdhhm' }
+    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' }
   ];
 
   // Fetch data on component mount
@@ -33,13 +53,15 @@ const ListPage = () => {
     fetchListData();
   }, []);
 
-  const fetchListData = async () => {
+  const fetchListData = async (showLoading = true) => {
     try {
-      setIsLoading(true);
+      if (showLoading) {
+        setIsLoading(true);
+      }
       setError(null);
 
       const filterParams = {
-        limit: 50,
+        limit: 100,
         status: 'published'
       };
 
@@ -53,13 +75,17 @@ const ListPage = () => {
 
       const response = await listService.getAllLists(filterParams);
 
-      if (response.success && response.data && response.data.lists && response.data.lists.length > 0) {
+      if (response.success && response.data && response.data.lists) {
         const allLists = response.data.lists;
         setLists(allLists);
 
-        // Set latest list as featured
-        const latestList = allLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
-        setFeaturedList(latestList);
+        // Set latest list as featured if we have data
+        if (allLists.length > 0) {
+          const latestList = allLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+          setFeaturedList(latestList);
+        } else {
+          setFeaturedList(null);
+        }
       } else {
         // Show empty state if no data
         setLists([]);
@@ -67,7 +93,7 @@ const ListPage = () => {
       }
     } catch (err) {
       console.error('Error fetching list data:', err);
-      setError('Failed to load lists');
+      setError('Failed to load lists. Please try again.');
       setLists([]);
       setFeaturedList(null);
     } finally {
@@ -77,12 +103,16 @@ const ListPage = () => {
 
   const handleYearChange = (year) => {
     setCurrentYear(year);
-    fetchListData();
+    debouncedFetch(true);
   };
 
   const handleCategoryChange = (category) => {
     setSelectedCategory(category);
-    fetchListData();
+    debouncedFetch(true);
+  };
+
+  const handleRefresh = () => {
+    fetchListData(true);
   };
 
   return (
@@ -118,6 +148,13 @@ const ListPage = () => {
             <div className="flex flex-col justify-center items-center py-20">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black mb-6"></div>
               <p className="text-gray-600 text-lg">Loading lists from database...</p>
+              <button
+                onClick={handleRefresh}
+                className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Refresh Now
+              </button>
             </div>
           ) : error ? (
             <div className="flex flex-col justify-center items-center py-20">
@@ -125,9 +162,16 @@ const ListPage = () => {
                 <AlertCircle className="h-16 w-16 text-red-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Lists</h2>
-              <p className="text-gray-600 text-lg text-center max-w-md">
+              <p className="text-gray-600 text-lg text-center max-w-md mb-6">
                 {error}
               </p>
+              <button
+                onClick={handleRefresh}
+                className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
+              >
+                <RefreshCw className="h-4 w-4" />
+                Try Again
+              </button>
             </div>
           ) : (
             <>
@@ -194,7 +238,7 @@ const ListPage = () => {
               </div>
 
               {/* Category Filters */}
-              <div className="flex flex-wrap gap-4 mb-12">
+              <div className="flex flex-wrap items-center gap-4 mb-12">
                 {categories.map((category) => (
                   <button
                     key={category.id}
@@ -208,6 +252,14 @@ const ListPage = () => {
                     {category.label}
                   </button>
                 ))}
+                <button
+                  onClick={handleRefresh}
+                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
+                  title="Refresh data"
+                >
+                  <RefreshCw className="h-4 w-4" />
+                  Refresh
+                </button>
               </div>
 
               {/* Lists Grid */}
