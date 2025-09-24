@@ -26,6 +26,7 @@ const ListPage = () => {
   const [lists, setLists] = useState([]);
   const [featuredList, setFeaturedList] = useState(null);
   const [featuredListItems, setFeaturedListItems] = useState([]);
+  const [featured, setFeatured] = useState(null);
 
   // List metadata
   const [listMetadata, setListMetadata] = useState({
