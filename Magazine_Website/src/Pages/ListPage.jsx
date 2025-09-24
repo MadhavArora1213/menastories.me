@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { Search, Filter, Award, TrendingUp, Users, Building2, Star, ChevronRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { Search, Filter, Award, TrendingUp, Users, Building2, Star, ChevronRight, AlertCircle, RefreshCw, Calendar, Tag, FileText, Image, Settings } from 'lucide-react';
 import listService from '../services/listService';
 
 const ListPage = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
+  const [selectedListType, setSelectedListType] = useState('recommended');
   const [sortBy, setSortBy] = useState('rank');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -13,6 +14,20 @@ const ListPage = () => {
   // Dynamic data from API
   const [listData, setListData] = useState(null);
   const [listItems, setListItems] = useState([]);
+
+  // List metadata from form structure
+  const [listMetadata, setListMetadata] = useState({
+    title: "Middle East's Most Influential Business Leaders 2024",
+    slug: "middle-east-most-influential-business-leaders-2024",
+    category: "Business",
+    year: "2024",
+    description: "A comprehensive ranking of the most influential business leaders shaping the Middle East's economic landscape.",
+    content: "This list recognizes leaders who have demonstrated exceptional vision, innovation, and impact in their respective industries. Our methodology includes factors such as company performance, industry influence, leadership achievements, and community impact.",
+    methodology: "Compiled through extensive research, industry analysis, and expert consultations. Rankings are based on quantitative metrics including revenue growth, market impact, and qualitative assessments of leadership excellence.",
+    metaTitle: "Middle East's Most Influential Business Leaders 2024 | Forbes Rankings",
+    metaDescription: "Discover the most influential business leaders and executives shaping the Middle East's economic landscape in 2024.",
+    featuredImageCaption: "Top business leaders from across the Middle East region"
+  });
 
   // Fetch data on component mount
   useEffect(() => {
@@ -137,6 +152,17 @@ const ListPage = () => {
     }
   ];
 
+  const listTypes = [
+    { id: 'recommended', name: 'Recommended', icon: Award },
+    { id: 'rich-lists', name: 'Rich Lists', icon: TrendingUp },
+    { id: 'entrepreneurs', name: 'Entrepreneurs', icon: Users },
+    { id: 'companies', name: 'Companies', icon: Building2 },
+    { id: 'leaders', name: 'Leaders', icon: Star },
+    { id: 'entertainment', name: 'Entertainment', icon: Star },
+    { id: 'sports', name: 'Sports', icon: Award },
+    { id: 'lifestyle', name: 'Lifestyle', icon: Users }
+  ];
+
   const categories = [
     { id: 'all', name: 'All Categories', icon: Award },
     { id: 'technology', name: 'Technology', icon: TrendingUp },
@@ -172,6 +198,10 @@ const ListPage = () => {
     setTimeout(() => setIsLoading(false), 500); // Simulate loading
   };
 
+  const handleListTypeChange = (listType) => {
+    setSelectedListType(listType);
+  };
+
   const handleSortChange = (sort) => {
     setSortBy(sort);
   };
@@ -179,73 +209,148 @@ const ListPage = () => {
   return (
     <>
       <Helmet>
-        <title>Top Business Leaders 2024 | Middle East's Most Influential Executives</title>
-        <meta name="description" content="Discover the most influential business leaders and executives shaping the Middle East's economic landscape in 2024." />
+        <title>{listMetadata.metaTitle}</title>
+        <meta name="description" content={listMetadata.metaDescription} />
         <meta name="keywords" content="business leaders, executives, Middle East, top CEOs, influential people" />
       </Helmet>
 
-      <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
-        {/* Header with Forbes-style branding */}
-        <header className="bg-white shadow-sm border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-4">
+      <div className="min-h-screen bg-white">
+        {/* Clean Header */}
+        <header className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-lg">F</span>
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-xl">F</span>
                 </div>
                 <div>
-                  <h1 className="text-xl font-bold text-gray-900">Forbes Middle East</h1>
+                  <h1 className="text-2xl font-bold text-black">Forbes Middle East</h1>
                   <p className="text-sm text-gray-600">Business Intelligence</p>
                 </div>
               </div>
               <nav className="hidden md:flex items-center gap-8">
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Lists</a>
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Companies</a>
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Leaders</a>
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">Innovation</a>
-                <a href="#" className="text-gray-700 hover:text-blue-600 font-medium">About</a>
+                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Lists</a>
+                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Companies</a>
+                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Leaders</a>
+                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Innovation</a>
+                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">About</a>
               </nav>
             </div>
           </div>
         </header>
 
-        {/* Hero Section */}
-        <section className="relative bg-gradient-to-r from-blue-900 via-blue-800 to-indigo-900 text-white py-24 px-4">
-          <div className="absolute inset-0 bg-black/20"></div>
-          <div className="relative max-w-7xl mx-auto text-center">
-            <div className="inline-flex items-center gap-2 bg-blue-600/20 backdrop-blur-sm rounded-full px-6 py-2 mb-6">
-              <Award className="w-5 h-5 text-yellow-400" />
-              <span className="text-sm font-medium uppercase tracking-wide">2024 EDITION</span>
-            </div>
-            <h1 className="text-5xl md:text-7xl font-bold mb-6 leading-tight">
-              Middle East's Most
-              <span className="block text-transparent bg-clip-text bg-gradient-to-r from-yellow-400 to-orange-400">
-                Influential Leaders
-              </span>
-            </h1>
-            <p className="text-xl md:text-2xl text-blue-100 max-w-4xl mx-auto leading-relaxed mb-12">
-              Celebrating the visionaries, innovators, and trailblazers who are shaping the future of business across the Middle East region.
-            </p>
-            <div className="flex flex-wrap justify-center gap-8 text-center">
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
-                <div className="text-4xl font-bold text-yellow-400 mb-1">500+</div>
-                <div className="text-blue-200 text-sm uppercase tracking-wide">Leaders Featured</div>
+        {/* List Metadata Section */}
+        <section className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+              {/* Title and Slug */}
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <Tag className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-black">List Information</h3>
+                </div>
+                <h2 className="text-xl font-bold text-black mb-2">{listMetadata.title}</h2>
+                <p className="text-sm text-gray-600 mb-2">
+                  <span className="font-medium">Slug:</span> {listMetadata.slug}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Category:</span> {listMetadata.category}
+                </p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
-                <div className="text-4xl font-bold text-yellow-400 mb-1">25+</div>
-                <div className="text-blue-200 text-sm uppercase tracking-wide">Industries</div>
+
+              {/* Year and List Type */}
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <Calendar className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-black">Publication Details</h3>
+                </div>
+                <p className="text-lg font-bold text-blue-600 mb-2">{listMetadata.year}</p>
+                <p className="text-sm text-gray-600 mb-2">
+                  <span className="font-medium">List Type:</span> {listTypes.find(t => t.id === selectedListType)?.name}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Status:</span> Published
+                </p>
               </div>
-              <div className="bg-white/10 backdrop-blur-sm rounded-lg px-8 py-6 min-w-[150px]">
-                <div className="text-4xl font-bold text-yellow-400 mb-1">12</div>
-                <div className="text-blue-200 text-sm uppercase tracking-wide">Countries</div>
+
+              {/* Featured Image */}
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <Image className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-black">Featured Image</h3>
+                </div>
+                <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center mb-2">
+                  <Image className="w-8 h-8 text-gray-400" />
+                </div>
+                <p className="text-xs text-gray-500 text-center">{listMetadata.featuredImageCaption}</p>
+              </div>
+
+              {/* SEO Settings */}
+              <div className="bg-white p-6 rounded-lg border border-gray-200">
+                <div className="flex items-center gap-3 mb-3">
+                  <Settings className="w-5 h-5 text-blue-600" />
+                  <h3 className="font-semibold text-black">SEO Settings</h3>
+                </div>
+                <p className="text-sm text-gray-600 mb-1">
+                  <span className="font-medium">Meta Title:</span> {listMetadata.metaTitle}
+                </p>
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Meta Description:</span> {listMetadata.metaDescription}
+                </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Filters and Search */}
-        <section className="py-8 px-4 bg-white shadow-sm">
-          <div className="max-w-7xl mx-auto">
+        {/* List Types Selection */}
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-6">
+            <h3 className="text-lg font-semibold text-black mb-4">List Categories</h3>
+            <div className="flex flex-wrap gap-3">
+              {listTypes.map((listType) => {
+                const Icon = listType.icon;
+                return (
+                  <button
+                    key={listType.id}
+                    onClick={() => handleListTypeChange(listType.id)}
+                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                      selectedListType === listType.id
+                        ? 'bg-blue-600 text-white'
+                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                    }`}
+                  >
+                    <Icon className="w-4 h-4" />
+                    {listType.name}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+
+        {/* Description and Content */}
+        <section className="bg-white border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-8">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+              <div>
+                <h3 className="text-lg font-semibold text-black mb-3">Description</h3>
+                <p className="text-gray-700 leading-relaxed">{listMetadata.description}</p>
+              </div>
+              <div>
+                <h3 className="text-lg font-semibold text-black mb-3">Content & Methodology</h3>
+                <p className="text-gray-700 leading-relaxed mb-4">{listMetadata.content}</p>
+                <div className="bg-blue-50 p-4 rounded-lg">
+                  <h4 className="font-semibold text-blue-900 mb-2">Methodology</h4>
+                  <p className="text-blue-800 text-sm">{listMetadata.methodology}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Search and Filters */}
+        <section className="bg-gray-50 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-6">
             <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
               {/* Search */}
               <div className="relative flex-1 max-w-md">
@@ -255,7 +360,7 @@ const ListPage = () => {
                   placeholder="Search leaders, companies, or titles..."
                   value={searchTerm}
                   onChange={handleSearch}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
                 />
               </div>
 
@@ -267,10 +372,10 @@ const ListPage = () => {
                     <button
                       key={category.id}
                       onClick={() => handleCategoryChange(category.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium transition-all duration-200 ${
+                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
                         selectedCategory === category.id
-                          ? 'bg-blue-600 text-white shadow-md'
-                          : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                          ? 'bg-blue-600 text-white'
+                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
                       }`}
                     >
                       <Icon className="w-4 h-4" />
@@ -286,7 +391,7 @@ const ListPage = () => {
                 <select
                   value={sortBy}
                   onChange={(e) => handleSortChange(e.target.value)}
-                  className="px-3 py-2 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
                 >
                   <option value="rank">Sort by Rank</option>
                   <option value="name">Sort by Name</option>
@@ -298,7 +403,7 @@ const ListPage = () => {
         </section>
 
         {/* List Content */}
-        <section className="py-12 px-4">
+        <section className="py-12 px-4 bg-white">
           <div className="max-w-7xl mx-auto">
             {isLoading ? (
               <div className="flex flex-col justify-center items-center py-20">
@@ -308,7 +413,7 @@ const ListPage = () => {
             ) : error ? (
               <div className="flex flex-col justify-center items-center py-20">
                 <AlertCircle className="w-16 h-16 text-red-500 mb-4" />
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Failed to Load Data</h3>
+                <h3 className="text-xl font-semibold text-black mb-2">Failed to Load Data</h3>
                 <p className="text-gray-600 mb-6 text-center max-w-md">{error}</p>
                 <button
                   onClick={fetchListData}
@@ -322,7 +427,7 @@ const ListPage = () => {
               <>
                 {/* Results Header */}
                 <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-gray-900 mb-2">
+                  <h2 className="text-2xl font-bold text-black mb-2">
                     {selectedCategory === 'all' ? 'All Leaders' : categories.find(c => c.id === selectedCategory)?.name}
                     {listData && (
                       <span className="text-lg font-normal text-gray-600 ml-2">
@@ -336,22 +441,17 @@ const ListPage = () => {
                 </div>
 
                 {/* List Items */}
-                <div className="space-y-6">
+                <div className="space-y-4">
                   {filteredItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="bg-white rounded-xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100"
+                      className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300 overflow-hidden"
                     >
                       <div className="flex flex-col lg:flex-row">
-                        {/* Rank and Image */}
-                        <div className="lg:w-48 flex-shrink-0 bg-gradient-to-br from-blue-600 to-indigo-700 text-white p-6 flex items-center justify-center">
+                        {/* Rank */}
+                        <div className="lg:w-20 flex-shrink-0 bg-blue-600 text-white p-4 flex items-center justify-center">
                           <div className="text-center">
-                            <div className="text-4xl font-bold mb-2">#{item.rank}</div>
-                            <div className="flex items-center justify-center gap-1">
-                              {item.trend === 'up' && <TrendingUp className="w-4 h-4 text-green-300" />}
-                              {item.trend === 'down' && <TrendingUp className="w-4 h-4 text-red-300 rotate-180" />}
-                              {item.trend === 'stable' && <div className="w-4 h-4 rounded-full bg-yellow-300"></div>}
-                            </div>
+                            <div className="text-2xl font-bold">#{item.rank}</div>
                           </div>
                         </div>
 
@@ -364,11 +464,11 @@ const ListPage = () => {
                                 <img
                                   src={item.image}
                                   alt={item.name}
-                                  className="w-24 h-24 rounded-full object-cover border-4 border-white shadow-lg"
+                                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
                                 />
                                 {item.verified && (
                                   <div className="absolute -bottom-1 -right-1 bg-blue-600 rounded-full p-1">
-                                    <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
                                       <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
                                     </svg>
                                   </div>
@@ -380,30 +480,30 @@ const ListPage = () => {
                             <div className="flex-1">
                               <div className="flex items-start justify-between mb-3">
                                 <div>
-                                  <h3 className="text-xl font-bold text-gray-900 mb-1">{item.name}</h3>
-                                  <p className="text-blue-600 font-medium">{item.title}</p>
-                                  <p className="text-gray-600">{item.company}</p>
+                                  <h3 className="text-lg font-bold text-black mb-1">{item.name}</h3>
+                                  <p className="text-blue-600 font-medium text-sm">{item.title}</p>
+                                  <p className="text-gray-600 text-sm">{item.company}</p>
                                 </div>
                                 <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
                               </div>
 
-                              <p className="text-gray-700 mb-4 leading-relaxed">{item.description}</p>
+                              <p className="text-gray-700 mb-4 leading-relaxed text-sm">{item.description}</p>
 
-                              <div className="flex flex-wrap gap-4 text-sm">
+                              <div className="flex flex-wrap gap-4 text-xs">
                                 <div className="flex items-center gap-2">
-                                  <Building2 className="w-4 h-4 text-gray-500" />
+                                  <Building2 className="w-3 h-3 text-gray-500" />
                                   <span className="text-gray-600">Industry:</span>
-                                  <span className="font-medium text-gray-900">{item.industry}</span>
+                                  <span className="font-medium text-black">{item.industry}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <TrendingUp className="w-4 h-4 text-gray-500" />
+                                  <TrendingUp className="w-3 h-3 text-gray-500" />
                                   <span className="text-gray-600">Revenue:</span>
-                                  <span className="font-medium text-gray-900">{item.revenue}</span>
+                                  <span className="font-medium text-black">{item.revenue}</span>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                  <Users className="w-4 h-4 text-gray-500" />
+                                  <Users className="w-3 h-3 text-gray-500" />
                                   <span className="text-gray-600">Employees:</span>
-                                  <span className="font-medium text-gray-900">{item.employees}</span>
+                                  <span className="font-medium text-black">{item.employees}</span>
                                 </div>
                               </div>
                             </div>
@@ -428,7 +528,7 @@ const ListPage = () => {
         </section>
 
         {/* Call to Action */}
-        <section className="py-16 px-4 bg-gradient-to-r from-blue-600 to-indigo-700 text-white">
+        <section className="py-16 px-4 bg-blue-600 text-white">
           <div className="max-w-4xl mx-auto text-center">
             <h2 className="text-3xl font-bold mb-4">Know a Leader Who Should Be Featured?</h2>
             <p className="text-xl text-blue-100 mb-8">
@@ -441,7 +541,7 @@ const ListPage = () => {
         </section>
 
         {/* Footer */}
-        <footer className="bg-gray-900 text-white py-12 px-4">
+        <footer className="bg-black text-white py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               <div className="col-span-1 md:col-span-2">
