@@ -249,9 +249,93 @@ const ListPage = () => {
                 </h2>
               </div>
 
+              {/* Navigation Menu */}
+              <div className="flex items-center gap-8 mb-8 border-b border-gray-200 overflow-x-auto">
+                <button
+                  onClick={() => handleCategoryChange('all')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'all'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  All
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('rich-lists')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'rich-lists'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Rich Lists
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('entrepreneurs')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'entrepreneurs'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Entrepreneurs
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('companies')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'companies'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Companies
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('leaders')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'leaders'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Leaders
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('entertainment')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'entertainment'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Entertainment
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('sports')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'sports'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Sports
+                </button>
+                <button
+                  onClick={() => handleCategoryChange('lifestyle')}
+                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                    selectedCategory === 'lifestyle'
+                      ? 'text-black border-black'
+                      : 'text-gray-500 border-transparent hover:text-gray-700'
+                  }`}
+                >
+                  Lifestyle
+                </button>
+              </div>
+
               {/* Year Navigation */}
               <div className="flex items-center gap-8 mb-8 border-b border-gray-200">
-                {years.map((year) => (
+                {[2026, 2025, 2024, 2023, 2022, 2021].map((year) => (
                   <button
                     key={year}
                     onClick={() => handleYearChange(year)}
@@ -310,67 +394,52 @@ const ListPage = () => {
                       to={`/lists/${list.slug}`}
                       className="group cursor-pointer block"
                     >
-                      <div className="relative overflow-hidden rounded-lg mb-4">
-                        <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-64 relative">
-                          {list.entries_count > 0 ? (
-                            // Grid layout for lists with entries
-                            <div className="absolute inset-0 p-4">
-                              <div className="grid grid-cols-5 gap-2 h-full">
-                                {Array.from({ length: Math.min(list.entries_count, 10) }).map((_, index) => (
-                                  <div key={index} className="relative">
-                                    <div className="w-full h-full rounded-full overflow-hidden border-2 border-white">
-                                      <img
-                                        src={`/api/placeholder/80/80`}
-                                        alt={`Entry ${index + 1}`}
-                                        className="w-full h-full object-cover"
-                                      />
-                                    </div>
-                                  </div>
-                                ))}
-                              </div>
-
-                              {/* Title Overlay */}
-                              <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-gray-800 to-transparent p-4">
-                                <p className="text-white text-xs font-medium uppercase tracking-wide mb-1">
-                                  {list.title.toUpperCase()}
-                                </p>
-                              </div>
-                            </div>
+                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                        {/* Featured Image */}
+                        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
+                          {list.featured_image ? (
+                            <img
+                              src={list.featured_image}
+                              alt={list.title}
+                              className="w-full h-full object-cover"
+                              onError={(e) => {
+                                e.target.src = "/api/placeholder/400/300";
+                              }}
+                            />
                           ) : (
-                            // Simple layout for lists with no entries
-                            <div className="absolute inset-0">
-                              <img
-                                src="/api/placeholder/400/300"
-                                alt={list.title}
-                                className="w-full h-full object-cover"
-                              />
-                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                            <img
+                              src="/api/placeholder/400/300"
+                              alt={list.title}
+                              className="w-full h-full object-cover"
+                            />
+                          )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
+                        </div>
 
-                              {/* Title Overlay */}
-                              <div className="absolute bottom-4 left-4 right-4">
-                                <p className="text-white text-sm font-bold uppercase tracking-wide">
-                                  {list.title.replace(/\d{4}/g, '').trim()}
-                                </p>
-                              </div>
+                        {/* Card Content */}
+                        <div className="p-6">
+                          <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
+                            {list.title}
+                          </h3>
+                          <p className="text-sm text-gray-600 mb-4 line-clamp-3">
+                            {list.description || 'A comprehensive list featuring top leaders and companies.'}
+                          </p>
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span className="bg-gray-100 px-3 py-1 rounded-full text-xs">
+                              {list.category || 'General'}
+                            </span>
+                            <span className="bg-gray-100 px-3 py-1 rounded-full text-xs">
+                              {list.entries_count || 0} entries
+                            </span>
+                          </div>
+                          {list.year && (
+                            <div className="mt-3">
+                              <span className="inline-block bg-black text-white px-3 py-1 rounded-full text-xs font-medium">
+                                {list.year}
+                              </span>
                             </div>
                           )}
                         </div>
-                      </div>
-
-                      {/* List Info */}
-                      <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors">
-                        {list.title}
-                      </h3>
-                      <p className="text-sm text-gray-600 mb-2">
-                        {list.description || 'A comprehensive list featuring top leaders and companies.'}
-                      </p>
-                      <div className="flex items-center gap-4 text-sm text-gray-500">
-                        <span className="bg-gray-100 px-2 py-1 rounded">
-                          {list.category}
-                        </span>
-                        <span className="bg-gray-100 px-2 py-1 rounded">
-                          {list.entries_count} entries
-                        </span>
                       </div>
                     </Link>
                   ))}
@@ -414,45 +483,6 @@ const ListPage = () => {
           )}
         </main>
 
-        {/* Footer */}
-        <footer className="bg-black text-white py-12 mt-16">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
-              <div className="col-span-1 md:col-span-2">
-                <h3 className="text-2xl font-bold mb-4">MAGAZINE</h3>
-                <p className="text-gray-400 leading-relaxed max-w-md">
-                  The definitive source for business news, financial insights, and leadership intelligence.
-                </p>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-semibold mb-4">SECTIONS</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li><a href="#" className="hover:text-white transition-colors">Lists</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">News</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Companies</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Leaders</a></li>
-                </ul>
-              </div>
-
-              <div>
-                <h4 className="text-lg font-semibold mb-4">COMPANY</h4>
-                <ul className="space-y-2 text-gray-400">
-                  <li><a href="#" className="hover:text-white transition-colors">About</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Contact</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Privacy</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Terms</a></li>
-                </ul>
-              </div>
-            </div>
-
-            <div className="border-t border-gray-800 pt-8 mt-8">
-              <p className="text-gray-400 text-center">
-                © 2024 Magazine. All rights reserved.
-              </p>
-            </div>
-          </div>
-        </footer>
       </div>
     </>
   );
