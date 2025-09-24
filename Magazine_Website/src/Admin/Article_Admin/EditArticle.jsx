@@ -2,6 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
+import { useAdminAuth } from '../context/AdminAuthContext';
 import articleService from '../../services/articleService';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
@@ -12,6 +13,7 @@ const EditArticle = () => {
   const { id } = useParams();
   const { theme } = useTheme();
   const { showSuccess, showError, showWarning, showInfo } = useToast();
+  const { admin, isMasterAdmin, loading: authLoading } = useAdminAuth();
   const navigate = useNavigate();
   const autoSaveRef = useRef(null);
   const quillRef = useRef(null);
@@ -87,22 +89,25 @@ const EditArticle = () => {
     }
   }, [formData.categoryId]);
 
-  // Auto-save functionality
+  // Auto-save functionality - only for draft articles
   useEffect(() => {
     if (article && (formData.title !== article.title || formData.content !== article.content)) {
-      if (autoSaveRef.current) {
-        clearTimeout(autoSaveRef.current);
+      // Only auto-save if article is in draft status and user has been inactive
+      if (article.status === 'draft' && formData.captchaVerified && formData.guidelinesAccepted) {
+        if (autoSaveRef.current) {
+          clearTimeout(autoSaveRef.current);
+        }
+        autoSaveRef.current = setTimeout(() => {
+          autoSave();
+        }, 60000); // Increased to 60 seconds to reduce conflicts
       }
-      autoSaveRef.current = setTimeout(() => {
-        autoSave();
-      }, 30000);
     }
     return () => {
       if (autoSaveRef.current) {
         clearTimeout(autoSaveRef.current);
       }
     };
-  }, [formData, article]);
+  }, [formData, article, formData.captchaVerified, formData.guidelinesAccepted]);
 
   const fetchArticle = async () => {
     try {
@@ -233,13 +238,22 @@ const EditArticle = () => {
   };
 
   const autoSave = async () => {
-    if (formData.title && formData.content) {
+    // Only auto-save if article is in draft status and has required fields
+    if (formData.title && formData.content && article?.status === 'draft') {
       try {
-        await articleService.updateArticle(id, { ...formData, status: 'draft' });
+        // Only save essential fields to avoid conflicts
+        const autoSaveData = {
+          title: formData.title,
+          content: formData.content,
+          status: 'draft' // Always keep as draft for auto-save
+        };
+
+        await articleService.updateArticle(id, autoSaveData);
         showInfo('Changes auto-saved successfully');
       } catch (error) {
         console.error('Auto-save failed:', error);
-        showWarning('Auto-save failed - please save manually');
+        // Don't show warning for auto-save failures to avoid annoying users
+        console.warn('Auto-save failed, but user can continue working');
       }
     }
   };
@@ -700,10 +714,14 @@ const EditArticle = () => {
     ]
   };
 
-  if (loading) {
+  // Show loading if auth is still loading
+  if (authLoading || loading) {
     return (
       <div className={`min-h-screen ${bgMain} flex items-center justify-center`}>
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
+          <p className={`${isDark ? 'text-gray-300' : 'text-gray-600'}`}>Loading...</p>
+        </div>
       </div>
     );
   }
