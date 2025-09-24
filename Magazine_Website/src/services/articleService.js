@@ -135,7 +135,7 @@ class ArticleService {
 
       // Add text fields with proper field name mapping
       Object.keys(articleData).forEach(key => {
-        if (articleData[key] !== null && articleData[key] !== undefined && key !== 'featuredImage') {
+        if (articleData[key] !== null && articleData[key] !== undefined) {
           // Use mapped field name if available, otherwise use original
           const fieldName = fieldMapping[key] || key;
 
