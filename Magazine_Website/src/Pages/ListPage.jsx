@@ -15,7 +15,11 @@ const ListPage = () => {
     recommended: false,
     richLists: false,
     entrepreneurs: false,
-    companies: false
+    companies: false,
+    leaders: false,
+    entertainment: false,
+    sports: false,
+    lifestyle: false
   });
 
   // Dynamic data from API only
@@ -85,9 +89,9 @@ const ListPage = () => {
         const allLists = response.data.lists;
         setLists(allLists);
 
-        // Set featured list (first one or the one with most entries)
-        const featured = allLists[0];
-        setFeaturedList(featured);
+        // Set featured list (latest one from database based on creation date)
+        const latestList = allLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        setFeaturedList(latestList);
 
         // Update metadata from featured list data
         setListMetadata({
@@ -131,12 +135,13 @@ const ListPage = () => {
   };
 
   const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
-  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021];
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
 
   const handleYearChange = (year) => {
     setCurrentYear(year);
     setSelectedYear(year);
-    // In a real implementation, you would fetch data for the selected year
+    // Refetch data for the selected year
+    setTimeout(() => fetchListData(), 0);
     console.log('Year changed to:', year);
   };
 
@@ -174,7 +179,11 @@ const ListPage = () => {
       recommended: false,
       richLists: false,
       entrepreneurs: false,
-      companies: false
+      companies: false,
+      leaders: false,
+      entertainment: false,
+      sports: false,
+      lifestyle: false
     });
     // Refetch data after clearing filters
     setTimeout(() => fetchListData(), 0);
@@ -329,7 +338,7 @@ const ListPage = () => {
                       ))}
                     </div>
                     <button className="text-gray-500 hover:text-gray-700 text-sm font-medium">
-                      Recommender
+                      Recommended
                     </button>
                   </div>
 
@@ -396,7 +405,11 @@ const ListPage = () => {
                             <span className="text-sm font-medium text-gray-700 capitalize">
                               {key === 'richLists' ? 'Rich Lists' :
                                key === 'entrepreneurs' ? 'Entrepreneurs' :
-                               key === 'companies' ? 'Companies' : key}
+                               key === 'companies' ? 'Companies' :
+                               key === 'leaders' ? 'Leaders' :
+                               key === 'entertainment' ? 'Entertainment' :
+                               key === 'sports' ? 'Sports' :
+                               key === 'lifestyle' ? 'Lifestyle' : key}
                             </span>
                           </label>
                         ))}

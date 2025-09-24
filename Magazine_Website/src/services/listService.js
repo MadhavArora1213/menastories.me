@@ -85,6 +85,20 @@ class ListService {
       throw new Error(error.response?.data?.message || 'Failed to create list');
     }
   }
+
+  // Update an existing list
+  async updateList(listId, formData) {
+    try {
+      const response = await api.put(`/lists/${listId}`, formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to update list');
+    }
+  }
 }
 
 export default new ListService();
