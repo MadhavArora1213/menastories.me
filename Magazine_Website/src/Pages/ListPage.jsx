@@ -30,8 +30,8 @@ const ListPage = () => {
   return (
     <>
       <Helmet>
-        <title>Lists | Forbes Middle East</title>
-        <meta name="description" content="Discover the most influential leaders and companies from Forbes Middle East." />
+        <title>Lists | Magazine</title>
+        <meta name="description" content="Discover the most influential leaders and companies." />
       </Helmet>
 
       <div className="min-h-screen bg-white">
@@ -41,8 +41,7 @@ const ListPage = () => {
             <div className="flex items-center justify-between h-16">
               <div className="flex items-center">
                 <div className="flex-shrink-0">
-                  <span className="text-2xl font-bold text-black">FORBES</span>
-                  <span className="text-sm text-gray-600 ml-2">MIDDLE EAST</span>
+                  <span className="text-2xl font-bold text-black">MAGAZINE</span>
                 </div>
               </div>
               <nav className="hidden md:flex space-x-8">
@@ -59,9 +58,81 @@ const ListPage = () => {
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           {/* Breadcrumb */}
           <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 mt-8">
-            <span>Forbes Middle East</span>
+            <span>Magazine</span>
             <span>/</span>
             <span>Lists</span>
+          </div>
+
+          {/* Featured Header Banner */}
+          <div className="relative mb-8">
+            <div className="bg-gradient-to-r from-green-800 to-green-900 rounded-lg overflow-hidden h-64">
+              <div className="absolute inset-0">
+                <img
+                  src="/api/placeholder/1200/300"
+                  alt="Lists Banner"
+                  className="w-full h-full object-cover"
+                />
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+
+                {/* Title Overlay */}
+                <div className="absolute bottom-8 left-8 right-8">
+                  <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight">
+                    LISTS & RANKINGS
+                  </h1>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Title */}
+          <div className="mb-8">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Lists & Rankings
+            </h2>
+          </div>
+
+          {/* Year Navigation */}
+          <div className="flex items-center gap-8 mb-8 border-b border-gray-200">
+            {years.map((year) => (
+              <button
+                key={year}
+                onClick={() => handleYearChange(year)}
+                className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 ${
+                  currentYear === year
+                    ? 'text-black border-black'
+                    : 'text-gray-500 border-transparent hover:text-gray-700'
+                }`}
+              >
+                {year}
+              </button>
+            ))}
+            <button
+              onClick={() => handleCategoryChange('recommended')}
+              className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 ${
+                selectedCategory === 'recommended'
+                  ? 'text-black border-black'
+                  : 'text-gray-500 border-transparent hover:text-gray-700'
+              }`}
+            >
+              Recommended →
+            </button>
+          </div>
+
+          {/* Category Filters */}
+          <div className="flex flex-wrap gap-4 mb-12">
+            {categories.map((category) => (
+              <button
+                key={category.id}
+                onClick={() => handleCategoryChange(category.id)}
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
+                  category.active
+                    ? 'bg-black text-white'
+                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                }`}
+              >
+                {category.label}
+              </button>
+            ))}
           </div>
 
           {/* Empty State */}
@@ -82,9 +153,9 @@ const ListPage = () => {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
               <div className="col-span-1 md:col-span-2">
-                <h3 className="text-2xl font-bold mb-4">FORBES MIDDLE EAST</h3>
+                <h3 className="text-2xl font-bold mb-4">MAGAZINE</h3>
                 <p className="text-gray-400 leading-relaxed max-w-md">
-                  The definitive source for business news, financial insights, and leadership intelligence across the Middle East region.
+                  The definitive source for business news, financial insights, and leadership intelligence.
                 </p>
               </div>
 
@@ -111,7 +182,7 @@ const ListPage = () => {
 
             <div className="border-t border-gray-800 pt-8 mt-8">
               <p className="text-gray-400 text-center">
-                © 2024 Forbes Middle East. All rights reserved.
+                © 2024 Magazine. All rights reserved.
               </p>
             </div>
           </div>
