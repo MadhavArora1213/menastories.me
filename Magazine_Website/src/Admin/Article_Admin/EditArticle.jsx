@@ -424,7 +424,7 @@ const EditArticle = () => {
           formDataUpload.append('image', formData.featuredImage);
 
           // Upload the image using the same method as CreateArticle
-          const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
+          const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
           if (uploadResponse.success && uploadResponse.data?.filename) {
             submitData.featuredImage = uploadResponse.data.filename;
           } else {
@@ -460,7 +460,7 @@ const EditArticle = () => {
             formDataUpload.append('image', file);
 
             // Upload the image using the same method as CreateArticle
-            const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
+            const uploadResponse = await articleService.uploadFile('/api/upload/image', formDataUpload);
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
             } else {
