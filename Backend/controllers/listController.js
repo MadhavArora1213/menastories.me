@@ -1356,12 +1356,12 @@ class ListController {
   // Permission check methods
   checkEditPermission(list, userId, admin) {
     // Allow editing if user created the list or is admin
-    return list.createdBy === userId || admin?.role === 'Master Admin';
+    return list.createdBy === userId || admin?.role?.name === 'Master Admin';
   }
 
   checkDeletePermission(list, userId, admin) {
     // Only allow deletion by creator or master admin
-    return list.createdBy === userId || admin?.role === 'Master Admin';
+    return list.createdBy === userId || admin?.role?.name === 'Master Admin';
   }
 
   // Create sample entries when DOCX parsing fails
