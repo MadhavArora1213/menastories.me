@@ -980,23 +980,63 @@ const CreateArticle = () => {
       // Handle gallery images upload
       if (formData.gallery.length > 0) {
         const galleryImagePaths = [];
-        for (const file of formData.gallery) {
+        console.log('Starting gallery upload for', formData.gallery.length, 'images');
+
+        for (let i = 0; i < formData.gallery.length; i++) {
+          const file = formData.gallery[i];
           try {
+            // Validate file before upload
+            if (!file || typeof file.size === 'undefined') {
+              console.error('Invalid gallery file detected:', file);
+              toast.error(`Invalid file detected: ${file?.name || 'Unknown file'}`);
+              continue;
+            }
+
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+              console.error('Gallery file too large:', file.name, file.size);
+              toast.error(`${file.name} is too large. Max size is 5MB`);
+              continue;
+            }
+
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+              console.error('Invalid file type:', file.name, file.type);
+              toast.error(`${file.name} is not an image file`);
+              continue;
+            }
+
             const formDataUpload = new FormData();
             formDataUpload.append('featured_image', file);
 
+            console.log(`Uploading gallery image ${i + 1}/${formData.gallery.length}:`, file.name);
             const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
+
             if (uploadResponse.success && uploadResponse.file?.filename) {
               galleryImagePaths.push(uploadResponse.file.filename);
+              console.log(`✅ Gallery image uploaded successfully: ${file.name} -> ${uploadResponse.file.filename}`);
+            } else {
+              console.error('Gallery upload failed:', uploadResponse);
+              toast.error(`Failed to upload ${file.name}: ${uploadResponse.message || 'Unknown error'}`);
             }
           } catch (uploadError) {
             console.error('Error uploading gallery image:', uploadError);
-            toast.error(`Failed to upload ${file.name}`);
+            toast.error(`Failed to upload ${file.name}: ${uploadError.message}`);
           }
         }
-        // Store gallery images as JSON array in the gallery field
-        submitData.gallery = galleryImagePaths;
-        console.log('Gallery images stored as:', submitData.gallery);
+
+        // Store gallery images as array of objects with proper structure
+        if (galleryImagePaths.length > 0) {
+          submitData.gallery = galleryImagePaths.map(filename => ({
+            url: filename,
+            alt: '',
+            caption: ''
+          }));
+          console.log('Gallery images stored as:', submitData.gallery);
+        } else {
+          console.warn('No gallery images were successfully uploaded');
+          submitData.gallery = [];
+        }
       }
 
       console.log('=== FRONTEND SUBMIT DEBUG ===');
