@@ -17,11 +17,15 @@ const ListPage = () => {
   const categories = [
     { id: 'all', label: 'All', active: selectedCategory === 'all' },
     { id: 'recommended', label: 'Recommended', active: selectedCategory === 'recommended' },
-    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' },
-    { id: 'tfdhhm', label: 'TFDHHM', active: selectedCategory === 'tfdhhm' },
-    { id: 'Entertainment', label: 'Entertainment', active: selectedCategory === 'Entertainment' },
+    { id: 'rich-lists', label: 'Rich Lists', active: selectedCategory === 'rich-lists' },
+    { id: 'entrepreneurs', label: 'Entrepreneurs', active: selectedCategory === 'entrepreneurs' },
     { id: 'companies', label: 'Companies', active: selectedCategory === 'companies' },
-    { id: 'leaders', label: 'Leaders', active: selectedCategory === 'leaders' }
+    { id: 'leaders', label: 'Leaders', active: selectedCategory === 'leaders' },
+    { id: 'entertainment', label: 'Entertainment', active: selectedCategory === 'entertainment' },
+    { id: 'sports', label: 'Sports', active: selectedCategory === 'sports' },
+    { id: 'lifestyle', label: 'Lifestyle', active: selectedCategory === 'lifestyle' },
+    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' },
+    { id: 'tfdhhm', label: 'TFDHHM', active: selectedCategory === 'tfdhhm' }
   ];
 
   // Fetch data on component mount
