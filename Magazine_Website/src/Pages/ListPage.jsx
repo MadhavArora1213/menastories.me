@@ -221,26 +221,7 @@ const ListPage = () => {
               {featuredList && (
                 <div className="mb-12">
                   <Link to={`/lists/${featuredList.slug}`} className="block group">
-                    <div className="relative h-96 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg overflow-hidden">
-                      {featuredList.featuredImage || featuredList.featured_image || featuredList.image ? (
-                        <img
-                          src={featuredList.featuredImage || featuredList.featured_image || featuredList.image}
-                          alt={featuredList.title}
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className="w-full h-full bg-gradient-to-br from-green-600 to-green-900 flex items-center justify-center"
-                        style={{ display: (featuredList.featuredImage || featuredList.featured_image || featuredList.image) ? 'none' : 'flex' }}
-                      >
-                        <span className="text-white text-2xl font-bold opacity-50">
-                          {featuredList.title}
-                        </span>
-                      </div>
+                    <div className="relative h-96 bg-gradient-to-br from-green-600 to-green-900 rounded-lg overflow-hidden">
                       <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                       
                       {/* Featured Content Overlay */}
@@ -426,25 +407,6 @@ const ListPage = () => {
                       <div className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300 border border-gray-200 rounded-lg">
                         {/* Featured Image */}
                         <div className="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-                          {list.featuredImage || list.featured_image || list.image ? (
-                            <img
-                              src={list.featuredImage || list.featured_image || list.image}
-                              alt={list.title}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
-                              onError={(e) => {
-                                e.target.style.display = 'none';
-                                e.target.nextSibling.style.display = 'flex';
-                              }}
-                            />
-                          ) : null}
-                          <div 
-                            className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center absolute inset-0"
-                            style={{ display: (list.featuredImage || list.featured_image || list.image) ? 'none' : 'flex' }}
-                          >
-                            <span className="text-white text-lg font-bold opacity-50">
-                              {list.title?.split(' ').slice(0, 2).join(' ') || 'List'}
-                            </span>
-                          </div>
                           <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                           
                           {/* Title Overlay */}

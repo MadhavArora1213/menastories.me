@@ -140,6 +140,7 @@ sequelize.sync({ alter: false, force: false })
 // Import controllers
 const adminAuthController = require('./controllers/adminAuthController');
 const fileController = require('./controllers/fileController');
+const placeholderController = require('./controllers/placeholderController');
 
 // Import ALL route modules at the top (MOVE THIS SECTION UP)
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
@@ -154,6 +155,7 @@ const flipbookRoutes = require('./routes/flipbookRoutes');
 const imageRoutes = require('./routes/imageRoutes');
 const mediaRoutes = require('./routes/mediaRoutes');
 const newsletterRoutes = require('./routes/newsletterRoutes');
+const placeholderRoutes = require('./routes/placeholderRoutes');
 const publicRoutes = require('./routes/publicRoutes');
 const roleRoutes = require('./routes/roleRoutes');
 const searchRoutes = require('./routes/searchRoutes');
@@ -493,6 +495,12 @@ app.use('/api/files', fileRoutes);
 // File upload route without /api prefix (for frontend compatibility)
 app.post('/files/upload', fileController.uploadImage);
 
+// Placeholder image generation routes
+app.get('/placeholder/:width/:height', placeholderController.generatePlaceholder);
+app.get('/api/placeholder/:width/:height', placeholderController.generatePlaceholder);
+app.get('/placeholder/health', placeholderController.healthCheck);
+app.get('/api/placeholder/health', placeholderController.healthCheck);
+
 // Image routes
 app.use('/api/images', imageRoutes);
 
@@ -501,6 +509,9 @@ app.use('/api/media', mediaRoutes);
 
 // Newsletter routes
 app.use('/api/newsletter', newsletterRoutes);
+
+// Placeholder image routes
+app.use('/placeholder', placeholderRoutes);
 
 // Promotion routes - temporarily commented out for debugging
 // app.use('/api/promotion', promotionRoutes);

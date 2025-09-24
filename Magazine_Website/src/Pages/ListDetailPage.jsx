@@ -175,24 +175,12 @@ const ListDetailPage = () => {
                 <div className="grid grid-cols-5 gap-4">
                   {listData.entries?.slice(0, 5).map((entry, index) => (
                     <div key={entry.id || index} className="text-center">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-300">
-                        {entry.image ? (
-                          <img
-                            src={entry.image}
-                            alt={entry.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.parentNode.style.background = '#9CA3AF';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">
-                              {entry.name?.charAt(0) || '?'}
-                            </span>
-                          </div>
-                        )}
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-400">
+                        <div className="w-full h-full bg-gray-400 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {entry.name?.charAt(0) || index + 1}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -204,24 +192,12 @@ const ListDetailPage = () => {
                 <div className="grid grid-cols-5 gap-4">
                   {listData.entries?.slice(5, 10).map((entry, index) => (
                     <div key={entry.id || index} className="text-center">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-300">
-                        {entry.image ? (
-                          <img
-                            src={entry.image}
-                            alt={entry.name}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.parentNode.style.background = '#9CA3AF';
-                            }}
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-400 flex items-center justify-center">
-                            <span className="text-white text-xs font-bold">
-                              {entry.name?.charAt(0) || '?'}
-                            </span>
-                          </div>
-                        )}
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-400">
+                        <div className="w-full h-full bg-gray-400 flex items-center justify-center">
+                          <span className="text-white text-xs font-bold">
+                            {entry.name?.charAt(0) || index + 6}
+                          </span>
+                        </div>
                       </div>
                     </div>
                   ))}
@@ -265,26 +241,10 @@ const ListDetailPage = () => {
               {listData.entries?.slice(0, 10).map((entry, index) => (
                 <div key={entry.id || index} className="text-center">
                   <div className="relative mb-4">
-                    <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-100">
-                      {entry.image ? (
-                        <img
-                          src={entry.image}
-                          alt={entry.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className="w-full h-full bg-gray-300 flex items-center justify-center absolute inset-0"
-                        style={{ display: entry.image ? 'none' : 'flex' }}
-                      >
-                        <span className="text-gray-600 text-2xl font-bold">
-                          {entry.name?.charAt(0) || '?'}
-                        </span>
-                      </div>
+                    <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-300 flex items-center justify-center">
+                      <span className="text-gray-600 text-2xl font-bold">
+                        {entry.name?.charAt(0) || index + 1}
+                      </span>
                     </div>
                     <div className="absolute top-2 left-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                       {index + 1}
@@ -304,26 +264,10 @@ const ListDetailPage = () => {
               {listData.entries?.slice(10).map((entry, index) => (
                 <div key={entry.id || index} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
                   <div className="relative">
-                    <div className="w-full aspect-square bg-gray-100">
-                      {entry.image ? (
-                        <img
-                          src={entry.image}
-                          alt={entry.name}
-                          className="w-full h-full object-cover"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                            e.target.nextSibling.style.display = 'flex';
-                          }}
-                        />
-                      ) : null}
-                      <div 
-                        className="w-full h-full bg-gray-300 flex items-center justify-center absolute inset-0"
-                        style={{ display: entry.image ? 'none' : 'flex' }}
-                      >
-                        <span className="text-gray-600 text-lg font-bold">
-                          {entry.name?.charAt(0) || '?'}
-                        </span>
-                      </div>
+                    <div className="w-full aspect-square bg-gray-300 flex items-center justify-center">
+                      <span className="text-gray-600 text-lg font-bold">
+                        {entry.name?.charAt(0) || index + 11}
+                      </span>
                     </div>
                     <div className="absolute top-2 left-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
                       {index + 11}
@@ -371,26 +315,10 @@ const ListDetailPage = () => {
                     className="flex items-center gap-6 group hover:bg-gray-50 p-4 rounded-lg transition-colors"
                   >
                     <div className="flex-shrink-0">
-                      <div className="w-24 h-24 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg overflow-hidden">
-                        {relatedList.featuredImage || relatedList.featured_image ? (
-                          <img
-                            src={relatedList.featuredImage || relatedList.featured_image}
-                            alt={relatedList.title}
-                            className="w-full h-full object-cover"
-                            onError={(e) => {
-                              e.target.style.display = 'none';
-                              e.target.nextSibling.style.display = 'flex';
-                            }}
-                          />
-                        ) : null}
-                        <div 
-                          className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center"
-                          style={{ display: (relatedList.featuredImage || relatedList.featured_image) ? 'none' : 'flex' }}
-                        >
-                          <span className="text-white text-sm font-bold opacity-50">
-                            {relatedList.title?.split(' ').slice(0, 2).join(' ')}
-                          </span>
-                        </div>
+                      <div className="w-24 h-24 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center">
+                        <span className="text-white text-sm font-bold opacity-50">
+                          {relatedList.title?.split(' ').slice(0, 2).join(' ')}
+                        </span>
                       </div>
                     </div>
                     <div className="flex-grow">
