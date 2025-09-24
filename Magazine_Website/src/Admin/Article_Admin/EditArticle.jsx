@@ -27,6 +27,7 @@ const EditArticle = () => {
   const [article, setArticle] = useState(null);
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [touched, setTouched] = useState({});
+  const [imageJustUploaded, setImageJustUploaded] = useState(false);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -114,62 +115,70 @@ const EditArticle = () => {
       const response = await articleService.getArticle(id);
       if (response.success) {
         const articleData = response.data;
+        console.log('Article loaded from database:', {
+          id: articleData.id,
+          featuredImage: articleData.featuredImage,
+          gallery: articleData.gallery,
+          status: articleData.status
+        });
         setArticle(articleData);
 
         // Populate form with existing data, preserving any unsaved changes
-        setFormData(prevFormData => ({
-           title: articleData.title || '',
-             subtitle: articleData.subtitle || '',
-             content: articleData.content || '',
-             excerpt: articleData.excerpt || '',
-             description: articleData.description || '',
-             categoryId: articleData.categoryId || '',
-             subcategoryId: articleData.subcategoryId || '',
-             authorId: articleData.authorId || '',
-             coAuthors: articleData.coAuthors || [],
-             tags: articleData.tags || [],
-             featured: articleData.featured || false,
-             heroSlider: articleData.heroSlider || false,
-             trending: articleData.trending || false,
-             pinned: articleData.pinned || false,
-             allowComments: articleData.allowComments !== false,
-             metaTitle: articleData.metaTitle || '',
-             metaDescription: articleData.metaDescription || '',
-             keywords: articleData.keywords || [],
-             publishDate: articleData.publishDate
-               ? (() => {
-                   const date = new Date(articleData.publishDate);
-                   // Ensure we get the local date string for datetime-local input
-                   const year = date.getFullYear();
-                   const month = String(date.getMonth() + 1).padStart(2, '0');
-                   const day = String(date.getDate()).padStart(2, '0');
-                   const hours = String(date.getHours()).padStart(2, '0');
-                   const minutes = String(date.getMinutes()).padStart(2, '0');
-                   return `${year}-${month}-${day}T${hours}:${minutes}`;
-                 })()
-               : '',
-             featuredImage: prevFormData.featuredImage, // Preserve uploaded file
-             imageCaption: articleData.imageCaption || '',
-             gallery: prevFormData.gallery || [], // Preserve uploaded gallery files
-             authorBioOverride: articleData.authorBioOverride || '',
-             status: articleData.status || 'draft',
-             custom_tags: prevFormData.custom_tags || '', // Preserve custom tags input
-             reviewNotes: articleData.reviewNotes || '',
-             // New fields
-             nationality: articleData.nationality || '',
-             age: articleData.age || '',
-             gender: articleData.gender || '',
-             ethnicity: articleData.ethnicity || '',
-             residency: articleData.residency || '',
-             industry: articleData.industry || '',
-             position: articleData.position || '',
-             imageDisplayMode: articleData.imageDisplayMode || 'single',
-             links: articleData.links || [],
-             socialEmbeds: articleData.socialEmbeds || [],
-             externalLinkFollow: articleData.externalLinkFollow !== false,
-             captchaVerified: prevFormData.captchaVerified || false,
-             guidelinesAccepted: prevFormData.guidelinesAccepted || false
-           }));
+         setFormData(prevFormData => ({
+            title: articleData.title || '',
+              subtitle: articleData.subtitle || '',
+              content: articleData.content || '',
+              excerpt: articleData.excerpt || '',
+              description: articleData.description || '',
+              categoryId: articleData.categoryId || '',
+              subcategoryId: articleData.subcategoryId || '',
+              authorId: articleData.authorId || '',
+              coAuthors: articleData.coAuthors || [],
+              tags: articleData.tags || [],
+              featured: articleData.featured || false,
+              heroSlider: articleData.heroSlider || false,
+              trending: articleData.trending || false,
+              pinned: articleData.pinned || false,
+              allowComments: articleData.allowComments !== false,
+              metaTitle: articleData.metaTitle || '',
+              metaDescription: articleData.metaDescription || '',
+              keywords: articleData.keywords || [],
+              publishDate: articleData.publishDate
+                ? (() => {
+                    const date = new Date(articleData.publishDate);
+                    // Ensure we get the local date string for datetime-local input
+                    const year = date.getFullYear();
+                    const month = String(date.getMonth() + 1).padStart(2, '0');
+                    const day = String(date.getDate()).padStart(2, '0');
+                    const hours = String(date.getHours()).padStart(2, '0');
+                    const minutes = String(date.getMinutes()).padStart(2, '0');
+                    return `${year}-${month}-${day}T${hours}:${minutes}`;
+                  })()
+                : '',
+              // Use database image if available, otherwise preserve uploaded file
+              featuredImage: articleData.featuredImage ? null : prevFormData.featuredImage,
+              imageCaption: articleData.imageCaption || '',
+              // Use database gallery if available, otherwise preserve uploaded files
+              gallery: articleData.gallery && articleData.gallery.length > 0 ? [] : prevFormData.gallery,
+              authorBioOverride: articleData.authorBioOverride || '',
+              status: articleData.status || 'draft',
+              custom_tags: prevFormData.custom_tags || '', // Preserve custom tags input
+              reviewNotes: articleData.reviewNotes || '',
+              // New fields
+              nationality: articleData.nationality || '',
+              age: articleData.age || '',
+              gender: articleData.gender || '',
+              ethnicity: articleData.ethnicity || '',
+              residency: articleData.residency || '',
+              industry: articleData.industry || '',
+              position: articleData.position || '',
+              imageDisplayMode: articleData.imageDisplayMode || 'single',
+              links: articleData.links || [],
+              socialEmbeds: articleData.socialEmbeds || [],
+              externalLinkFollow: articleData.externalLinkFollow !== false,
+              captchaVerified: prevFormData.captchaVerified || false,
+              guidelinesAccepted: prevFormData.guidelinesAccepted || false
+            }));
 
         showSuccess('Article loaded successfully');
       } else {
@@ -490,6 +499,13 @@ const EditArticle = () => {
                submitData.oldFeaturedImage = oldImagePath;
              }
 
+             console.log('Image uploaded successfully:', {
+               oldPath: oldImagePath,
+               newPath: uploadResponse.data.filename,
+               willDelete: !!oldImagePath
+             });
+
+             setImageJustUploaded(true);
              showInfo('Featured image uploaded successfully');
            } else {
              showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
@@ -585,18 +601,22 @@ const EditArticle = () => {
 
       if (response.success) {
         // Update the article state with the response data
-        if (response.data) {
-          setArticle(response.data);
-          // Update form data with server response to ensure consistency
-          setFormData(prevFormData => ({
-            ...prevFormData,
-            status: response.data.status || prevFormData.status,
-            reviewNotes: response.data.reviewNotes || prevFormData.reviewNotes,
-            // Preserve any local changes that weren't sent to server
-            featuredImage: prevFormData.featuredImage,
-            custom_tags: prevFormData.custom_tags
-          }));
-        }
+         if (response.data) {
+           setArticle(response.data);
+           // Update form data with server response to ensure consistency
+           setFormData(prevFormData => ({
+             ...prevFormData,
+             status: response.data.status || prevFormData.status,
+             reviewNotes: response.data.reviewNotes || prevFormData.reviewNotes,
+             // Clear uploaded files since they're now saved to database
+             featuredImage: null, // Clear the File object since it's now saved
+             gallery: [], // Clear uploaded gallery files since they're now saved
+             custom_tags: prevFormData.custom_tags
+           }));
+
+           // Clear the image upload flag since the image is now saved
+           setImageJustUploaded(false);
+         }
 
         // More specific success messages based on status
         let successMessage = '';
@@ -630,8 +650,11 @@ const EditArticle = () => {
         }
 
         showSuccess(successMessage);
-        // Fetch fresh data from server to ensure UI is in sync
-        fetchArticle();
+
+         // Small delay to ensure database is updated before refetching
+         setTimeout(() => {
+           fetchArticle();
+         }, 500);
       }
     } catch (error) {
       console.error('Update error:', error);
@@ -862,7 +885,7 @@ const EditArticle = () => {
 
                   <div>
                     <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                      {article.featuredImage ? 'Replace Image' : 'Upload Image'}
+                       {article.featuredImage ? 'Replace Image' : 'Upload Image'}
                     </label>
                     <input
                       type="file"
@@ -870,6 +893,11 @@ const EditArticle = () => {
                       accept="image/*"
                       className={`w-full p-3 border rounded-lg ${inputBg}`}
                     />
+                    {imageJustUploaded && (
+                      <div className="text-sm text-green-600 mt-1">
+                        ✓ Image uploaded and saved successfully
+                      </div>
+                    )}
                   </div>
 
                   <div>
