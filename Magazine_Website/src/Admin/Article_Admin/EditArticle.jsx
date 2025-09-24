@@ -3,7 +3,6 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { useTheme } from '../context/ThemeContext';
 import { useToast } from '../../context/ToastContext';
 import articleService from '../../services/articleService';
-import imageUploadService from '../../services/imageUploadService';
 import ReactQuill from 'react-quill';
 import 'react-quill/dist/quill.snow.css';
 import Captcha from '../Components/Captcha';
@@ -301,10 +300,35 @@ const EditArticle = () => {
   };
 
   const removeGalleryImage = (index) => {
-    setFormData(prev => ({
-      ...prev,
-      gallery: prev.gallery.filter((_, i) => i !== index)
-    }));
+    setFormData(prev => {
+      const newGallery = prev.gallery.filter((_, i) => i !== index);
+      let newFeaturedImage = prev.featuredImage;
+
+      // If the removed image was the featured image, clear it or set to first remaining image
+      if (prev.featuredImage && prev.gallery[index] === prev.featuredImage) {
+        newFeaturedImage = newGallery.length > 0 ? newGallery[0] : null;
+        if (newFeaturedImage) {
+          showInfo('Featured image updated to first remaining gallery image');
+        }
+      }
+
+      return {
+        ...prev,
+        gallery: newGallery,
+        featuredImage: newFeaturedImage
+      };
+    });
+  };
+
+  const selectGalleryImageAsFeatured = (index) => {
+    const selectedImage = formData.gallery[index];
+    if (selectedImage) {
+      setFormData(prev => ({
+        ...prev,
+        featuredImage: selectedImage
+      }));
+      showSuccess('Gallery image set as featured image');
+    }
   };
 
   const handleTagToggle = (tag) => {
@@ -389,18 +413,18 @@ const EditArticle = () => {
       // Handle featured image upload
       if (formData.featuredImage instanceof File) {
         try {
-          // Validate and optimize the featured image
-          const validation = imageUploadService.validateImageFile(formData.featuredImage);
-          if (!validation.isValid) {
-            showError(`Invalid featured image: ${validation.errors.join(', ')}`);
+          // Validate file size (max 5MB)
+          if (formData.featuredImage.size > 5 * 1024 * 1024) {
+            showError('Featured image size should be less than 5MB');
             return;
           }
 
-          // Optimize the image
-          const optimizedFile = await imageUploadService.optimizeImage(formData.featuredImage);
+          // Create FormData for upload
+          const formDataUpload = new FormData();
+          formDataUpload.append('image', formData.featuredImage);
 
-          // Upload the image using the proper service
-          const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
+          // Upload the image using the same method as CreateArticle
+          const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
           if (uploadResponse.success && uploadResponse.data?.filename) {
             submitData.featuredImage = uploadResponse.data.filename;
           } else {
@@ -419,18 +443,24 @@ const EditArticle = () => {
         const galleryImagePaths = [];
         for (const file of formData.gallery) {
           try {
-            // Validate and optimize the image
-            const validation = imageUploadService.validateImageFile(file);
-            if (!validation.isValid) {
-              showError(`Invalid image ${file.name}: ${validation.errors.join(', ')}`);
+            // Validate file size (max 5MB)
+            if (file.size > 5 * 1024 * 1024) {
+              showError(`${file.name} is too large. Max size is 5MB`);
               continue;
             }
 
-            // Optimize the image
-            const optimizedFile = await imageUploadService.optimizeImage(file);
+            // Validate file type
+            if (!file.type.startsWith('image/')) {
+              showError(`${file.name} is not an image file`);
+              continue;
+            }
 
-            // Upload the image using the proper service
-            const uploadResponse = await imageUploadService.uploadImage(optimizedFile);
+            // Create FormData for upload
+            const formDataUpload = new FormData();
+            formDataUpload.append('image', file);
+
+            // Upload the image using the same method as CreateArticle
+            const uploadResponse = await articleService.uploadFile('/upload/image', formDataUpload);
             if (uploadResponse.success && uploadResponse.data?.filename) {
               galleryImagePaths.push(uploadResponse.data.filename);
             } else {
@@ -756,13 +786,18 @@ const EditArticle = () => {
                   {formData.featuredImage && (
                     <div className="mt-4">
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                        New Image Preview
+                        New Featured Image Preview
                       </label>
                       <img
                         src={URL.createObjectURL(formData.featuredImage)}
-                        alt="Preview"
+                        alt="Featured Preview"
                         className="max-w-full h-48 object-cover rounded-lg"
                       />
+                      <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                        {formData.gallery.includes(formData.featuredImage)
+                          ? 'This image is also in the gallery'
+                          : 'Upload gallery images to use them as featured images'}
+                      </div>
                     </div>
                   )}
                 </div>
@@ -793,7 +828,7 @@ const EditArticle = () => {
                   </div>
 
                   {/* Current Gallery Images */}
-                  {article.gallery && article.gallery.length > 0 && (
+                  {article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0 && (
                     <div>
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
                         Current Gallery Images ({article.gallery.length})
@@ -814,7 +849,7 @@ const EditArticle = () => {
 
                   <div>
                     <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                      {article.gallery && article.gallery.length > 0 ? 'Add More Gallery Images' : 'Upload Gallery Images'} (Max 5 total)
+                      {article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0 ? 'Add More Gallery Images' : 'Upload Gallery Images'} (Max 5 total)
                     </label>
                     <input
                       type="file"
@@ -836,21 +871,46 @@ const EditArticle = () => {
                       </label>
                       <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
                         {formData.gallery.map((file, index) => (
-                          <div key={index} className="relative">
+                          <div key={index} className="relative group">
                             <img
                               src={URL.createObjectURL(file)}
                               alt={`Gallery ${index + 1}`}
-                              className="w-full h-24 object-cover rounded-lg"
+                              className={`w-full h-24 object-cover rounded-lg ${
+                                formData.featuredImage === file ? 'ring-2 ring-blue-500' : ''
+                              }`}
                             />
-                            <button
-                              type="button"
-                              onClick={() => removeGalleryImage(index)}
-                              className="absolute top-1 right-1 bg-red-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-sm hover:bg-red-700"
-                            >
-                              ×
-                            </button>
+                            {/* Featured indicator */}
+                            {formData.featuredImage === file && (
+                              <div className="absolute top-1 left-1 bg-blue-600 text-white text-xs px-2 py-1 rounded">
+                                Featured
+                              </div>
+                            )}
+                            {/* Action buttons */}
+                            <div className="absolute inset-0 bg-black bg-opacity-0 group-hover:bg-opacity-50 transition-all duration-200 flex items-center justify-center opacity-0 group-hover:opacity-100">
+                              <div className="flex gap-1">
+                                <button
+                                  type="button"
+                                  onClick={() => selectGalleryImageAsFeatured(index)}
+                                  className="bg-blue-600 text-white text-xs px-2 py-1 rounded hover:bg-blue-700"
+                                  title="Set as Featured"
+                                >
+                                  Featured
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => removeGalleryImage(index)}
+                                  className="bg-red-600 text-white text-xs px-2 py-1 rounded hover:bg-red-700"
+                                  title="Remove"
+                                >
+                                  Remove
+                                </button>
+                              </div>
+                            </div>
                           </div>
                         ))}
+                      </div>
+                      <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
+                        Click "Featured" on any image to set it as the featured image. The currently featured image is highlighted with a blue border.
                       </div>
                     </div>
                   )}
