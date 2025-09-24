@@ -467,6 +467,7 @@ exports.getFileStats = async (req, res) => {
 
 module.exports = {
   uploadFile: exports.uploadFile,
+  uploadImage: exports.uploadImage,
   getFiles: exports.getFiles,
   getFileById: exports.getFileById,
   downloadFile: exports.downloadFile,
