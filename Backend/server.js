@@ -218,6 +218,28 @@ app.use('/api/storage', express.static(path.join(__dirname, 'storage'), {
   }
 }));
 
+// Serve static files from storage directory without /api prefix
+app.use('/storage', express.static(path.join(__dirname, 'storage'), {
+  maxAge: '1d', // Cache for 1 day
+  etag: true,
+  lastModified: true,
+  setHeaders: (res, filePath) => {
+    // Set proper content type for images
+    if (filePath.endsWith('.webp')) {
+      res.setHeader('Content-Type', 'image/webp');
+    } else if (filePath.endsWith('.jpg') || filePath.endsWith('.jpeg')) {
+      res.setHeader('Content-Type', 'image/jpeg');
+    } else if (filePath.endsWith('.png')) {
+      res.setHeader('Content-Type', 'image/png');
+    }
+
+    // Add CORS headers for images
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+  }
+}));
+
 // Serve download files with appropriate headers
 app.use('/api/storage/downloads', express.static(path.join(__dirname, 'storage', 'downloads'), {
   maxAge: '7d', // Cache downloads for 7 days
