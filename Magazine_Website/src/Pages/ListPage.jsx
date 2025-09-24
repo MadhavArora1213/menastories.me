@@ -215,199 +215,117 @@ const ListPage = () => {
       </Helmet>
 
       <div className="min-h-screen bg-white">
-        {/* Clean Header */}
-        <header className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-6">
+        {/* Forbes-style Header */}
+        <header className="bg-gray-100 border-b border-gray-200">
+          <div className="max-w-7xl mx-auto px-4 py-4">
             <div className="flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
-                  <span className="text-white font-bold text-xl">F</span>
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 bg-gray-800 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-lg">F</span>
                 </div>
                 <div>
-                  <h1 className="text-2xl font-bold text-black">Forbes Middle East</h1>
-                  <p className="text-sm text-gray-600">Business Intelligence</p>
+                  <h1 className="text-lg font-bold text-black">Forbes Middle East</h1>
+                  <p className="text-xs text-gray-600">Lists</p>
                 </div>
               </div>
-              <nav className="hidden md:flex items-center gap-8">
-                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Lists</a>
-                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Companies</a>
-                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Leaders</a>
-                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">Innovation</a>
-                <a href="#" className="text-black hover:text-blue-600 font-medium transition-colors">About</a>
+              <nav className="hidden md:flex items-center gap-6">
+                <a href="#" className="text-gray-700 hover:text-black font-medium transition-colors text-sm">Home</a>
+                <a href="#" className="text-gray-700 hover:text-black font-medium transition-colors text-sm">Lists</a>
+                <a href="#" className="text-gray-700 hover:text-black font-medium transition-colors text-sm">Companies</a>
+                <a href="#" className="text-gray-700 hover:text-black font-medium transition-colors text-sm">Leaders</a>
               </nav>
             </div>
           </div>
         </header>
 
-        {/* List Metadata Section */}
-        <section className="bg-gray-50 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-              {/* Title and Slug */}
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <Tag className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-black">List Information</h3>
-                </div>
-                <h2 className="text-xl font-bold text-black mb-2">{listMetadata.title}</h2>
-                <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">Slug:</span> {listMetadata.slug}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Category:</span> {listMetadata.category}
-                </p>
+        {/* Main Hero Section with Forbes-style Grid */}
+        <section className="bg-[#1a5f3f] text-white relative overflow-hidden">
+          <div className="max-w-7xl mx-auto px-4 py-12">
+            {/* Forbes Branding */}
+            <div className="flex items-center gap-4 mb-8">
+              <div className="w-16 h-16 bg-white rounded-lg flex items-center justify-center">
+                <span className="text-[#1a5f3f] font-bold text-2xl">Forbes</span>
               </div>
-
-              {/* Year and List Type */}
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <Calendar className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-black">Publication Details</h3>
-                </div>
-                <p className="text-lg font-bold text-blue-600 mb-2">{listMetadata.year}</p>
-                <p className="text-sm text-gray-600 mb-2">
-                  <span className="font-medium">List Type:</span> {listTypes.find(t => t.id === selectedListType)?.name}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Status:</span> Published
-                </p>
-              </div>
-
-              {/* Featured Image */}
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <Image className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-black">Featured Image</h3>
-                </div>
-                <div className="w-full h-24 bg-gray-100 rounded-lg flex items-center justify-center mb-2">
-                  <Image className="w-8 h-8 text-gray-400" />
-                </div>
-                <p className="text-xs text-gray-500 text-center">{listMetadata.featuredImageCaption}</p>
-              </div>
-
-              {/* SEO Settings */}
-              <div className="bg-white p-6 rounded-lg border border-gray-200">
-                <div className="flex items-center gap-3 mb-3">
-                  <Settings className="w-5 h-5 text-blue-600" />
-                  <h3 className="font-semibold text-black">SEO Settings</h3>
-                </div>
-                <p className="text-sm text-gray-600 mb-1">
-                  <span className="font-medium">Meta Title:</span> {listMetadata.metaTitle}
-                </p>
-                <p className="text-sm text-gray-600">
-                  <span className="font-medium">Meta Description:</span> {listMetadata.metaDescription}
-                </p>
+              <div>
+                <p className="text-white/80 text-sm font-medium">MIDDLE EAST</p>
               </div>
             </div>
-          </div>
-        </section>
 
-        {/* List Types Selection */}
-        <section className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            <h3 className="text-lg font-semibold text-black mb-4">List Categories</h3>
-            <div className="flex flex-wrap gap-3">
-              {listTypes.map((listType) => {
-                const Icon = listType.icon;
-                return (
-                  <button
-                    key={listType.id}
-                    onClick={() => handleListTypeChange(listType.id)}
-                    className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                      selectedListType === listType.id
-                        ? 'bg-blue-600 text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4" />
-                    {listType.name}
+            {/* Main Title */}
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-12 leading-tight">
+              SUSTAINABILITY<br />
+              LEADERS IN<br />
+              GOVERNMENT
+            </h1>
+
+            {/* Profile Grid */}
+            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 lg:grid-cols-5 gap-4 md:gap-6">
+              {filteredItems.slice(0, 10).map((item, index) => (
+                <div
+                  key={item.id}
+                  className="group cursor-pointer transform transition-all duration-300 hover:scale-105"
+                >
+                  <div className="relative aspect-square rounded-lg overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
+                    <img
+                      src={item.image}
+                      alt={item.name}
+                      className="w-full h-full object-cover group-hover:brightness-110 transition-all duration-300"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <div className="absolute bottom-0 left-0 right-0 p-3">
+                        <p className="text-white text-xs font-semibold truncate">{item.name}</p>
+                        <p className="text-white/80 text-xs truncate">{item.title}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            {/* Year Navigation */}
+            <div className="mt-12 pt-8 border-t border-white/20">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <button className="text-white/60 hover:text-white transition-colors">
+                    <ChevronRight className="w-5 h-5 rotate-180" />
                   </button>
-                );
-              })}
-            </div>
-          </div>
-        </section>
-
-        {/* Description and Content */}
-        <section className="bg-white border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-8">
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-              <div>
-                <h3 className="text-lg font-semibold text-black mb-3">Description</h3>
-                <p className="text-gray-700 leading-relaxed">{listMetadata.description}</p>
-              </div>
-              <div>
-                <h3 className="text-lg font-semibold text-black mb-3">Content & Methodology</h3>
-                <p className="text-gray-700 leading-relaxed mb-4">{listMetadata.content}</p>
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h4 className="font-semibold text-blue-900 mb-2">Methodology</h4>
-                  <p className="text-blue-800 text-sm">{listMetadata.methodology}</p>
                 </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
-        {/* Search and Filters */}
-        <section className="bg-gray-50 border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-6">
-            <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
-              {/* Search */}
-              <div className="relative flex-1 max-w-md">
-                <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
-                <input
-                  type="text"
-                  placeholder="Search leaders, companies, or titles..."
-                  value={searchTerm}
-                  onChange={handleSearch}
-                  className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition-all duration-200 bg-white"
-                />
-              </div>
-
-              {/* Category Filter */}
-              <div className="flex flex-wrap gap-2">
-                {categories.map((category) => {
-                  const Icon = category.icon;
-                  return (
+                <div className="flex items-center gap-1">
+                  {[2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016].map((year) => (
                     <button
-                      key={category.id}
-                      onClick={() => handleCategoryChange(category.id)}
-                      className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
-                        selectedCategory === category.id
-                          ? 'bg-blue-600 text-white'
-                          : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                      key={year}
+                      className={`px-3 py-1 text-sm font-medium transition-all duration-200 ${
+                        year === 2025
+                          ? 'text-white bg-white/20 rounded px-4 py-2'
+                          : 'text-white/60 hover:text-white hover:bg-white/10 rounded px-3 py-1'
                       }`}
                     >
-                      <Icon className="w-4 h-4" />
-                      {category.name}
+                      {year}
                     </button>
-                  );
-                })}
-              </div>
+                  ))}
+                </div>
 
-              {/* Sort Options */}
-              <div className="flex items-center gap-2">
-                <Filter className="w-4 h-4 text-gray-500" />
-                <select
-                  value={sortBy}
-                  onChange={(e) => handleSortChange(e.target.value)}
-                  className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-blue-500 bg-white"
-                >
-                  <option value="rank">Sort by Rank</option>
-                  <option value="name">Sort by Name</option>
-                  <option value="revenue">Sort by Revenue</option>
-                </select>
+                <div className="flex items-center gap-2">
+                  <button className="text-white/60 hover:text-white transition-colors">
+                    <ChevronRight className="w-5 h-5" />
+                  </button>
+                  <button className="text-white/60 hover:text-white transition-colors font-medium">
+                    Recommends
+                  </button>
+                  <ChevronRight className="w-5 h-5 text-white/60" />
+                </div>
               </div>
             </div>
           </div>
         </section>
 
-        {/* List Content */}
-        <section className="py-12 px-4 bg-white">
+        {/* Content Section */}
+        <section className="bg-white py-16 px-4">
           <div className="max-w-7xl mx-auto">
             {isLoading ? (
               <div className="flex flex-col justify-center items-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mb-4"></div>
+                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-[#1a5f3f] mb-4"></div>
                 <p className="text-gray-600">Loading leaders...</p>
               </div>
             ) : error ? (
@@ -417,7 +335,7 @@ const ListPage = () => {
                 <p className="text-gray-600 mb-6 text-center max-w-md">{error}</p>
                 <button
                   onClick={fetchListData}
-                  className="flex items-center gap-2 bg-blue-600 hover:bg-blue-700 text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
+                  className="flex items-center gap-2 bg-[#1a5f3f] hover:bg-[#154a35] text-white px-6 py-3 rounded-lg font-medium transition-colors duration-200"
                 >
                   <RefreshCw className="w-4 h-4" />
                   Try Again
@@ -425,87 +343,115 @@ const ListPage = () => {
               </div>
             ) : (
               <>
-                {/* Results Header */}
-                <div className="mb-8">
-                  <h2 className="text-2xl font-bold text-black mb-2">
-                    {selectedCategory === 'all' ? 'All Leaders' : categories.find(c => c.id === selectedCategory)?.name}
-                    {listData && (
-                      <span className="text-lg font-normal text-gray-600 ml-2">
-                        - {listData.title}
-                      </span>
-                    )}
+                {/* List Title */}
+                <div className="mb-12">
+                  <h2 className="text-3xl font-bold text-black mb-4">
+                    Sustainability Leaders in Government 2025
                   </h2>
-                  <p className="text-gray-600">
-                    Showing {filteredItems.length} of {listItems.length} leaders
+                  <p className="text-gray-600 text-lg">
+                    Recognizing government leaders driving sustainable development and environmental stewardship across the Middle East
                   </p>
                 </div>
 
-                {/* List Items */}
-                <div className="space-y-4">
+                {/* Search and Filters */}
+                <div className="bg-gray-50 rounded-lg p-6 mb-12">
+                  <div className="flex flex-col lg:flex-row gap-6 items-center justify-between">
+                    {/* Search */}
+                    <div className="relative flex-1 max-w-md">
+                      <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400 w-5 h-5" />
+                      <input
+                        type="text"
+                        placeholder="Search leaders..."
+                        value={searchTerm}
+                        onChange={handleSearch}
+                        className="w-full pl-12 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a5f3f] focus:border-[#1a5f3f] transition-all duration-200 bg-white"
+                      />
+                    </div>
+
+                    {/* Category Filter */}
+                    <div className="flex flex-wrap gap-2">
+                      {categories.map((category) => {
+                        const Icon = category.icon;
+                        return (
+                          <button
+                            key={category.id}
+                            onClick={() => handleCategoryChange(category.id)}
+                            className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-medium transition-all duration-200 ${
+                              selectedCategory === category.id
+                                ? 'bg-[#1a5f3f] text-white'
+                                : 'bg-white text-gray-700 border border-gray-300 hover:bg-gray-100'
+                            }`}
+                          >
+                            <Icon className="w-4 h-4" />
+                            {category.name}
+                          </button>
+                        );
+                      })}
+                    </div>
+
+                    {/* Sort Options */}
+                    <div className="flex items-center gap-2">
+                      <Filter className="w-4 h-4 text-gray-500" />
+                      <select
+                        value={sortBy}
+                        onChange={(e) => handleSortChange(e.target.value)}
+                        className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#1a5f3f] focus:border-[#1a5f3f] bg-white"
+                      >
+                        <option value="rank">Sort by Rank</option>
+                        <option value="name">Sort by Name</option>
+                        <option value="revenue">Sort by Revenue</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Leaders Grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8 mb-16">
                   {filteredItems.map((item, index) => (
                     <div
                       key={item.id}
-                      className="bg-white border border-gray-200 rounded-lg hover:shadow-md transition-all duration-300 overflow-hidden"
+                      className="group cursor-pointer"
                     >
-                      <div className="flex flex-col lg:flex-row">
-                        {/* Rank */}
-                        <div className="lg:w-20 flex-shrink-0 bg-blue-600 text-white p-4 flex items-center justify-center">
-                          <div className="text-center">
-                            <div className="text-2xl font-bold">#{item.rank}</div>
+                      <div className="bg-white rounded-lg shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden border border-gray-100">
+                        {/* Profile Image */}
+                        <div className="relative aspect-square overflow-hidden">
+                          <img
+                            src={item.image}
+                            alt={item.name}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                          />
+                          {item.verified && (
+                            <div className="absolute top-3 right-3 bg-[#1a5f3f] rounded-full p-1">
+                              <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
+                              </svg>
+                            </div>
+                          )}
+                          {/* Rank Badge */}
+                          <div className="absolute top-3 left-3 bg-[#1a5f3f] text-white rounded-full w-8 h-8 flex items-center justify-center font-bold text-sm">
+                            #{item.rank}
                           </div>
                         </div>
 
                         {/* Content */}
-                        <div className="flex-1 p-6">
-                          <div className="flex flex-col md:flex-row gap-6">
-                            {/* Profile Image */}
-                            <div className="flex-shrink-0">
-                              <div className="relative">
-                                <img
-                                  src={item.image}
-                                  alt={item.name}
-                                  className="w-20 h-20 rounded-full object-cover border-2 border-gray-200"
-                                />
-                                {item.verified && (
-                                  <div className="absolute -bottom-1 -right-1 bg-blue-600 rounded-full p-1">
-                                    <svg className="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
-                                      <path fillRule="evenodd" d="M6.267 3.455a3.066 3.066 0 001.745-.723 3.066 3.066 0 013.976 0 3.066 3.066 0 001.745.723 3.066 3.066 0 012.812 2.812c.051.643.304 1.254.723 1.745a3.066 3.066 0 010 3.976 3.066 3.066 0 00-.723 1.745 3.066 3.066 0 01-2.812 2.812 3.066 3.066 0 00-1.745.723 3.066 3.066 0 01-3.976 0 3.066 3.066 0 00-1.745-.723 3.066 3.066 0 01-2.812-2.812 3.066 3.066 0 00-.723-1.745 3.066 3.066 0 010-3.976 3.066 3.066 0 00.723-1.745 3.066 3.066 0 012.812-2.812zm7.44 5.252a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                                    </svg>
-                                  </div>
-                                )}
-                              </div>
+                        <div className="p-6">
+                          <h3 className="text-lg font-bold text-black mb-2 group-hover:text-[#1a5f3f] transition-colors duration-200">
+                            {item.name}
+                          </h3>
+                          <p className="text-[#1a5f3f] font-medium text-sm mb-1">{item.title}</p>
+                          <p className="text-gray-600 text-sm mb-3">{item.company}</p>
+                          <p className="text-gray-700 text-sm leading-relaxed mb-4 line-clamp-3">
+                            {item.description}
+                          </p>
+
+                          <div className="flex items-center justify-between text-xs">
+                            <div className="flex items-center gap-2">
+                              <Building2 className="w-3 h-3 text-gray-500" />
+                              <span className="text-gray-600">{item.industry}</span>
                             </div>
-
-                            {/* Details */}
-                            <div className="flex-1">
-                              <div className="flex items-start justify-between mb-3">
-                                <div>
-                                  <h3 className="text-lg font-bold text-black mb-1">{item.name}</h3>
-                                  <p className="text-blue-600 font-medium text-sm">{item.title}</p>
-                                  <p className="text-gray-600 text-sm">{item.company}</p>
-                                </div>
-                                <ChevronRight className="w-5 h-5 text-gray-400 flex-shrink-0" />
-                              </div>
-
-                              <p className="text-gray-700 mb-4 leading-relaxed text-sm">{item.description}</p>
-
-                              <div className="flex flex-wrap gap-4 text-xs">
-                                <div className="flex items-center gap-2">
-                                  <Building2 className="w-3 h-3 text-gray-500" />
-                                  <span className="text-gray-600">Industry:</span>
-                                  <span className="font-medium text-black">{item.industry}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <TrendingUp className="w-3 h-3 text-gray-500" />
-                                  <span className="text-gray-600">Revenue:</span>
-                                  <span className="font-medium text-black">{item.revenue}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <Users className="w-3 h-3 text-gray-500" />
-                                  <span className="text-gray-600">Employees:</span>
-                                  <span className="font-medium text-black">{item.employees}</span>
-                                </div>
-                              </div>
+                            <div className="flex items-center gap-1">
+                              <TrendingUp className="w-3 h-3 text-gray-500" />
+                              <span className="text-gray-600">{item.revenue}</span>
                             </div>
                           </div>
                         </div>
@@ -515,9 +461,9 @@ const ListPage = () => {
                 </div>
 
                 {/* Load More Button */}
-                {filteredItems.length >= 5 && (
-                  <div className="text-center mt-12">
-                    <button className="bg-blue-600 hover:bg-blue-700 text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200">
+                {filteredItems.length >= 12 && (
+                  <div className="text-center">
+                    <button className="bg-[#1a5f3f] hover:bg-[#154a35] text-white px-8 py-3 rounded-lg font-medium transition-colors duration-200">
                       Load More Leaders
                     </button>
                   </div>
@@ -527,27 +473,41 @@ const ListPage = () => {
           </div>
         </section>
 
-        {/* Call to Action */}
-        <section className="py-16 px-4 bg-blue-600 text-white">
-          <div className="max-w-4xl mx-auto text-center">
-            <h2 className="text-3xl font-bold mb-4">Know a Leader Who Should Be Featured?</h2>
-            <p className="text-xl text-blue-100 mb-8">
-              Nominate exceptional business leaders who are making a significant impact in their industries.
-            </p>
-            <button className="bg-white text-blue-600 px-8 py-3 rounded-lg font-medium hover:bg-gray-100 transition-colors duration-200">
-              Submit Nomination
-            </button>
+        {/* Methodology Section */}
+        <section className="py-16 px-4 bg-gray-50">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-white rounded-lg shadow-sm p-8">
+              <h2 className="text-2xl font-bold text-black mb-6">Methodology</h2>
+              <div className="prose prose-lg max-w-none">
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  The Sustainability Leaders in Government list recognizes government officials and policymakers who have demonstrated exceptional leadership in advancing sustainable development goals, environmental protection, and green initiatives across the Middle East region.
+                </p>
+                <p className="text-gray-700 leading-relaxed mb-4">
+                  Our comprehensive evaluation process considers multiple factors including policy impact, innovation in sustainable practices, measurable environmental outcomes, stakeholder engagement, and long-term vision for sustainable development.
+                </p>
+                <div className="bg-[#1a5f3f]/5 border-l-4 border-[#1a5f3f] p-4 rounded-r-lg">
+                  <h3 className="font-semibold text-[#1a5f3f] mb-2">Evaluation Criteria</h3>
+                  <ul className="text-gray-700 space-y-1">
+                    <li>• Policy implementation and environmental impact</li>
+                    <li>• Innovation in sustainable governance</li>
+                    <li>• Stakeholder collaboration and engagement</li>
+                    <li>• Long-term strategic vision</li>
+                    <li>• Measurable sustainability outcomes</li>
+                  </ul>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
         {/* Footer */}
-        <footer className="bg-black text-white py-12 px-4">
+        <footer className="bg-gray-900 text-white py-12 px-4">
           <div className="max-w-7xl mx-auto">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
               <div className="col-span-1 md:col-span-2">
                 <div className="flex items-center gap-3 mb-4">
-                  <div className="w-10 h-10 bg-blue-600 rounded-lg flex items-center justify-center">
-                    <span className="text-white font-bold text-lg">F</span>
+                  <div className="w-12 h-12 bg-[#1a5f3f] rounded-lg flex items-center justify-center">
+                    <span className="text-white font-bold text-xl">F</span>
                   </div>
                   <div>
                     <h3 className="text-xl font-bold">Forbes Middle East</h3>
@@ -562,10 +522,10 @@ const ListPage = () => {
               <div>
                 <h4 className="text-lg font-semibold mb-4">Lists</h4>
                 <ul className="space-y-2 text-gray-300">
+                  <li><a href="#" className="hover:text-white transition-colors">Sustainability Leaders</a></li>
                   <li><a href="#" className="hover:text-white transition-colors">Top Companies</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Richest Individuals</a></li>
-                  <li><a href="#" className="hover:text-white transition-colors">Most Powerful CEOs</a></li>
                   <li><a href="#" className="hover:text-white transition-colors">Innovation Leaders</a></li>
+                  <li><a href="#" className="hover:text-white transition-colors">Business Leaders</a></li>
                 </ul>
               </div>
 
@@ -583,7 +543,7 @@ const ListPage = () => {
             <div className="border-t border-gray-800 pt-8">
               <div className="flex flex-col md:flex-row justify-between items-center">
                 <p className="text-gray-400 text-sm">
-                  © 2024 Forbes Middle East. All rights reserved.
+                  © 2025 Forbes Middle East. All rights reserved.
                 </p>
                 <div className="flex items-center gap-6 mt-4 md:mt-0">
                   <a href="#" className="text-gray-400 hover:text-white transition-colors">
