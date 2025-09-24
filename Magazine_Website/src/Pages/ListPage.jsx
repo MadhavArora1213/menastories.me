@@ -37,18 +37,6 @@ const ListPage = () => {
     [currentYear, selectedCategory]
   );
 
-  // Generate dynamic categories and years based on available data
-  const categories = [
-    { id: 'all', label: 'All', active: selectedCategory === 'all' },
-    ...availableCategories.map(category => ({
-      id: category,
-      label: category,
-      active: selectedCategory === category
-    }))
-  ];
-
-  const years = availableYears.length > 0 ? availableYears : [2025, 2024, 2023, 2022, 2021];
-
   // Fetch data on component mount
   useEffect(() => {
     fetchListData();
@@ -76,20 +64,6 @@ const ListPage = () => {
 
         setAvailableCategories(categories);
         setAvailableYears(years);
-
-        // Apply current filters
-        const filterParams = {
-          limit: 100,
-          status: 'published'
-        };
-
-        if (currentYear !== 'all') {
-          filterParams.year = currentYear;
-        }
-
-        if (selectedCategory !== 'all') {
-          filterParams.category = selectedCategory;
-        }
 
         // Filter lists based on current selection
         let filteredLists = allLists;
@@ -131,21 +105,11 @@ const ListPage = () => {
   };
 
   const handleYearChange = (year) => {
-    // Validate that the year exists in available years
-    if (year !== 'all' && !availableYears.includes(year)) {
-      console.warn(`Year "${year}" not found in available years:`, availableYears);
-      return;
-    }
     setCurrentYear(year);
     debouncedFetch(true);
   };
 
   const handleCategoryChange = (category) => {
-    // Validate that the category exists in available categories
-    if (category !== 'all' && !availableCategories.includes(category)) {
-      console.warn(`Category "${category}" not found in available categories:`, availableCategories);
-      return;
-    }
     setSelectedCategory(category);
     debouncedFetch(true);
   };
@@ -157,26 +121,26 @@ const ListPage = () => {
   return (
     <>
       <Helmet>
-        <title>Lists | Magazine</title>
+        <title>Lists | Forbes Middle East</title>
         <meta name="description" content="Discover the most influential leaders and companies." />
       </Helmet>
 
       <div className="min-h-screen bg-white">
         {/* Header */}
-        <header className="bg-white border-b border-gray-200">
+        <header className="bg-black text-white">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex items-center justify-between h-16">
-              <div className="flex items-center">
+              <div className="flex items-center gap-8">
                 <div className="flex-shrink-0">
-                  <span className="text-2xl font-bold text-black">MAGAZINE</span>
+                  <span className="text-2xl font-bold">Forbes</span>
                 </div>
+                <nav className="hidden md:flex space-x-8">
+                  <a href="/" className="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">HOME</a>
+                  <a href="/list" className="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium border-b-2 border-white">LISTS</a>
+                  <a href="#" className="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">NEWS</a>
+                  <a href="#" className="text-white hover:text-gray-300 px-3 py-2 text-sm font-medium">COMPANIES</a>
+                </nav>
               </div>
-              <nav className="hidden md:flex space-x-8">
-                <a href="#" className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">HOME</a>
-                <a href="#" className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium border-b-2 border-black">LISTS</a>
-                <a href="#" className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">NEWS</a>
-                <a href="#" className="text-gray-900 hover:text-gray-700 px-3 py-2 text-sm font-medium">COMPANIES</a>
-              </nav>
             </div>
           </div>
         </header>
@@ -186,13 +150,13 @@ const ListPage = () => {
           {isLoading ? (
             <div className="flex flex-col justify-center items-center py-20">
               <div className="animate-spin rounded-full h-16 w-16 border-b-2 border-black mb-6"></div>
-              <p className="text-gray-600 text-lg">Loading lists from database...</p>
+              <p className="text-gray-600 text-lg">Loading lists...</p>
               <button
                 onClick={handleRefresh}
                 className="mt-4 flex items-center gap-2 px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-lg transition-colors"
               >
                 <RefreshCw className="h-4 w-4" />
-                Refresh Now
+                Refresh
               </button>
             </div>
           ) : error ? (
@@ -201,9 +165,7 @@ const ListPage = () => {
                 <AlertCircle className="h-16 w-16 text-red-400" />
               </div>
               <h2 className="text-2xl font-bold text-gray-900 mb-4">Error Loading Lists</h2>
-              <p className="text-gray-600 text-lg text-center max-w-md mb-6">
-                {error}
-              </p>
+              <p className="text-gray-600 text-lg text-center max-w-md mb-6">{error}</p>
               <button
                 onClick={handleRefresh}
                 className="flex items-center gap-2 px-6 py-3 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
@@ -214,53 +176,41 @@ const ListPage = () => {
             </div>
           ) : (
             <>
-              {/* Breadcrumb */}
-              <div className="flex items-center gap-2 text-sm text-gray-500 mb-8 mt-8">
-                <span>Magazine</span>
-                <span>/</span>
-                <span>Lists</span>
+              {/* Title Section */}
+              <div className="py-12">
+                <h1 className="text-4xl md:text-5xl font-bold text-black mb-2">LISTS</h1>
+                <p className="text-lg text-gray-600">Discover the most influential leaders and companies</p>
               </div>
 
-              {/* Featured Header Banner */}
-              <div className="relative mb-8">
-                <div className="bg-gradient-to-r from-green-800 to-green-900 rounded-lg overflow-hidden h-64">
-                  <div className="absolute inset-0">
-                    <img
-                      src="/api/placeholder/1200/300"
-                      alt="Lists Banner"
-                      className="w-full h-full object-cover"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
-
-                    {/* Title Overlay */}
-                    <div className="absolute bottom-8 left-8 right-8">
-                      <h1 className="text-white text-4xl md:text-5xl font-bold leading-tight">
-                        LISTS & RANKINGS
-                      </h1>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Title */}
-              <div className="mb-8">
-                <h2 className="text-3xl font-bold text-gray-900 mb-2">
-                  Lists & Rankings
-                </h2>
-              </div>
-
-              {/* Navigation Menu */}
+              {/* Year Navigation */}
               <div className="flex items-center gap-8 mb-8 border-b border-gray-200 overflow-x-auto">
+                {[2026, 2025, 2024, 2023, 2022, 2021].map((year) => (
+                  <button
+                    key={year}
+                    onClick={() => handleYearChange(year)}
+                    className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
+                      currentYear === year
+                        ? 'text-black border-black'
+                        : 'text-gray-500 border-transparent hover:text-gray-700'
+                    }`}
+                  >
+                    {year}
+                  </button>
+                ))}
                 <button
-                  onClick={() => handleCategoryChange('all')}
+                  onClick={() => handleCategoryChange('recommended')}
                   className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
-                    selectedCategory === 'all'
+                    selectedCategory === 'recommended'
                       ? 'text-black border-black'
                       : 'text-gray-500 border-transparent hover:text-gray-700'
                   }`}
                 >
-                  All
+                  Recommended →
                 </button>
+              </div>
+
+              {/* Category Navigation */}
+              <div className="flex items-center gap-8 mb-12 border-b border-gray-200 overflow-x-auto">
                 <button
                   onClick={() => handleCategoryChange('rich-lists')}
                   className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
@@ -333,58 +283,6 @@ const ListPage = () => {
                 </button>
               </div>
 
-              {/* Year Navigation */}
-              <div className="flex items-center gap-8 mb-8 border-b border-gray-200">
-                {[2026, 2025, 2024, 2023, 2022, 2021].map((year) => (
-                  <button
-                    key={year}
-                    onClick={() => handleYearChange(year)}
-                    className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 ${
-                      currentYear === year
-                        ? 'text-black border-black'
-                        : 'text-gray-500 border-transparent hover:text-gray-700'
-                    }`}
-                  >
-                    {year}
-                  </button>
-                ))}
-                <button
-                  onClick={() => handleCategoryChange('recommended')}
-                  className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 ${
-                    selectedCategory === 'recommended'
-                      ? 'text-black border-black'
-                      : 'text-gray-500 border-transparent hover:text-gray-700'
-                  }`}
-                >
-                  Recommended →
-                </button>
-              </div>
-
-              {/* Category Filters */}
-              <div className="flex flex-wrap items-center gap-4 mb-12">
-                {categories.map((category) => (
-                  <button
-                    key={category.id}
-                    onClick={() => handleCategoryChange(category.id)}
-                    className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                      category.active
-                        ? 'bg-black text-white'
-                        : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-                    }`}
-                  >
-                    {category.label}
-                  </button>
-                ))}
-                <button
-                  onClick={handleRefresh}
-                  className="flex items-center gap-2 px-3 py-2 text-sm text-gray-600 hover:text-gray-800 hover:bg-gray-100 rounded-lg transition-colors"
-                  title="Refresh data"
-                >
-                  <RefreshCw className="h-4 w-4" />
-                  Refresh
-                </button>
-              </div>
-
               {/* Lists Grid */}
               {lists.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
@@ -394,51 +292,48 @@ const ListPage = () => {
                       to={`/lists/${list.slug}`}
                       className="group cursor-pointer block"
                     >
-                      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden hover:shadow-md transition-shadow">
+                      <div className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         {/* Featured Image */}
-                        <div className="relative h-48 bg-gradient-to-br from-gray-100 to-gray-200">
-                          {list.featured_image ? (
+                        <div className="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
+                          {list.featuredImage || list.featured_image ? (
                             <img
-                              src={list.featured_image}
+                              src={list.featuredImage || list.featured_image}
                               alt={list.title}
-                              className="w-full h-full object-cover"
+                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               onError={(e) => {
                                 e.target.src = "/api/placeholder/400/300";
                               }}
                             />
                           ) : (
-                            <img
-                              src="/api/placeholder/400/300"
-                              alt={list.title}
-                              className="w-full h-full object-cover"
-                            />
-                          )}
-                          <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent" />
-                        </div>
-
-                        {/* Card Content */}
-                        <div className="p-6">
-                          <h3 className="text-lg font-semibold text-gray-900 mb-2 group-hover:text-gray-700 transition-colors line-clamp-2">
-                            {list.title}
-                          </h3>
-                          <p className="text-sm text-gray-600 mb-4 line-clamp-3">
-                            {list.description || 'A comprehensive list featuring top leaders and companies.'}
-                          </p>
-                          <div className="flex items-center justify-between text-sm text-gray-500">
-                            <span className="bg-gray-100 px-3 py-1 rounded-full text-xs">
-                              {list.category || 'General'}
-                            </span>
-                            <span className="bg-gray-100 px-3 py-1 rounded-full text-xs">
-                              {list.entries_count || 0} entries
-                            </span>
-                          </div>
-                          {list.year && (
-                            <div className="mt-3">
-                              <span className="inline-block bg-black text-white px-3 py-1 rounded-full text-xs font-medium">
-                                {list.year}
+                            <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900 flex items-center justify-center">
+                              <span className="text-white text-lg font-bold opacity-50">
+                                {list.title?.split(' ').slice(0, 2).join(' ')}
                               </span>
                             </div>
                           )}
+                          <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
+                          
+                          {/* Title Overlay */}
+                          <div className="absolute bottom-4 left-4 right-4">
+                            <p className="text-white text-sm font-bold uppercase tracking-wide">
+                              Forbes Middle East
+                            </p>
+                            <h3 className="text-white text-lg font-bold leading-tight mt-1 line-clamp-2">
+                              {list.title}
+                            </h3>
+                          </div>
+                        </div>
+
+                        {/* Card Footer */}
+                        <div className="p-4 bg-white">
+                          <div className="flex items-center justify-between text-sm text-gray-500">
+                            <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">
+                              {list.category || 'General'}
+                            </span>
+                            <span className="text-xs">
+                              {list.entries?.length || list.entries_count || 0} entries
+                            </span>
+                          </div>
                         </div>
                       </div>
                     </Link>
@@ -451,38 +346,29 @@ const ListPage = () => {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">No Lists Available</h2>
                   <p className="text-gray-600 text-lg text-center max-w-md">
-                    {selectedCategory === 'all' && currentYear === 'all'
-                      ? 'There are currently no lists available in the database. Please check back later for new content.'
-                      : selectedCategory === 'all'
-                      ? `There are currently no lists available for ${currentYear}. Please check back later for new content.`
-                      : currentYear === 'all'
-                      ? `There are currently no lists available in the "${selectedCategory}" category. Please try selecting a different category or check back later for new content.`
-                      : `There are currently no lists available in the "${selectedCategory}" category for ${currentYear}. Please try selecting different filters or check back later for new content.`
-                    }
+                    No lists found for the selected filters. Try selecting different options or check back later.
                   </p>
-                  {availableCategories.length > 0 && (
-                    <div className="mt-6 text-sm text-gray-500">
-                      <p className="mb-2">Available categories:</p>
-                      <div className="flex flex-wrap gap-2 justify-center">
-                        {availableCategories.slice(0, 5).map(category => (
-                          <span key={category} className="bg-gray-100 px-2 py-1 rounded text-xs">
-                            {category}
-                          </span>
-                        ))}
-                        {availableCategories.length > 5 && (
-                          <span className="bg-gray-100 px-2 py-1 rounded text-xs">
-                            +{availableCategories.length - 5} more
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
+                  <button
+                    onClick={handleRefresh}
+                    className="mt-6 flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
+                  >
+                    <RefreshCw className="h-4 w-4" />
+                    Refresh Lists
+                  </button>
                 </div>
               )}
             </>
           )}
         </main>
 
+        {/* Footer */}
+        <footer className="bg-black text-white py-12">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-gray-400">© 2025 Forbes Middle East</p>
+            </div>
+          </div>
+        </footer>
       </div>
     </>
   );
