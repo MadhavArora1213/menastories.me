@@ -166,17 +166,18 @@ const ListDetailPage = () => {
         </header>
 
         {/* Hero Section */}
-        <div className="bg-gradient-to-br from-green-600 to-green-900 relative">
-          <div className="absolute inset-0 bg-black opacity-20"></div>
+        <div className="bg-gradient-to-br from-green-600 via-green-700 to-green-900 relative overflow-hidden">
+          <div className="absolute inset-0 bg-black opacity-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent"></div>
           <div className="relative z-10">
             <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
               {/* Top 5 Leadership Photos */}
               <div className="flex justify-center mb-8">
                 <div className="grid grid-cols-5 gap-4">
                   {listData.entries?.slice(0, 5).map((entry, index) => (
-                    <div key={entry.id || index} className="text-center">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-400">
-                        <div className="w-full h-full bg-gray-400 flex items-center justify-center">
+                    <div key={entry.id || index} className="text-center group">
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gradient-to-br from-gray-300 to-gray-400 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
                           <span className="text-white text-xs font-bold">
                             {entry.name?.charAt(0) || index + 1}
                           </span>
@@ -191,9 +192,9 @@ const ListDetailPage = () => {
               <div className="flex justify-center mb-12">
                 <div className="grid grid-cols-5 gap-4">
                   {listData.entries?.slice(5, 10).map((entry, index) => (
-                    <div key={entry.id || index} className="text-center">
-                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gray-400">
-                        <div className="w-full h-full bg-gray-400 flex items-center justify-center">
+                    <div key={entry.id || index} className="text-center group">
+                      <div className="w-20 h-20 md:w-24 md:h-24 rounded-full overflow-hidden border-4 border-white mb-2 mx-auto bg-gradient-to-br from-gray-300 to-gray-400 shadow-lg group-hover:scale-105 transition-transform duration-300">
+                        <div className="w-full h-full bg-gradient-to-br from-gray-300 to-gray-400 flex items-center justify-center">
                           <span className="text-white text-xs font-bold">
                             {entry.name?.charAt(0) || index + 6}
                           </span>
@@ -206,14 +207,21 @@ const ListDetailPage = () => {
 
               {/* Title Section */}
               <div className="text-center text-white">
-                <div className="flex items-center justify-center gap-2 mb-6">
-                  <span className="text-xl font-bold">Forbes</span>
+                <div className="flex items-center justify-center gap-3 mb-6">
+                  <div className="w-10 h-10 bg-white/20 rounded-lg flex items-center justify-center backdrop-blur-sm">
+                    <span className="text-xl font-bold">Forbes</span>
+                  </div>
                 </div>
-                <h1 className="text-4xl md:text-6xl font-bold mb-4">
+                <h1 className="text-4xl md:text-6xl font-bold mb-4 leading-tight">
                   {listData.title?.replace('2025', '') || 'Sustainability Leaders'}
                 </h1>
-                <div className="text-2xl md:text-3xl font-light opacity-90">
+                <div className="text-2xl md:text-3xl font-light opacity-90 mb-6">
                   2025
+                </div>
+                <div className="flex items-center justify-center gap-2 text-sm opacity-75">
+                  <div className="w-8 h-px bg-white/50"></div>
+                  <span>MIDDLE EAST</span>
+                  <div className="w-8 h-px bg-white/50"></div>
                 </div>
               </div>
             </div>
@@ -223,116 +231,196 @@ const ListDetailPage = () => {
         {/* Main Content */}
         <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           {/* Introduction Text */}
-          <div className="max-w-4xl mx-auto mb-16">
-            <p className="text-lg leading-relaxed text-gray-700 mb-8">
-              In the Middle East, sustainability continues to move from commitment to action as governments and companies align with global climate goals and national visions. From expanding renewable energy capacity and reducing carbon emissions to advancing sustainable finance, circular economy initiatives, and adopting low-carbon manufacturing, the region is embedding sustainability in its long-term strategies. These efforts are reshaping industries and positioning the region as an active contributor to the global transition toward a more resilient future.
-            </p>
-            <p className="text-lg leading-relaxed text-gray-700 mb-8">
-              This year's Sustainability Leaders 2025 list highlights 126 executives driving sustainability and impact in the region's largest companies across 15 industries: banks, energy and utilities, food and agriculture, investment and holding companies, financial services, family businesses, healthcare, manufacturing and industrials, oil and gas, real estate and construction, renewable energy, telecom, transport and logistics, travel and tourism, and waste management.
-            </p>
-            <p className="text-lg leading-relaxed text-gray-700">
-              The U.A.E. is home to 67 entries, followed by Saudi Arabia with 23, and Egypt with 12. The list features CEOs, chairpersons, and chief sustainability officers.
-            </p>
+          <div className="max-w-5xl mx-auto mb-20">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8 md:p-12">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-xl font-bold">📊</span>
+                </div>
+                <h2 className="text-2xl font-bold text-gray-900">About This List</h2>
+              </div>
+
+              <div className="space-y-6 text-lg leading-relaxed text-gray-700">
+                <p>
+                  In the Middle East, sustainability continues to move from commitment to action as governments and companies align with global climate goals and national visions. From expanding renewable energy capacity and reducing carbon emissions to advancing sustainable finance, circular economy initiatives, and adopting low-carbon manufacturing, the region is embedding sustainability in its long-term strategies. These efforts are reshaping industries and positioning the region as an active contributor to the global transition toward a more resilient future.
+                </p>
+
+                <div className="bg-green-50 border-l-4 border-green-600 p-6 rounded-r-lg">
+                  <p className="font-semibold text-green-900 mb-2">This year's highlights:</p>
+                  <p className="text-green-800">
+                    This year's Sustainability Leaders 2025 list highlights 126 executives driving sustainability and impact in the region's largest companies across 15 industries: banks, energy and utilities, food and agriculture, investment and holding companies, financial services, family businesses, healthcare, manufacturing and industrials, oil and gas, real estate and construction, renewable energy, telecom, transport and logistics, travel and tourism, and waste management.
+                  </p>
+                </div>
+
+                <p>
+                  The U.A.E. is home to 67 entries, followed by Saudi Arabia with 23, and Egypt with 12. The list features CEOs, chairpersons, and chief sustainability officers.
+                </p>
+              </div>
+            </div>
           </div>
 
           {/* Leadership Grid */}
-          <div className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
-              {listData.entries?.slice(0, 10).map((entry, index) => (
-                <div key={entry.id || index} className="text-center">
-                  <div className="relative mb-4">
-                    <div className="w-full aspect-square rounded-lg overflow-hidden bg-gray-300 flex items-center justify-center">
-                      <span className="text-gray-600 text-2xl font-bold">
-                        {entry.name?.charAt(0) || index + 1}
-                      </span>
-                    </div>
-                    <div className="absolute top-2 left-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                      {index + 1}
-                    </div>
-                  </div>
-                  <h3 className="font-bold text-lg text-gray-900 mb-1">{entry.name}</h3>
-                  <p className="text-sm text-blue-600 mb-1">{entry.company}</p>
-                  <p className="text-xs text-gray-500">{entry.designation}</p>
+          <div className="mb-20">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                  <Users className="h-6 w-6 text-white" />
                 </div>
-              ))}
+                <h2 className="text-2xl font-bold text-gray-900">Top Leadership</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                {listData.entries?.slice(0, 10).map((entry, index) => (
+                  <div key={entry.id || index} className="text-center group hover:scale-105 transition-transform duration-300">
+                    <div className="relative mb-4">
+                      <div className="w-full aspect-square rounded-xl overflow-hidden bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center shadow-md group-hover:shadow-lg transition-shadow">
+                        <span className="text-gray-600 text-3xl font-bold">
+                          {entry.name?.charAt(0) || index + 1}
+                        </span>
+                      </div>
+                      <div className="absolute -top-2 -left-2 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold shadow-lg">
+                        {index + 1}
+                      </div>
+                    </div>
+                    <h3 className="font-bold text-lg text-gray-900 mb-1 group-hover:text-blue-600 transition-colors">{entry.name}</h3>
+                    <p className="text-sm text-blue-600 mb-1 font-medium">{entry.company}</p>
+                    <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Complete Entries List */}
-          <div className="mb-16">
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              {listData.entries?.slice(10).map((entry, index) => (
-                <div key={entry.id || index} className="bg-white border border-gray-200 rounded-lg overflow-hidden hover:shadow-md transition-shadow">
-                  <div className="relative">
-                    <div className="w-full aspect-square bg-gray-300 flex items-center justify-center">
-                      <span className="text-gray-600 text-lg font-bold">
-                        {entry.name?.charAt(0) || index + 11}
-                      </span>
-                    </div>
-                    <div className="absolute top-2 left-2 bg-black text-white rounded-full w-8 h-8 flex items-center justify-center text-sm font-bold">
-                      {index + 11}
-                    </div>
-                  </div>
-                  <div className="p-4">
-                    <h3 className="font-bold text-sm text-gray-900 mb-1">{entry.name}</h3>
-                    <p className="text-xs text-blue-600 mb-1">{entry.company}</p>
-                    <p className="text-xs text-gray-500">{entry.designation}</p>
-                  </div>
+          <div className="mb-20">
+            <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-12 h-12 bg-green-600 rounded-lg flex items-center justify-center">
+                  <Building2 className="h-6 w-6 text-white" />
                 </div>
-              ))}
+                <h2 className="text-2xl font-bold text-gray-900">Complete List</h2>
+              </div>
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                {listData.entries?.slice(10).map((entry, index) => (
+                  <div key={entry.id || index} className="bg-gradient-to-br from-gray-50 to-white border border-gray-200 rounded-xl overflow-hidden hover:shadow-lg hover:border-blue-300 transition-all duration-300 group">
+                    <div className="relative">
+                      <div className="w-full aspect-square bg-gradient-to-br from-gray-200 to-gray-300 flex items-center justify-center">
+                        <span className="text-gray-600 text-2xl font-bold">
+                          {entry.name?.charAt(0) || index + 11}
+                        </span>
+                      </div>
+                      <div className="absolute -top-2 -left-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-full w-10 h-10 flex items-center justify-center text-sm font-bold shadow-lg">
+                        {index + 11}
+                      </div>
+                    </div>
+                    <div className="p-5">
+                      <h3 className="font-bold text-base text-gray-900 mb-2 group-hover:text-green-600 transition-colors">{entry.name}</h3>
+                      <p className="text-sm text-blue-600 mb-2 font-medium">{entry.company}</p>
+                      <p className="text-xs text-gray-500 uppercase tracking-wide">{entry.designation}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
 
           {/* Methodology Section */}
-          <div className="mb-16 bg-red-600 text-white p-8 rounded-lg">
-            <h2 className="text-3xl font-bold mb-6">Methodology</h2>
-            <div className="space-y-4 text-lg leading-relaxed">
-              <p>For this list, we gathered information from questionnaires, sustainability or ESG reports, official disclosures, and recent news. The ranking was applied separately for each sector. Initiatives were horizontally compared and assessed while giving special weight to some sector-specific initiatives.</p>
-              
-              <p className="font-semibold">We considered:</p>
-              <ul className="space-y-2 ml-6">
-                <li>• Sustainability or ESG reporting and the degree of transparency and clarity in reporting.</li>
-                <li>• Green/sustainable financing, especially weighted in the banking, financial services, and investments categories.</li>
-                <li>• Trends in greenhouse gas emissions across scopes.</li>
-                <li>• Waste handling, water, energy, and other resource consumption.</li>
-                <li>• Reliance on or percentage change in renewable energy and energy-efficient technology.</li>
-                <li>• The size of the company in relation to its climate impact using proportional analysis.</li>
-                <li>• Sustainability-related initiatives in 2025 led by the leader.</li>
-                <li>• Other roles that the leader has or has had.</li>
-              </ul>
+          <div className="mb-16 bg-gradient-to-br from-gray-50 to-gray-100 border border-gray-200 p-8 rounded-xl shadow-sm">
+            <div className="flex items-center gap-3 mb-6">
+              <div className="w-12 h-12 bg-blue-600 rounded-lg flex items-center justify-center">
+                <span className="text-white text-xl font-bold">M</span>
+              </div>
+              <h2 className="text-3xl font-bold text-gray-900">Methodology</h2>
+            </div>
+            <div className="space-y-6 text-lg leading-relaxed text-gray-700">
+              <p className="text-lg leading-relaxed">
+                For this list, we gathered information from questionnaires, sustainability or ESG reports, official disclosures, and recent news. The ranking was applied separately for each sector. Initiatives were horizontally compared and assessed while giving special weight to some sector-specific initiatives.
+              </p>
+
+              <div className="bg-white p-6 rounded-lg border-l-4 border-blue-600">
+                <p className="font-semibold text-gray-900 mb-4">We considered:</p>
+                <ul className="space-y-3">
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Sustainability or ESG reporting and the degree of transparency and clarity in reporting.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Green/sustainable financing, especially weighted in the banking, financial services, and investments categories.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Trends in greenhouse gas emissions across scopes.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Waste handling, water, energy, and other resource consumption.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Reliance on or percentage change in renewable energy and energy-efficient technology.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>The size of the company in relation to its climate impact using proportional analysis.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Sustainability-related initiatives in 2025 led by the leader.</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <div className="w-2 h-2 bg-blue-600 rounded-full mt-2 flex-shrink-0"></div>
+                    <span>Other roles that the leader has or has had.</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
 
-          {/* Related Lists */}
-          {relatedLists.length > 0 && (
-            <div className="mb-16">
-              <h3 className="text-2xl font-bold text-gray-900 mb-8 border-b-2 border-gray-200 pb-4">RELATED LISTS</h3>
-              <div className="space-y-8">
-                {relatedLists.map((relatedList) => (
-                  <Link
-                    key={relatedList.id}
-                    to={`/lists/${relatedList.slug}`}
-                    className="flex items-center gap-6 group hover:bg-gray-50 p-4 rounded-lg transition-colors"
-                  >
-                    <div className="flex-shrink-0">
-                      <div className="w-24 h-24 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg flex items-center justify-center">
-                        <span className="text-white text-sm font-bold opacity-50">
-                          {relatedList.title?.split(' ').slice(0, 2).join(' ')}
-                        </span>
+        </main>
+
+        {/* Related Lists */}
+        {relatedLists.length > 0 && (
+          <div className="bg-gray-50 border-t border-gray-200">
+            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+              <div className="bg-white rounded-2xl shadow-sm border border-gray-100 p-8">
+                <div className="flex items-center gap-3 mb-8">
+                  <div className="w-12 h-12 bg-purple-600 rounded-lg flex items-center justify-center">
+                    <span className="text-white text-xl font-bold">📚</span>
+                  </div>
+                  <h2 className="text-2xl font-bold text-gray-900">Related Lists</h2>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {relatedLists.map((relatedList) => (
+                    <Link
+                      key={relatedList.id}
+                      to={`/lists/${relatedList.slug}`}
+                      className="group bg-gradient-to-br from-white to-gray-50 border border-gray-200 rounded-xl p-6 hover:shadow-lg hover:border-purple-300 transition-all duration-300"
+                    >
+                      <div className="flex items-start gap-4">
+                        <div className="flex-shrink-0">
+                          <div className="w-16 h-16 bg-gradient-to-br from-purple-600 to-purple-700 rounded-lg flex items-center justify-center shadow-md">
+                            <span className="text-white text-xs font-bold">
+                              {relatedList.title?.split(' ').slice(0, 2).join(' ')}
+                            </span>
+                          </div>
+                        </div>
+                        <div className="flex-grow min-w-0">
+                          <p className="text-purple-600 text-xs font-semibold mb-2 uppercase tracking-wide">Forbes Middle East</p>
+                          <h4 className="text-lg font-bold text-gray-900 group-hover:text-purple-600 transition-colors leading-tight">
+                            {relatedList.title}
+                          </h4>
+                        </div>
                       </div>
-                    </div>
-                    <div className="flex-grow">
-                      <p className="text-blue-600 text-sm font-semibold mb-1">Forbes Middle East</p>
-                      <h4 className="text-xl font-bold text-gray-900 group-hover:text-blue-600 transition-colors">
-                        {relatedList.title}
-                      </h4>
-                    </div>
-                  </Link>
-                ))}
+                    </Link>
+                  ))}
+                </div>
               </div>
             </div>
-          )}
-        </main>
+          </div>
+        )}
 
         {/* Footer */}
         <footer className="bg-black text-white py-12">
