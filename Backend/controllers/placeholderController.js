@@ -15,7 +15,7 @@ class PlaceholderController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  async generatePlaceholder(req, res) {
+  generatePlaceholder = async (req, res) => {
     try {
       const { width = 300, height = 300, text = 'Placeholder', bgColor = 'f3f4f6', textColor = '6b7280' } = req.params;
 
@@ -179,7 +179,7 @@ class PlaceholderController {
    * @param {Object} req - Express request object
    * @param {Object} res - Express response object
    */
-  async healthCheck(req, res) {
+  healthCheck = async (req, res) => {
     try {
       res.json({
         success: true,
