@@ -1829,7 +1829,7 @@ const EditArticle = () => {
                     required
                   >
                     <option value="">Select Author</option>
-                    <option value="internal_team">Internal Team</option>
+                    <option value="ecf61387-ac3b-4cf1-9cb8-216edd23bb8f">Internal Team</option>
                     {authors.map(author => (
                       <option key={author.id} value={author.id}>
                         {author.name} - {author.title}

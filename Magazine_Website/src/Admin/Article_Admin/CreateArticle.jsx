@@ -313,7 +313,7 @@ const CreateArticle = () => {
     description: '',
     categoryId: '',
     subcategoryId: '',
-    authorId: 'internal_team',
+    authorId: 'ecf61387-ac3b-4cf1-9cb8-216edd23bb8f',
     coAuthors: [],
     tags: [],
     custom_tags: '',
@@ -1848,7 +1848,7 @@ const CreateArticle = () => {
                       <option value="">
                         {authors.length > 0 ? 'Select Author (or choose from suggestions below)' : 'No authors available - create new'}
                       </option>
-                      <option value="internal_team">Internal Team</option>
+                      <option value="ecf61387-ac3b-4cf1-9cb8-216edd23bb8f">Internal Team</option>
                       <option value="all">All Authors</option>
                       {authors.map(author => (
                         <option key={author.id} value={author.id}>
@@ -1869,7 +1869,7 @@ const CreateArticle = () => {
                         {/* Internal Team option */}
                         <button
                           type="button"
-                          onClick={() => setFormData(prev => ({ ...prev, authorId: 'internal_team' }))}
+                          onClick={() => setFormData(prev => ({ ...prev, authorId: 'ecf61387-ac3b-4cf1-9cb8-216edd23bb8f' }))}
                           className={`p-3 text-left border rounded-lg transition-colors ${
                             isDark ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'
                           }`}

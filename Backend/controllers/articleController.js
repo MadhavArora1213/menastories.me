@@ -269,7 +269,7 @@ class ArticleController {
               "dateModified": article.updatedAt,
               "author": {
                 "@type": "Person",
-                "name": article.primaryAuthor?.name || 'Unknown Author',
+                "name": article.primaryAuthor?.name || (article.authorId === 'ecf61387-ac3b-4cf1-9cb8-216edd23bb8f' ? 'Internal Team' : 'Unknown Author'),
                 "jobTitle": article.primaryAuthor?.title || undefined
               },
               "publisher": {
@@ -402,12 +402,7 @@ class ArticleController {
         });
       }
 
-      // Handle special "internal_team" author case
-      if (primary_author_id === 'internal_team') {
-        // For internal team, we'll use a special identifier
-        // This will be handled in the frontend display logic
-        primary_author_id = 'internal_team';
-      }
+      // primary_author_id is now a valid UUID for the Internal Team author
 
       // Check permissions for publishing - Master Admin can publish directly
       let initialStatus = 'draft';
@@ -2658,7 +2653,7 @@ class ArticleController {
       "dateModified": article.updatedAt,
       "author": {
         "@type": "Person",
-        "name": article.primaryAuthor?.name || article.writerName || (article.authorId === 'internal_team' ? 'Internal Team' : 'Unknown Author'),
+        "name": article.primaryAuthor?.name || article.writerName || (article.authorId === 'ecf61387-ac3b-4cf1-9cb8-216edd23bb8f' ? 'Internal Team' : 'Unknown Author'),
         "jobTitle": article.primaryAuthor?.title || article.writerPosition || undefined,
         "nationality": article.nationality ? {
           "@type": "Country",
