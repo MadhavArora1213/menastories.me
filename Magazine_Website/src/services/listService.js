@@ -71,6 +71,20 @@ class ListService {
       throw new Error(error.response?.data?.message || 'Failed to fetch lists by year');
     }
   }
+
+  // Create a new list
+  async createList(formData) {
+    try {
+      const response = await api.post('/lists', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      });
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to create list');
+    }
+  }
 }
 
 export default new ListService();
