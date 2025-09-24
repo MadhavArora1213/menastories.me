@@ -140,17 +140,23 @@ class ImageUploadService {
   }
 
   /**
-   * Generate public URL for image
-   * @param {string} filename - Image filename
-   * @returns {string} - Public URL
-   */
-  generateImageUrl(filename) {
-    // Use server URL for images without /api prefix to match user requirement
-    const serverUrl = process.env.SERVER_URL || 'https://menastories.me';
-    const url = `${serverUrl}/storage/images/${filename}`;
-    console.log('🔗 Generated image URL:', url);
-    return url;
-  }
+    * Generate public URL for image
+    * @param {string} filename - Image filename
+    * @returns {string} - Public URL
+    */
+   generateImageUrl(filename) {
+     // Use appropriate URL based on environment
+     const isProduction = process.env.NODE_ENV === 'production';
+     const serverUrl = isProduction
+       ? (process.env.SERVER_URL || 'https://menastories.me')
+       : (process.env.SERVER_URL || 'http://localhost:5000');
+
+     const url = `${serverUrl}/storage/images/${filename}`;
+     console.log('🔗 Generated image URL:', url);
+     console.log('🌍 Environment:', isProduction ? 'production' : 'development');
+     console.log('🔧 Server URL:', serverUrl);
+     return url;
+   }
 
   /**
    * Safely delete file with retry logic for Windows file locking issues

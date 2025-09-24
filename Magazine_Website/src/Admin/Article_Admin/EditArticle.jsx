@@ -539,6 +539,9 @@ const EditArticle = () => {
              setImageJustUploaded(true);
              setNewUploadedImage(uploadResponse.file.filename);
              showInfo('Featured image uploaded successfully');
+
+             // Clear the File object since we now have the uploaded filename
+             setFormData(prev => ({ ...prev, featuredImage: null }));
            } else {
              console.error('Upload failed:', uploadResponse);
              showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
@@ -981,15 +984,21 @@ const EditArticle = () => {
                     />
                   </div>
 
-                  {(formData.featuredImage || newUploadedImage) && (
+                  {(formData.featuredImage || newUploadedImage || article.featuredImage) && (
                     <div className="mt-4">
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                        {newUploadedImage ? 'Uploaded Featured Image' : 'New Featured Image Preview'}
+                        {newUploadedImage ? 'Uploaded Featured Image' : 'Featured Image Preview'}
                       </label>
                       <img
-                        src={newUploadedImage || URL.createObjectURL(formData.featuredImage)}
+                        src={newUploadedImage || (formData.featuredImage ? URL.createObjectURL(formData.featuredImage) : article.featuredImage)}
                         alt="Featured Preview"
                         className="max-w-full h-48 object-cover rounded-lg"
+                        onError={(e) => {
+                          console.error('Failed to load image preview:', e.target.src);
+                          if (article.featuredImage && e.target.src !== article.featuredImage) {
+                            e.target.src = article.featuredImage;
+                          }
+                        }}
                       />
                       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
                         {imageJustUploaded && newUploadedImage
@@ -1820,6 +1829,7 @@ const EditArticle = () => {
                     required
                   >
                     <option value="">Select Author</option>
+                    <option value="internal_team">Internal Team</option>
                     {authors.map(author => (
                       <option key={author.id} value={author.id}>
                         {author.name} - {author.title}
