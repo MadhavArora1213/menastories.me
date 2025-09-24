@@ -636,6 +636,7 @@ class ArticleController {
       console.log('Admin object:', req.admin);
       console.log('Request body keys:', Object.keys(req.body));
       console.log('Request body:', JSON.stringify(req.body, null, 2));
+      console.log('Request file:', req.file);
 
       // Validate article ID format
       const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;

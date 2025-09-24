@@ -125,7 +125,7 @@ class ArticleService {
         imageCaption: 'featured_image_caption',
         authorBioOverride: 'author_bio_override',
         reviewNotes: 'review_notes',
-        featuredImage: 'featured_image',
+        // featuredImage should remain as featuredImage (no mapping needed)
         // Additional fields that need mapping
         imageDisplayMode: 'image_display_mode',
         externalLinkFollow: 'external_link_follow',
@@ -151,10 +151,12 @@ class ArticleService {
         }
       });
 
+
       // Add file if exists
       if (articleData.featuredImage instanceof File) {
         formData.append('featured_image', articleData.featuredImage);
       }
+
 
       const response = await api.put(`/articles/${id}`, formData, {
         headers: {
