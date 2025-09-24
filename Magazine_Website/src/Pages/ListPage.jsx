@@ -85,7 +85,7 @@ const ListPage = () => {
 
       const response = await listService.getAllLists(filterParams);
 
-      if (response.success && response.data.lists.length > 0) {
+      if (response.success && response.data && response.data.lists && response.data.lists.length > 0) {
         const allLists = response.data.lists;
         setLists(allLists);
 
@@ -112,7 +112,7 @@ const ListPage = () => {
 
         // Transform entries for featured list to match the expected format
         if (latestList && latestList.entries && latestList.entries.length > 0) {
-          const transformedEntries = featured.entries.map(entry => ({
+          const transformedEntries = latestList.entries.map(entry => ({
             id: entry.id,
             rank: entry.rank || 0,
             name: entry.name,
@@ -131,9 +131,11 @@ const ListPage = () => {
           setFeaturedListItems([]);
         }
       } else {
-        setError('No published lists found matching your criteria');
+        setError('No published lists found in database. Please add some lists to display content.');
         setLists([]);
+        setFeaturedList(null);
         setFeaturedListItems([]);
+        console.log('No lists found in database. Response:', response);
       }
     } catch (err) {
       console.error('Error fetching list data:', err);
