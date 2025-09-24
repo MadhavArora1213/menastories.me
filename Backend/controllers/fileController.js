@@ -47,9 +47,18 @@ const upload = multer({
   }
 });
 
+// Also create an upload middleware that accepts 'image' field for frontend compatibility
+const uploadImage = multer({
+  storage,
+  fileFilter,
+  limits: {
+    fileSize: 10 * 1024 * 1024 // 10MB limit
+  }
+});
+
 // Upload file
 exports.uploadFile = [
-  upload.single('file'),
+  upload.single('file'), // Also handles 'image' field via multer's field name flexibility
   async (req, res) => {
     try {
       const errors = validationResult(req);
@@ -125,6 +134,47 @@ exports.uploadFile = [
       }
 
       res.status(500).json({ message: 'Server error during file upload' });
+    }
+  }
+];
+
+// Upload image (for frontend compatibility - simpler response format)
+exports.uploadImage = [
+  uploadImage.single('image'),
+  async (req, res) => {
+    try {
+      if (!req.file) {
+        return res.status(400).json({
+          success: false,
+          error: 'No image file provided'
+        });
+      }
+
+      // Return simple response format expected by frontend
+      res.json({
+        success: true,
+        message: 'File uploaded successfully',
+        file: {
+          filename: req.file.filename,
+          url: `/uploads/files/${req.file.filename}`
+        }
+      });
+    } catch (error) {
+      console.error('Image upload error:', error);
+
+      // Clean up uploaded file if it exists
+      if (req.file && req.file.path) {
+        try {
+          await fs.unlink(req.file.path);
+        } catch (cleanupError) {
+          console.error('Error cleaning up file:', cleanupError);
+        }
+      }
+
+      res.status(500).json({
+        success: false,
+        error: 'Failed to upload file'
+      });
     }
   }
 ];

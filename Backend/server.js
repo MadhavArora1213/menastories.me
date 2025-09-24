@@ -139,6 +139,7 @@ sequelize.sync({ alter: false, force: false })
 
 // Import controllers
 const adminAuthController = require('./controllers/adminAuthController');
+const fileController = require('./controllers/fileController');
 
 // Import ALL route modules at the top (MOVE THIS SECTION UP)
 const adminAuthRoutes = require('./routes/adminAuthRoutes');
@@ -466,6 +467,9 @@ app.use('/api/downloads', downloadRoutes);
 
 // File routes
 app.use('/api/files', fileRoutes);
+
+// File upload route without /api prefix (for frontend compatibility)
+app.post('/files/upload', fileController.uploadImage);
 
 // Image routes
 app.use('/api/images', imageRoutes);
