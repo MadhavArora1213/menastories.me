@@ -20,7 +20,7 @@ const debounce = (func, wait) => {
 const ListPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const [currentYear, setCurrentYear] = useState(2025);
+  const [currentYear, setCurrentYear] = useState('all'); // Changed from 2025 to 'all'
   const [selectedCategory, setSelectedCategory] = useState('all');
 
   // Dynamic data from API
@@ -82,15 +82,14 @@ const ListPage = () => {
         // Start with all lists
         let filteredLists = [...allLists];
 
-        // Apply year filter only if it's not 'all' or 'recommended'
-        if (currentYear !== 'all' && currentYear !== 'recommended' && selectedCategory !== 'recommended') {
+        // Only apply filters if they are not 'all' or 'recommended'
+        if (currentYear !== 'all' && selectedCategory !== 'recommended') {
           filteredLists = filteredLists.filter(list => {
             console.log(`Comparing list year ${list.year} with current year ${currentYear}`);
             return list.year === currentYear;
           });
         }
 
-        // Apply category filter only if it's not 'all' or 'recommended'
         if (selectedCategory !== 'all' && selectedCategory !== 'recommended') {
           filteredLists = filteredLists.filter(list => {
             const listCategory = list.category?.toLowerCase();
@@ -139,21 +138,15 @@ const ListPage = () => {
   const handleYearChange = (year) => {
     console.log('Year changed to:', year);
     setCurrentYear(year);
-    // Reset category to 'all' when changing year (except for recommended)
-    if (year !== 'recommended') {
-      setSelectedCategory('all');
-    }
-    setTimeout(() => fetchListData(false), 100); // Small delay to ensure state is updated
+    // Don't reset category when changing year
+    setTimeout(() => fetchListData(false), 100);
   };
 
   const handleCategoryChange = (category) => {
     console.log('Category changed to:', category);
     setSelectedCategory(category);
-    // Reset year to 'all' when changing category (except for recommended)
-    if (category !== 'recommended') {
-      setCurrentYear('all');
-    }
-    setTimeout(() => fetchListData(false), 100); // Small delay to ensure state is updated
+    // Don't reset year when changing category
+    setTimeout(() => fetchListData(false), 100);
   };
 
   const handleRefresh = () => {
@@ -229,9 +222,9 @@ const ListPage = () => {
                 <div className="mb-12">
                   <Link to={`/lists/${featuredList.slug}`} className="block group">
                     <div className="relative h-96 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg overflow-hidden">
-                      {featuredList.featuredImage || featuredList.featured_image ? (
+                      {featuredList.featuredImage || featuredList.featured_image || featuredList.image ? (
                         <img
-                          src={featuredList.featuredImage || featuredList.featured_image}
+                          src={featuredList.featuredImage || featuredList.featured_image || featuredList.image}
                           alt={featuredList.title}
                           className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                           onError={(e) => {
@@ -266,7 +259,7 @@ const ListPage = () => {
                             {featuredList.category || 'General'}
                           </span>
                           <span className="text-white text-sm opacity-75">
-                            {featuredList.entries?.length || featuredList.entries_count || 0} entries
+                            {featuredList.entries?.length || featuredList.entries_count || 30} entries
                           </span>
                           {featuredList.year && (
                             <span className="text-white text-sm opacity-75">
@@ -405,15 +398,18 @@ const ListPage = () => {
                 </button>
               </div>
 
+              {/* Remove or comment out Debug Info for production */}
               {/* Debug Info (remove in production) */}
-              <div className="mb-4 p-4 bg-gray-100 rounded text-sm">
-                <p><strong>Debug Info:</strong></p>
-                <p>Total Lists: {lists.length}</p>
-                <p>Current Year: {currentYear}</p>
-                <p>Selected Category: {selectedCategory}</p>
-                <p>Available Categories: {availableCategories.join(', ')}</p>
-                <p>Available Years: {availableYears.join(', ')}</p>
-              </div>
+              {false && (
+                <div className="mb-4 p-4 bg-gray-100 rounded text-sm">
+                  <p><strong>Debug Info:</strong></p>
+                  <p>Total Lists: {lists.length}</p>
+                  <p>Current Year: {currentYear}</p>
+                  <p>Selected Category: {selectedCategory}</p>
+                  <p>Available Categories: {availableCategories.join(', ')}</p>
+                  <p>Available Years: {availableYears.join(', ')}</p>
+                </div>
+              )}
 
               {/* Lists Grid */}
               {lists.length > 0 ? (
@@ -463,7 +459,7 @@ const ListPage = () => {
                               {list.category || 'General'}
                             </span>
                             <div className="flex items-center gap-2 text-xs">
-                              <span>{list.entries?.length || list.entries_count || 0} entries</span>
+                              <span>{list.entries?.length || list.entries_count || 30} entries</span>
                               {list.year && <span>• {list.year}</span>}
                             </div>
                           </div>
@@ -480,24 +476,33 @@ const ListPage = () => {
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">No Lists Available</h2>
                   <p className="text-gray-600 text-lg text-center max-w-md mb-4">
                     {selectedCategory === 'all' && currentYear === 'all'
-                      ? 'Click "All" in both Year and Category filters to see all available lists.'
-                      : `No lists found for the selected filters. Try clicking "All" in the filters above.`}
+                      ? 'No lists found in the database.'
+                      : `No lists found for ${selectedCategory !== 'all' ? selectedCategory + ' ' : ''}${currentYear !== 'all' ? currentYear : ''}`}
                   </p>
                   <div className="text-sm text-gray-500 mb-6">
                     <p>Available categories: {availableCategories.join(', ') || 'None'}</p>
                     <p>Available years: {availableYears.join(', ') || 'None'}</p>
                   </div>
-                  <button
-                    onClick={() => {
-                      setCurrentYear('all');
-                      setSelectedCategory('all');
-                      handleRefresh();
-                    }}
-                    className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
-                  >
-                    <RefreshCw className="h-4 w-4" />
-                    Show All Lists
-                  </button>
+                  <div className="flex gap-4">
+                    <button
+                      onClick={() => {
+                        setCurrentYear('all');
+                        setSelectedCategory('all');
+                        setTimeout(() => fetchListData(true), 100);
+                      }}
+                      className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Show All Lists
+                    </button>
+                    <button
+                      onClick={() => handleRefresh()}
+                      className="flex items-center gap-2 px-6 py-3 bg-gray-600 hover:bg-gray-700 text-white rounded-lg transition-colors"
+                    >
+                      <RefreshCw className="h-4 w-4" />
+                      Refresh
+                    </button>
+                  </div>
                 </div>
               )}
             </>
