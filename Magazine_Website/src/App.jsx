@@ -59,6 +59,7 @@ import SubCategoryPage from './Pages/SubCategoryPage'; // Dynamic subcategory pa
 import NewsContentPage from './Pages/NewsContentPage'; // Dedicated News Content page
 import VideoPage from './Pages/VideoPage'; // Video article page
 import ListPage from './Pages/ListPage'; // List page
+import ListDetailPage from './Pages/ListDetailPage'; // Individual list detail page
 import AdminIndex from './Admin/AdminIndex';
 import NewsletterSubscriptionPopup from './Components/Newsletter/NewsletterSubscriptionPopup';
 import { useAuth } from './context/AuthContext';
@@ -211,6 +212,7 @@ function App() {
 
                           {/* List page route */}
                           <Route path="/list" element={<ListPage />} />
+                          <Route path="/lists/:slug" element={<ListDetailPage />} />
 
                           {/* Dynamic category and subcategory routes - handle any slug from database */}
                           <Route path="/:categorySlug" element={<CategoryPage />} />

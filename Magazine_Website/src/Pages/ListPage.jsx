@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Helmet } from 'react-helmet-async';
 import { AlertCircle, RefreshCw } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import listService from '../services/listService';
 
 // Debounce utility function
@@ -25,6 +26,8 @@ const ListPage = () => {
   // Dynamic data from API
   const [lists, setLists] = useState([]);
   const [featuredList, setFeaturedList] = useState(null);
+  const [availableCategories, setAvailableCategories] = useState([]);
+  const [availableYears, setAvailableYears] = useState([]);
 
   // Debounced fetch function to prevent excessive API calls
   const debouncedFetch = useCallback(
@@ -34,19 +37,17 @@ const ListPage = () => {
     [currentYear, selectedCategory]
   );
 
-  const years = [2026, 2025, 2024, 2023, 2022, 2021];
+  // Generate dynamic categories and years based on available data
   const categories = [
     { id: 'all', label: 'All', active: selectedCategory === 'all' },
-    { id: 'recommended', label: 'Recommended', active: selectedCategory === 'recommended' },
-    { id: 'rich-lists', label: 'Rich Lists', active: selectedCategory === 'rich-lists' },
-    { id: 'entrepreneurs', label: 'Entrepreneurs', active: selectedCategory === 'entrepreneurs' },
-    { id: 'companies', label: 'Companies', active: selectedCategory === 'companies' },
-    { id: 'leaders', label: 'Leaders', active: selectedCategory === 'leaders' },
-    { id: 'entertainment', label: 'Entertainment', active: selectedCategory === 'entertainment' },
-    { id: 'sports', label: 'Sports', active: selectedCategory === 'sports' },
-    { id: 'lifestyle', label: 'Lifestyle', active: selectedCategory === 'lifestyle' },
-    { id: 'Business & Leadership', label: 'Business & Leadership', active: selectedCategory === 'Business & Leadership' }
+    ...availableCategories.map(category => ({
+      id: category,
+      label: category,
+      active: selectedCategory === category
+    }))
   ];
+
+  const years = availableYears.length > 0 ? availableYears : [2025, 2024, 2023, 2022, 2021];
 
   // Fetch data on component mount
   useEffect(() => {
@@ -60,53 +61,91 @@ const ListPage = () => {
       }
       setError(null);
 
-      const filterParams = {
-        limit: 100,
+      // Fetch all lists to get available categories and years
+      const allListsResponse = await listService.getAllLists({
+        limit: 1000, // Get all lists to extract metadata
         status: 'published'
-      };
+      });
 
-      if (currentYear !== 'all') {
-        filterParams.year = currentYear;
-      }
+      if (allListsResponse.success && allListsResponse.data && allListsResponse.data.lists) {
+        const allLists = allListsResponse.data.lists;
 
-      if (selectedCategory !== 'all') {
-        filterParams.category = selectedCategory;
-      }
+        // Extract unique categories and years from the data
+        const categories = [...new Set(allLists.map(list => list.category).filter(Boolean))];
+        const years = [...new Set(allLists.map(list => list.year).filter(Boolean))].sort((a, b) => b - a);
 
-      const response = await listService.getAllLists(filterParams);
+        setAvailableCategories(categories);
+        setAvailableYears(years);
 
-      if (response.success && response.data && response.data.lists) {
-        const allLists = response.data.lists;
-        setLists(allLists);
+        // Apply current filters
+        const filterParams = {
+          limit: 100,
+          status: 'published'
+        };
+
+        if (currentYear !== 'all') {
+          filterParams.year = currentYear;
+        }
+
+        if (selectedCategory !== 'all') {
+          filterParams.category = selectedCategory;
+        }
+
+        // Filter lists based on current selection
+        let filteredLists = allLists;
+
+        if (currentYear !== 'all') {
+          filteredLists = filteredLists.filter(list => list.year === currentYear);
+        }
+
+        if (selectedCategory !== 'all') {
+          filteredLists = filteredLists.filter(list => list.category === selectedCategory);
+        }
+
+        setLists(filteredLists);
 
         // Set latest list as featured if we have data
-        if (allLists.length > 0) {
-          const latestList = allLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        if (filteredLists.length > 0) {
+          const latestList = filteredLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
           setFeaturedList(latestList);
         } else {
           setFeaturedList(null);
         }
       } else {
-        // Show empty state if no data
+        // No data available
         setLists([]);
         setFeaturedList(null);
+        setAvailableCategories([]);
+        setAvailableYears([]);
       }
     } catch (err) {
       console.error('Error fetching list data:', err);
       setError('Failed to load lists. Please try again.');
       setLists([]);
       setFeaturedList(null);
+      setAvailableCategories([]);
+      setAvailableYears([]);
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleYearChange = (year) => {
+    // Validate that the year exists in available years
+    if (year !== 'all' && !availableYears.includes(year)) {
+      console.warn(`Year "${year}" not found in available years:`, availableYears);
+      return;
+    }
     setCurrentYear(year);
     debouncedFetch(true);
   };
 
   const handleCategoryChange = (category) => {
+    // Validate that the category exists in available categories
+    if (category !== 'all' && !availableCategories.includes(category)) {
+      console.warn(`Category "${category}" not found in available categories:`, availableCategories);
+      return;
+    }
     setSelectedCategory(category);
     debouncedFetch(true);
   };
@@ -266,7 +305,11 @@ const ListPage = () => {
               {lists.length > 0 ? (
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-16">
                   {lists.map((list) => (
-                    <div key={list.id} className="group cursor-pointer">
+                    <Link
+                      key={list.id}
+                      to={`/lists/${list.slug}`}
+                      className="group cursor-pointer block"
+                    >
                       <div className="relative overflow-hidden rounded-lg mb-4">
                         <div className="bg-gradient-to-br from-gray-800 to-gray-900 h-64 relative">
                           {list.entries_count > 0 ? (
@@ -329,7 +372,7 @@ const ListPage = () => {
                           {list.entries_count} entries
                         </span>
                       </div>
-                    </div>
+                    </Link>
                   ))}
                 </div>
               ) : (
@@ -339,9 +382,32 @@ const ListPage = () => {
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">No Lists Available</h2>
                   <p className="text-gray-600 text-lg text-center max-w-md">
-                    There are currently no lists available in the {selectedCategory === 'all' ? 'selected' : selectedCategory} category for {currentYear}.
-                    Please check back later for new content.
+                    {selectedCategory === 'all' && currentYear === 'all'
+                      ? 'There are currently no lists available in the database. Please check back later for new content.'
+                      : selectedCategory === 'all'
+                      ? `There are currently no lists available for ${currentYear}. Please check back later for new content.`
+                      : currentYear === 'all'
+                      ? `There are currently no lists available in the "${selectedCategory}" category. Please try selecting a different category or check back later for new content.`
+                      : `There are currently no lists available in the "${selectedCategory}" category for ${currentYear}. Please try selecting different filters or check back later for new content.`
+                    }
                   </p>
+                  {availableCategories.length > 0 && (
+                    <div className="mt-6 text-sm text-gray-500">
+                      <p className="mb-2">Available categories:</p>
+                      <div className="flex flex-wrap gap-2 justify-center">
+                        {availableCategories.slice(0, 5).map(category => (
+                          <span key={category} className="bg-gray-100 px-2 py-1 rounded text-xs">
+                            {category}
+                          </span>
+                        ))}
+                        {availableCategories.length > 5 && (
+                          <span className="bg-gray-100 px-2 py-1 rounded text-xs">
+                            +{availableCategories.length - 5} more
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  )}
                 </div>
               )}
             </>
