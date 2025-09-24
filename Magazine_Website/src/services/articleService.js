@@ -125,6 +125,7 @@ class ArticleService {
         imageCaption: 'featured_image_caption',
         authorBioOverride: 'author_bio_override',
         reviewNotes: 'review_notes',
+        featuredImage: 'featured_image',
         // Additional fields that need mapping
         imageDisplayMode: 'image_display_mode',
         externalLinkFollow: 'external_link_follow',
