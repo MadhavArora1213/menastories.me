@@ -49,14 +49,27 @@ const ListPage = () => {
       }
       setError(null);
 
-      // Fetch all lists to get available categories and years
+      // Fetch all lists with proper parameters
       const allListsResponse = await listService.getAllLists({
-        limit: 1000, // Get all lists to extract metadata
-        status: 'published'
+        limit: 100,
+        status: 'published',
+        sort: 'created_at',
+        order: 'desc'
       });
 
-      if (allListsResponse.success && allListsResponse.data && allListsResponse.data.lists) {
-        const allLists = allListsResponse.data.lists;
+      console.log('API Response:', allListsResponse); // Debug log
+
+      if (allListsResponse.success && allListsResponse.data) {
+        let allLists = [];
+        
+        // Handle different response structures
+        if (allListsResponse.data.lists) {
+          allLists = allListsResponse.data.lists;
+        } else if (Array.isArray(allListsResponse.data)) {
+          allLists = allListsResponse.data;
+        }
+
+        console.log('All Lists:', allLists); // Debug log
 
         // Extract unique categories and years from the data
         const categories = [...new Set(allLists.map(list => list.category).filter(Boolean))];
@@ -68,25 +81,27 @@ const ListPage = () => {
         // Filter lists based on current selection
         let filteredLists = allLists;
 
-        if (currentYear !== 'all') {
+        if (currentYear !== 'all' && currentYear !== 'recommended') {
           filteredLists = filteredLists.filter(list => list.year === currentYear);
         }
 
-        if (selectedCategory !== 'all') {
-          filteredLists = filteredLists.filter(list => list.category === selectedCategory);
+        if (selectedCategory !== 'all' && selectedCategory !== 'recommended') {
+          filteredLists = filteredLists.filter(list => 
+            list.category?.toLowerCase() === selectedCategory.toLowerCase()
+          );
         }
 
         setLists(filteredLists);
 
-        // Set latest list as featured if we have data
-        if (filteredLists.length > 0) {
-          const latestList = filteredLists.sort((a, b) => new Date(b.created_at) - new Date(a.created_at))[0];
+        // Set the most recent list as featured
+        if (allLists.length > 0) {
+          const latestList = allLists.sort((a, b) => new Date(b.created_at || b.createdAt) - new Date(a.created_at || a.createdAt))[0];
           setFeaturedList(latestList);
         } else {
           setFeaturedList(null);
         }
       } else {
-        // No data available
+        console.error('No data in response:', allListsResponse);
         setLists([]);
         setFeaturedList(null);
         setAvailableCategories([]);
@@ -182,6 +197,62 @@ const ListPage = () => {
                 <p className="text-lg text-gray-600">Discover the most influential leaders and companies</p>
               </div>
 
+              {/* Featured Latest List Section */}
+              {featuredList && (
+                <div className="mb-12">
+                  <Link to={`/lists/${featuredList.slug}`} className="block group">
+                    <div className="relative h-96 bg-gradient-to-br from-gray-800 to-gray-900 rounded-lg overflow-hidden">
+                      {featuredList.featuredImage || featuredList.featured_image ? (
+                        <img
+                          src={featuredList.featuredImage || featuredList.featured_image}
+                          alt={featuredList.title}
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+                          onError={(e) => {
+                            e.target.src = "/api/placeholder/1200/400";
+                          }}
+                        />
+                      ) : (
+                        <div className="w-full h-full bg-gradient-to-br from-green-600 to-green-900 flex items-center justify-center">
+                          <span className="text-white text-2xl font-bold opacity-50">
+                            {featuredList.title}
+                          </span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                      
+                      {/* Featured Content Overlay */}
+                      <div className="absolute bottom-8 left-8 right-8">
+                        <div className="flex items-center gap-2 mb-4">
+                          <span className="bg-red-600 text-white px-3 py-1 text-sm font-bold rounded">LATEST</span>
+                          <span className="text-white text-sm opacity-90">Forbes Middle East</span>
+                        </div>
+                        <h2 className="text-white text-3xl md:text-4xl font-bold leading-tight mb-4">
+                          {featuredList.title}
+                        </h2>
+                        {featuredList.description && (
+                          <p className="text-white text-lg opacity-90 max-w-2xl line-clamp-2">
+                            {featuredList.description}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-4 mt-4">
+                          <span className="bg-white/20 text-white px-3 py-1 rounded text-sm">
+                            {featuredList.category || 'General'}
+                          </span>
+                          <span className="text-white text-sm opacity-75">
+                            {featuredList.entries?.length || featuredList.entries_count || 0} entries
+                          </span>
+                          {featuredList.year && (
+                            <span className="text-white text-sm opacity-75">
+                              {featuredList.year}
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  </Link>
+                </div>
+              )}
+
               {/* Year Navigation */}
               <div className="flex items-center gap-8 mb-8 border-b border-gray-200 overflow-x-auto">
                 {[2026, 2025, 2024, 2023, 2022, 2021].map((year) => (
@@ -198,7 +269,10 @@ const ListPage = () => {
                   </button>
                 ))}
                 <button
-                  onClick={() => handleCategoryChange('recommended')}
+                  onClick={() => {
+                    setSelectedCategory('recommended');
+                    setCurrentYear('all');
+                  }}
                   className={`pb-4 px-2 text-sm font-medium border-b-2 transition-all duration-200 whitespace-nowrap ${
                     selectedCategory === 'recommended'
                       ? 'text-black border-black'
@@ -295,9 +369,9 @@ const ListPage = () => {
                       <div className="bg-white overflow-hidden hover:shadow-lg transition-shadow duration-300">
                         {/* Featured Image */}
                         <div className="relative h-64 bg-gradient-to-br from-gray-800 to-gray-900 overflow-hidden">
-                          {list.featuredImage || list.featured_image ? (
+                          {list.featuredImage || list.featured_image || list.image ? (
                             <img
-                              src={list.featuredImage || list.featured_image}
+                              src={list.featuredImage || list.featured_image || list.image}
                               alt={list.title}
                               className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
                               onError={(e) => {
@@ -330,9 +404,10 @@ const ListPage = () => {
                             <span className="bg-gray-100 px-2 py-1 rounded text-xs font-medium">
                               {list.category || 'General'}
                             </span>
-                            <span className="text-xs">
-                              {list.entries?.length || list.entries_count || 0} entries
-                            </span>
+                            <div className="flex items-center gap-2 text-xs">
+                              <span>{list.entries?.length || list.entries_count || 0} entries</span>
+                              {list.year && <span>• {list.year}</span>}
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -345,12 +420,18 @@ const ListPage = () => {
                     <AlertCircle className="h-16 w-16 text-gray-400" />
                   </div>
                   <h2 className="text-2xl font-bold text-gray-900 mb-4">No Lists Available</h2>
-                  <p className="text-gray-600 text-lg text-center max-w-md">
-                    No lists found for the selected filters. Try selecting different options or check back later.
+                  <p className="text-gray-600 text-lg text-center max-w-md mb-4">
+                    {selectedCategory === 'all' && currentYear === 'all'
+                      ? 'No lists found in the database.'
+                      : `No lists found for ${selectedCategory !== 'all' ? selectedCategory : ''} ${currentYear !== 'all' ? currentYear : ''}`}
                   </p>
+                  <div className="text-sm text-gray-500 mb-6">
+                    <p>Available categories: {availableCategories.join(', ') || 'None'}</p>
+                    <p>Available years: {availableYears.join(', ') || 'None'}</p>
+                  </div>
                   <button
                     onClick={handleRefresh}
-                    className="mt-6 flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
+                    className="flex items-center gap-2 px-6 py-3 bg-black hover:bg-gray-800 text-white rounded-lg transition-colors"
                   >
                     <RefreshCw className="h-4 w-4" />
                     Refresh Lists
