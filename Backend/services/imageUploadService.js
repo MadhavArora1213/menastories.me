@@ -3,10 +3,8 @@ const path = require('path');
 const fs = require('fs');
 const multer = require('multer');
 
-// Storage path for images
-const STORAGE_PATH = process.platform === 'win32'
-  ? path.join(__dirname, '../storage/images')
-  : '/var/www/menastories/menastories.me/Backend/storage/images';
+// Storage path for images - use relative path for consistency
+const STORAGE_PATH = path.join(__dirname, '../storage/images');
 const TEMP_UPLOAD_PATH = path.join(__dirname, '../uploads');
 
 console.log('🗂️  Image service paths:');
@@ -147,9 +145,9 @@ class ImageUploadService {
    * @returns {string} - Public URL
    */
   generateImageUrl(filename) {
-    // Use server URL for images without /api prefix (as per user requirement)
-    const serverUrl = process.env.SERVER_URL || 'https://menastories.me';
-    const url = `${serverUrl}/storage/images/${filename}`;
+    // Use server URL for images with /api prefix to match server configuration
+    const serverUrl = process.env.SERVER_URL || 'http://localhost:5000';
+    const url = `${serverUrl}/api/storage/images/${filename}`;
     console.log('🔗 Generated image URL:', url);
     return url;
   }

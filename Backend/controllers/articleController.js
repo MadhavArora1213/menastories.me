@@ -1689,18 +1689,39 @@ class ArticleController {
         });
       }
 
-      if (article.status !== 'approved' && article.status !== 'scheduled') {
-        return res.status(400).json({
+      // Check if user has permission to publish
+      if (!req.admin.hasPermission('content.publish')) {
+        return res.status(403).json({
           success: false,
-          message: 'Only approved or scheduled articles can be published'
+          message: 'You do not have permission to publish articles'
         });
       }
 
+      // Allow publishing from draft, pending_review, approved, or scheduled status
+      const allowedStatuses = ['draft', 'pending_review', 'approved', 'scheduled'];
+      if (!allowedStatuses.includes(article.status)) {
+        return res.status(400).json({
+          success: false,
+          message: `Cannot publish article with status: ${article.status}. Article must be in draft, pending_review, approved, or scheduled status.`
+        });
+      }
+
+      // Set publish date if not already set
+      const publishDate = article.publishDate || new Date();
+
       await article.update({
         status: 'published',
-        publishDate: new Date(),
+        publishDate: publishDate,
         updatedBy: userId
       });
+
+      // Add tags to database if article is published
+      if (article.tags && article.tags.length > 0) {
+        await this.addTagsToDatabase(article.tags, article.categoryId);
+      }
+
+      // Update RSS feed
+      await rssService.updateRSSFeed();
 
       res.json({
         success: true,
