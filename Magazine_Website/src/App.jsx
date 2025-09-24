@@ -58,6 +58,7 @@ import CategoryPage from './Pages/CategoryPage'; // Dynamic category page
 import SubCategoryPage from './Pages/SubCategoryPage'; // Dynamic subcategory page
 import NewsContentPage from './Pages/NewsContentPage'; // Dedicated News Content page
 import VideoPage from './Pages/VideoPage'; // Video article page
+import ListPage from './Pages/ListPage'; // List page
 import AdminIndex from './Admin/AdminIndex';
 import NewsletterSubscriptionPopup from './Components/Newsletter/NewsletterSubscriptionPopup';
 import { useAuth } from './context/AuthContext';
@@ -207,6 +208,9 @@ function App() {
 
                           {/* Video routes */}
                           <Route path="/videos/:slug" element={<VideoPage />} />
+
+                          {/* List page route */}
+                          <Route path="/list" element={<ListPage />} />
 
                           {/* Dynamic category and subcategory routes - handle any slug from database */}
                           <Route path="/:categorySlug" element={<CategoryPage />} />
