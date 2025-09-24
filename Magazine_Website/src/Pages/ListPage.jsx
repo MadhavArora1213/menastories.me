@@ -1,12 +1,26 @@
 import React, { useState, useEffect } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { ChevronLeft, ChevronRight, AlertCircle, RefreshCw } from 'lucide-react';
+import { ChevronLeft, ChevronRight, AlertCircle, RefreshCw, ChevronDown, Check } from 'lucide-react';
 import listService from '../services/listService';
 
 const ListPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const [currentYear, setCurrentYear] = useState(2025);
+
+  // Filter states
+  const [selectedYear, setSelectedYear] = useState(2025);
+  const [isYearDropdownOpen, setIsYearDropdownOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState({
+    recommended: false,
+    richLists: false,
+    entrepreneurs: false,
+    companies: false,
+    leaders: false,
+    entertainment: false,
+    sports: false,
+    lifestyle: false
+  });
 
   // Dynamic data from API only
   const [lists, setLists] = useState([]);
@@ -27,6 +41,20 @@ const ListPage = () => {
   useEffect(() => {
     fetchListData();
   }, []);
+
+  // Close dropdown when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      if (isYearDropdownOpen && !event.target.closest('.year-dropdown')) {
+        setIsYearDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isYearDropdownOpen]);
 
   const fetchListData = async () => {
     try {
@@ -85,11 +113,32 @@ const ListPage = () => {
   };
 
   const years = [2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
+  const availableYears = [2026, 2025, 2024, 2023, 2022, 2021, 2020, 2019, 2018, 2017, 2016];
 
   const handleYearChange = (year) => {
     setCurrentYear(year);
+    setSelectedYear(year);
     // In a real implementation, you would fetch data for the selected year
     console.log('Year changed to:', year);
+  };
+
+  const handleYearDropdownToggle = () => {
+    setIsYearDropdownOpen(!isYearDropdownOpen);
+  };
+
+  const handleYearSelect = (year) => {
+    setSelectedYear(year);
+    setCurrentYear(year);
+    setIsYearDropdownOpen(false);
+    console.log('Selected year:', year);
+  };
+
+  const handleCategoryToggle = (category) => {
+    setSelectedCategories(prev => ({
+      ...prev,
+      [category]: !prev[category]
+    }));
+    console.log('Toggled category:', category);
   };
 
   return (
@@ -239,13 +288,78 @@ const ListPage = () => {
               </div>
 
               {/* Title and Description */}
-              <div className="mb-16">
+              <div className="mb-8">
                 <h2 className="text-3xl font-bold text-black mb-4">
                   {listMetadata.title}
                 </h2>
                 <p className="text-lg text-gray-600 max-w-4xl leading-relaxed">
                   {listMetadata.description}
                 </p>
+              </div>
+
+              {/* Filters Section */}
+              <div className="mb-12">
+                <div className="bg-gray-50 p-6 rounded-lg">
+                  <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                    {/* Year Filter */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Year</h3>
+                      <div className="relative year-dropdown">
+                        <button
+                          onClick={handleYearDropdownToggle}
+                          className="w-full bg-blue-600 text-white px-4 py-3 rounded-lg flex items-center justify-between hover:bg-blue-700 transition-colors"
+                        >
+                          <span>Select Year</span>
+                          <ChevronDown className={`w-5 h-5 transition-transform ${isYearDropdownOpen ? 'rotate-180' : ''}`} />
+                        </button>
+
+                        {isYearDropdownOpen && (
+                          <div className="absolute top-full left-0 right-0 bg-white border border-gray-200 rounded-lg shadow-lg z-10 mt-1 max-h-60 overflow-y-auto">
+                            {availableYears.map((year) => (
+                              <button
+                                key={year}
+                                onClick={() => handleYearSelect(year)}
+                                className="w-full px-4 py-3 text-left hover:bg-gray-50 border-b border-gray-100 last:border-b-0"
+                              >
+                                {year}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Category Filters */}
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4">Categories</h3>
+                      <div className="grid grid-cols-2 gap-3">
+                        {Object.entries(selectedCategories).map(([key, value]) => (
+                          <label key={key} className="flex items-center space-x-3 cursor-pointer" onClick={() => handleCategoryToggle(key)}>
+                            <div className={`w-5 h-5 border-2 rounded flex items-center justify-center transition-colors ${
+                              value ? 'bg-black border-black' : 'border-gray-300 hover:border-gray-400'
+                            }`}>
+                              {value && <Check className="w-3 h-3 text-white" />}
+                            </div>
+                            <span className="text-sm font-medium text-gray-700 capitalize">
+                              {key === 'richLists' ? 'Rich Lists' :
+                               key === 'entrepreneurs' ? 'Entrepreneurs' :
+                               key === 'companies' ? 'Companies' :
+                               key === 'lifestyle' ? 'Lifestyle' : key}
+                            </span>
+                          </label>
+                        ))}
+                      </div>
+
+                      {/* Methodology Section */}
+                      <div className="mt-6 pt-4 border-t border-gray-200">
+                        <h4 className="text-md font-semibold text-gray-900 mb-3">Methodology</h4>
+                        <p className="text-sm text-gray-600">
+                          Our rankings are based on comprehensive research and analysis of various factors including financial performance, innovation, and market impact.
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
 
               {/* Lists Grid */}
