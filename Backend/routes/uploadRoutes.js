@@ -230,6 +230,50 @@ router.post('/image', upload.single('image'), handleMulterError, async (req, res
   }
 });
 
+// General file upload endpoint (for articles, etc.)
+router.post('/files/upload', upload.single('image'), handleMulterError, async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({
+        success: false,
+        error: 'No image file provided'
+      });
+    }
+
+    // Process the image with WebP optimization
+    const processedFilename = await imageService.processImage(req.file.path, {
+      width: 1200,
+      quality: 80,
+      format: 'webp'
+    });
+
+    // Generate URL
+    const imageUrl = imageService.generateImageUrl(processedFilename);
+
+    res.json({
+      success: true,
+      message: 'File uploaded successfully',
+      file: {
+        filename: processedFilename,
+        url: imageUrl
+      }
+    });
+
+  } catch (error) {
+    console.error('Error uploading file:', error);
+
+    // Clean up uploaded file if it exists
+    if (req.file && fs.existsSync(req.file.path)) {
+      fs.unlinkSync(req.file.path);
+    }
+
+    res.status(500).json({
+      success: false,
+      error: 'Failed to upload file'
+    });
+  }
+});
+
 // Delete image
 router.delete('/image/:filename', async (req, res) => {
   try {
