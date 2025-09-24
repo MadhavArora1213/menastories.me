@@ -353,7 +353,7 @@ app.get('/api/images/health', (req, res) => {
       recentFiles: imageFiles.slice(-5), // Last 5 image files
       serverUrl: process.env.SERVER_URL || 'http://localhost:5000',
       viteApiUrl: process.env.VITE_API_URL || 'Not set',
-      imageUrlPattern: `${process.env.SERVER_URL || 'http://localhost:5000'}/api/storage/images/{filename}`
+      imageUrlPattern: `${process.env.SERVER_URL || 'https://menastories.me'}/storage/images/{filename}`
     });
   } catch (error) {
     res.status(500).json({
