@@ -402,6 +402,13 @@ class ArticleController {
         });
       }
 
+      // Handle special "internal_team" author case
+      if (primary_author_id === 'internal_team') {
+        // For internal team, we'll use a special identifier
+        // This will be handled in the frontend display logic
+        primary_author_id = 'internal_team';
+      }
+
       // Check permissions for publishing - Master Admin can publish directly
       let initialStatus = 'draft';
 
@@ -2651,7 +2658,7 @@ class ArticleController {
       "dateModified": article.updatedAt,
       "author": {
         "@type": "Person",
-        "name": article.primaryAuthor?.name || article.writerName || 'Unknown Author',
+        "name": article.primaryAuthor?.name || article.writerName || (article.authorId === 'internal_team' ? 'Internal Team' : 'Unknown Author'),
         "jobTitle": article.primaryAuthor?.title || article.writerPosition || undefined,
         "nationality": article.nationality ? {
           "@type": "Country",

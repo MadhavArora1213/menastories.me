@@ -313,7 +313,7 @@ const CreateArticle = () => {
     description: '',
     categoryId: '',
     subcategoryId: '',
-    authorId: '',
+    authorId: 'internal_team',
     coAuthors: [],
     tags: [],
     custom_tags: '',
@@ -1848,6 +1848,7 @@ const CreateArticle = () => {
                       <option value="">
                         {authors.length > 0 ? 'Select Author (or choose from suggestions below)' : 'No authors available - create new'}
                       </option>
+                      <option value="internal_team">Internal Team</option>
                       <option value="all">All Authors</option>
                       {authors.map(author => (
                         <option key={author.id} value={author.id}>
@@ -1865,7 +1866,21 @@ const CreateArticle = () => {
                         Suggested Authors
                       </label>
                       <div className="grid grid-cols-1 gap-2 max-h-40 overflow-y-auto">
-                        {authors.slice(0, 5).map(author => (
+                        {/* Internal Team option */}
+                        <button
+                          type="button"
+                          onClick={() => setFormData(prev => ({ ...prev, authorId: 'internal_team' }))}
+                          className={`p-3 text-left border rounded-lg transition-colors ${
+                            isDark ? 'border-gray-600 hover:bg-gray-700' : 'border-gray-300 hover:bg-gray-50'
+                          }`}
+                        >
+                          <div className={`font-medium ${textMain}`}>Internal Team</div>
+                          <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-600'}`}>
+                            Default author for internal articles
+                          </div>
+                        </button>
+                        {/* Other authors */}
+                        {authors.slice(0, 4).map(author => (
                           <button
                             key={author.id}
                             type="button"
