@@ -28,6 +28,7 @@ const EditArticle = () => {
   const [showStatusModal, setShowStatusModal] = useState(false);
   const [touched, setTouched] = useState({});
   const [imageJustUploaded, setImageJustUploaded] = useState(false);
+  const [newUploadedImage, setNewUploadedImage] = useState(null);
   
   const [formData, setFormData] = useState({
     title: '',
@@ -124,7 +125,7 @@ const EditArticle = () => {
         setArticle(articleData);
 
         // Populate form with existing data, preserving any unsaved changes
-         setFormData(prevFormData => ({
+          setFormData(prevFormData => ({
             title: articleData.title || '',
               subtitle: articleData.subtitle || '',
               content: articleData.content || '',
@@ -536,6 +537,7 @@ const EditArticle = () => {
              });
 
              setImageJustUploaded(true);
+             setNewUploadedImage(uploadResponse.file.filename);
              showInfo('Featured image uploaded successfully');
            } else {
              console.error('Upload failed:', uploadResponse);
@@ -680,6 +682,7 @@ const EditArticle = () => {
 
            // Clear the image upload flag since the image is now saved
            setImageJustUploaded(false);
+           setNewUploadedImage(null);
          }
 
         // More specific success messages based on status
@@ -978,20 +981,22 @@ const EditArticle = () => {
                     />
                   </div>
 
-                  {formData.featuredImage && (
+                  {(formData.featuredImage || newUploadedImage) && (
                     <div className="mt-4">
                       <label className={`block text-sm font-medium ${textMain} mb-2`}>
-                        New Featured Image Preview
+                        {newUploadedImage ? 'Uploaded Featured Image' : 'New Featured Image Preview'}
                       </label>
                       <img
-                        src={URL.createObjectURL(formData.featuredImage)}
+                        src={newUploadedImage || URL.createObjectURL(formData.featuredImage)}
                         alt="Featured Preview"
                         className="max-w-full h-48 object-cover rounded-lg"
                       />
                       <div className={`text-sm ${isDark ? 'text-gray-400' : 'text-gray-500'} mt-2`}>
-                        {formData.gallery.includes(formData.featuredImage)
-                          ? 'This image is also in the gallery'
-                          : 'Upload gallery images to use them as featured images'}
+                        {imageJustUploaded && newUploadedImage
+                          ? '✓ Image uploaded and saved successfully'
+                          : formData.gallery.includes(formData.featuredImage)
+                            ? 'This image is also in the gallery'
+                            : 'Upload gallery images to use them as featured images'}
                       </div>
                     </div>
                   )}
