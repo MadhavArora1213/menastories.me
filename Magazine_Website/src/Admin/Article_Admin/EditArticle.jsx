@@ -517,6 +517,7 @@ const EditArticle = () => {
 
            const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
            console.log('Upload response:', uploadResponse);
+           console.log('Upload response file:', uploadResponse.file);
 
            if (uploadResponse.success && uploadResponse.file?.filename) {
              // Store the old image path for deletion
@@ -550,6 +551,9 @@ const EditArticle = () => {
          // User removed the featured image
          submitData.oldFeaturedImage = article.featuredImage;
          submitData.featuredImage = null;
+       } else if (!formData.featuredImage && article.featuredImage) {
+         // Keep existing featured image
+         submitData.featuredImage = article.featuredImage;
        }
 
       // Handle gallery images upload with proper database path management
@@ -595,6 +599,7 @@ const EditArticle = () => {
              console.log(`Uploading gallery image: ${file.name}`);
              const uploadResponse = await articleService.uploadFile('/files/upload', formDataUpload);
              console.log(`Gallery upload response for ${file.name}:`, uploadResponse);
+             console.log(`Gallery upload response file for ${file.name}:`, uploadResponse.file);
 
              if (uploadResponse.success && uploadResponse.file?.filename) {
                galleryImagePaths.push(uploadResponse.file.filename);
@@ -623,18 +628,9 @@ const EditArticle = () => {
            }
          }
        } else if (formData.gallery.length === 0 && article.gallery && Array.isArray(article.gallery) && article.gallery.length > 0) {
-         // User removed all gallery images
-         const oldGalleryImages = [];
-         for (const image of article.gallery) {
-           const imagePath = typeof image === 'string' ? image : image.url;
-           if (imagePath) {
-             oldGalleryImages.push(imagePath);
-           }
-         }
-         if (oldGalleryImages.length > 0) {
-           submitData.oldGalleryImages = oldGalleryImages;
-           submitData.gallery = [];
-         }
+         // User didn't upload new gallery images - keep existing gallery
+         submitData.gallery = article.gallery;
+         console.log('Keeping existing gallery images:', article.gallery.length, 'images');
        }
 
        console.log('=== FINAL SUBMIT DATA DEBUG ===');
