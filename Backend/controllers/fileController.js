@@ -165,8 +165,7 @@ exports.uploadImage = [
       const imageUploadService = new ImageUploadService();
       const processedFilename = await imageUploadService.processImage(req.file.path);
 
-      // Clean up temp file
-      await fs.unlink(req.file.path);
+      // Note: ImageUploadService already cleans up the temp file
 
       // Return simple response format expected by frontend
       res.json({
@@ -179,11 +178,24 @@ exports.uploadImage = [
       });
     } catch (error) {
       console.error('Image upload error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        file: req.file ? {
+          filename: req.file.filename,
+          path: req.file.path,
+          size: req.file.size,
+          mimetype: req.file.mimetype
+        } : 'No file'
+      });
 
-      // Clean up uploaded file if it exists
+      // Clean up uploaded file if it exists and hasn't been cleaned up already
       if (req.file && req.file.path) {
         try {
-          await fs.unlink(req.file.path);
+          if (fs.existsSync(req.file.path)) {
+            await fs.unlink(req.file.path);
+            console.log('✅ Cleaned up temp file after error:', req.file.path);
+          }
         } catch (cleanupError) {
           console.error('Error cleaning up file:', cleanupError);
         }
@@ -191,7 +203,7 @@ exports.uploadImage = [
 
       res.status(500).json({
         success: false,
-        error: 'Failed to upload file'
+        error: error.message || 'Failed to upload file'
       });
     }
   }
