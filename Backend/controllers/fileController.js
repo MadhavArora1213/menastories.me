@@ -3,6 +3,7 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 const { validationResult } = require('express-validator');
+const { ImageUploadService } = require('../services/imageUploadService');
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -150,13 +151,30 @@ exports.uploadImage = [
         });
       }
 
+      // Check if it's an image file
+      if (!req.file.mimetype.startsWith('image/')) {
+        // Clean up uploaded file
+        await fs.unlink(req.file.path);
+        return res.status(400).json({
+          success: false,
+          error: 'Only image files are allowed'
+        });
+      }
+
+      // Use ImageUploadService to process and store the image
+      const imageUploadService = new ImageUploadService();
+      const processedFilename = await imageUploadService.processImage(req.file.path);
+
+      // Clean up temp file
+      await fs.unlink(req.file.path);
+
       // Return simple response format expected by frontend
       res.json({
         success: true,
         message: 'File uploaded successfully',
         file: {
-          filename: req.file.filename,
-          url: `/uploads/files/${req.file.filename}`
+          filename: processedFilename,
+          url: `/storage/images/${processedFilename}`
         }
       });
     } catch (error) {
