@@ -293,11 +293,11 @@ const EventForm = ({
     }
   };
 
-  const textMain = "text-primary-text";
-  const subText = "text-primary-text-secondary";
+  const textMain = isDark ? "text-white" : "text-black";
+  const subText = isDark ? "text-gray-300" : "text-gray-600";
   const errorText = "text-red-500";
   const labelClass = `block text-sm font-medium mb-2 ${textMain}`;
-  const inputBaseClass = `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition bg-primary-bg text-primary-text border-primary-border-secondary placeholder-primary-text-secondary`;
+  const inputBaseClass = `w-full px-3 py-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 transition ${isDark ? "bg-gray-800 text-white border-gray-600 placeholder-gray-400" : "bg-white text-black border-gray-300 placeholder-gray-500"}`;
   const errorClass = `border-red-500 focus:ring-red-500`;
 
   const eventTypes = [
