@@ -97,21 +97,12 @@ const UpdateEvent = () => {
     }
   };
 
-  // Theme variables using CSS custom properties
-  const bgMain = "bg-primary-bg";
-  const textMain = "text-primary-text";
-  const subText = "text-primary-text-secondary";
-  const cardBg = "bg-primary-bg border border-primary-border";
-  const innerCardBg = "bg-primary-bg-secondary";
-  const innerBorderColor = "border-primary-border-secondary";
-  const inputBg = "bg-primary-bg border border-primary-border-secondary text-primary-text";
-
   if (loading) {
     return (
-      <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center`}>
+      <div className="min-h-screen bg-primary-bg py-12 px-2 flex items-center justify-center">
         <div className="text-center">
           <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-accent border-t-transparent mx-auto mb-4"></div>
-          <p className={`text-xl ${textMain}`}>Loading event...</p>
+          <p className="text-xl text-primary-text">Loading event...</p>
         </div>
       </div>
     );
@@ -119,13 +110,13 @@ const UpdateEvent = () => {
 
   if (!event || !event.id) {
     return (
-      <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center`}>
+      <div className="min-h-screen bg-primary-bg py-12 px-2 flex items-center justify-center">
         <div className="text-center">
-          <svg className={`w-16 h-16 mx-auto mb-4 ${subText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg className="w-16 h-16 mx-auto mb-4 text-primary-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
           </svg>
-          <h3 className={`text-xl font-semibold mb-2 ${textMain}`}>Event not found</h3>
-          <p className={`text-sm ${subText} mb-4`}>The event you're looking for doesn't exist or has been deleted.</p>
+          <h3 className="text-xl font-semibold mb-2 text-primary-text">Event not found</h3>
+          <p className="text-sm text-primary-text-secondary mb-4">The event you're looking for doesn't exist or has been deleted.</p>
           <button
             onClick={() => navigate("/admin/events")}
             className="px-6 py-3 rounded-lg font-medium transition bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
@@ -138,15 +129,15 @@ const UpdateEvent = () => {
   }
 
   return (
-    <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center transition-colors duration-300`}>
-      <div className={`w-full max-w-6xl ${cardBg} rounded-2xl p-8 md:p-12 shadow-lg`}>
+    <div className="min-h-screen bg-primary-bg py-12 px-2 flex items-center justify-center transition-colors duration-300">
+      <div className="w-full max-w-6xl bg-primary-bg border border-primary-border rounded-2xl p-8 md:p-12 shadow-lg">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
-            <h2 className={`text-3xl md:text-4xl font-extrabold mb-2 ${textMain}`}>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-2 text-primary-text">
               Update Event
             </h2>
-            <p className={`text-base ${subText}`}>
+            <p className="text-base text-primary-text-secondary">
               Modify the details of "{safeValue(event?.title, 'Loading...')}".
             </p>
           </div>
@@ -161,34 +152,34 @@ const UpdateEvent = () => {
         </div>
 
         {/* Current Info */}
-        <div className={`p-4 rounded-lg mb-6 ${innerCardBg} border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
-          <h3 className={`font-semibold mb-2 ${textMain}`}>Current Information</h3>
+        <div className="p-4 rounded-lg mb-6 bg-primary-bg-secondary border border-primary-border-secondary shadow-lg hover:shadow-xl transition-all duration-200">
+          <h3 className="font-semibold mb-2 text-primary-text">Current Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
-              <span className={`font-medium ${subText}`}>Title:</span>
-              <span className={`ml-2 ${textMain}`}>{safeValue(event.title)}</span>
+              <span className="font-medium text-primary-text-secondary">Title:</span>
+              <span className="ml-2 text-primary-text">{safeValue(event.title)}</span>
             </div>
             <div>
-              <span className={`font-medium ${subText}`}>Status:</span>
+              <span className="font-medium text-primary-text-secondary">Status:</span>
               <span className={`ml-2 ${safeValue(event.status) === 'published' ? 'text-green-500' : safeValue(event.status) === 'draft' ? 'text-yellow-500' : 'text-red-500'}`}>
                 {safeValue(event.status)?.charAt(0).toUpperCase() + safeValue(event.status)?.slice(1)}
               </span>
             </div>
             <div>
-              <span className={`font-medium ${subText}`}>Type:</span>
-              <span className={`ml-2 ${textMain}`}>{safeValue(event.eventType)?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+              <span className="font-medium text-primary-text-secondary">Type:</span>
+              <span className="ml-2 text-primary-text">{safeValue(event.eventType)?.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
             </div>
             <div>
-              <span className={`font-medium ${subText}`}>Category:</span>
-              <span className={`ml-2 ${textMain}`}>{safeValue(event.category)?.charAt(0).toUpperCase() + safeValue(event.category)?.slice(1)}</span>
+              <span className="font-medium text-primary-text-secondary">Category:</span>
+              <span className="ml-2 text-primary-text">{safeValue(event.category)?.charAt(0).toUpperCase() + safeValue(event.category)?.slice(1)}</span>
             </div>
             <div>
-              <span className={`font-medium ${subText}`}>Start Date:</span>
-              <span className={`ml-2 ${textMain}`}>{safeDate(event.startDate)}</span>
+              <span className="font-medium text-primary-text-secondary">Start Date:</span>
+              <span className="ml-2 text-primary-text">{safeDate(event.startDate)}</span>
             </div>
             <div>
-              <span className={`font-medium ${subText}`}>Capacity:</span>
-              <span className={`ml-2 ${textMain}`}>
+              <span className="font-medium text-primary-text-secondary">Capacity:</span>
+              <span className="ml-2 text-primary-text">
                 {event.capacity && !isNaN(event.capacity) ? event.capacity : 'Unlimited'}
               </span>
             </div>
@@ -196,7 +187,7 @@ const UpdateEvent = () => {
         </div>
 
         {/* Form */}
-        <div className={`rounded-xl p-6 md:p-8 ${innerCardBg} border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
+        <div className="rounded-xl p-6 md:p-8 bg-primary-bg-secondary border border-primary-border-secondary shadow-lg hover:shadow-xl transition-all duration-200">
           {event && event.id && (
             <EventForm
               initialData={event}
@@ -215,8 +206,8 @@ const UpdateEvent = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <div>
-                <h4 className={`font-semibold mb-1 ${textMain}`}>Update Considerations</h4>
-                <ul className={`text-sm ${subText} space-y-1`}>
+                <h4 className="font-semibold mb-1 text-primary-text">Update Considerations</h4>
+                <ul className="text-sm text-primary-text-secondary space-y-1">
                   <li>• Changing dates may affect existing registrations</li>
                   <li>• Updating capacity may impact registration availability</li>
                   <li>• Status changes will immediately affect event visibility</li>

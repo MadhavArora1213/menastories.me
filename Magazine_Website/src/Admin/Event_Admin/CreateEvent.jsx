@@ -7,7 +7,6 @@ import EventForm from "../Components/EventForm";
 
 const CreateEvent = () => {
   const { theme } = useTheme();
-  const isDark = theme === "dark";
   const { showSuccess, showError } = useToast();
   const navigate = useNavigate();
 
@@ -27,25 +26,16 @@ const CreateEvent = () => {
     }
   };
 
-  // Theme variables using CSS custom properties
-  const bgMain = "bg-primary-bg";
-  const textMain = "text-primary-text";
-  const subText = "text-primary-text-secondary";
-  const cardBg = "bg-primary-bg border border-primary-border";
-  const innerCardBg = "bg-primary-bg-secondary";
-  const innerBorderColor = "border-primary-border-secondary";
-  const inputBg = "bg-primary-bg border border-primary-border-secondary text-primary-text";
-
   return (
-    <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center transition-colors duration-300`}>
-      <div className={`w-full max-w-6xl ${cardBg} rounded-2xl p-8 md:p-12 shadow-lg`}>
+    <div className="min-h-screen bg-primary-bg py-12 px-2 flex items-center justify-center transition-colors duration-300">
+      <div className="w-full max-w-6xl bg-primary-bg border border-primary-border rounded-2xl p-8 md:p-12 shadow-lg">
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
-            <h2 className={`text-3xl md:text-4xl font-extrabold mb-2 ${textMain}`}>
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-2 text-primary-text">
               Create New Event
             </h2>
-            <p className={`text-base ${subText}`}>
+            <p className="text-base text-primary-text-secondary">
               Add a new event to your system.
             </p>
           </div>
@@ -60,14 +50,14 @@ const CreateEvent = () => {
         </div>
 
         {/* Guidelines */}
-        <div className={`p-4 rounded-lg mb-6 bg-blue-500/10 border border-blue-500/20`}>
+        <div className="p-4 rounded-lg mb-6 bg-blue-500/10 border border-blue-500/20">
           <div className="flex items-start gap-3">
             <svg className="w-5 h-5 mt-0.5 text-blue-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <div>
-              <h4 className={`font-semibold mb-1 ${textMain}`}>Event Creation Guidelines</h4>
-              <ul className={`text-sm ${subText} space-y-1`}>
+              <h4 className="font-semibold mb-1 text-primary-text">Event Creation Guidelines</h4>
+              <ul className="text-sm text-primary-text-secondary space-y-1">
                 <li>• Choose a clear, descriptive title that reflects the event's purpose</li>
                 <li>• Set appropriate dates and times in the correct timezone</li>
                 <li>• Consider capacity limits and registration requirements</li>
@@ -81,7 +71,7 @@ const CreateEvent = () => {
         </div>
 
         {/* Form */}
-        <div className={`rounded-xl p-6 md:p-8 ${innerCardBg} border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
+        <div className="rounded-xl p-6 md:p-8 bg-primary-bg-secondary border border-primary-border-secondary shadow-lg hover:shadow-xl transition-all duration-200">
           <EventForm
             initialData={{}}
             onSubmit={handleSubmit}
@@ -98,8 +88,8 @@ const CreateEvent = () => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
               <div>
-                <h4 className={`font-semibold mb-1 ${textMain}`}>Pro Tips</h4>
-                <ul className={`text-sm ${subText} space-y-1`}>
+                <h4 className="font-semibold mb-1 text-primary-text">Pro Tips</h4>
+                <ul className="text-sm text-primary-text-secondary space-y-1">
                   <li>• Use featured events sparingly to highlight important occasions</li>
                   <li>• Virtual events can reach a global audience without venue constraints</li>
                   <li>• Hybrid events combine the best of both physical and virtual attendance</li>
