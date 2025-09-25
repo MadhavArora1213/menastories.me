@@ -488,16 +488,25 @@ const Flipbook = () => {
       setError(null);
       setIsInitialized(true);
 
+      console.log('=== FRONTEND DEBUG ===');
+      console.log('Loading magazine with ID:', id);
+      console.log('Backend URL:', backendUrl);
+
       const magazineData = await flipbookService.getFlipbookMagazineById(id);
       setMagazine(magazineData.magazine);
+
+      console.log('Magazine loaded successfully:', magazineData.magazine.title);
 
       // Load page images for flipbook
       await loadPageImages(id);
 
       // Use the memoized backend URL
-      setPdfFile(`${backendUrl}/flipbook/download/${id}`);
+      const pdfUrl = `${backendUrl}/flipbook/download/${id}`;
+      console.log('PDF download URL:', pdfUrl);
+      setPdfFile(pdfUrl);
     } catch (err) {
       console.error('Failed to load magazine:', err);
+      console.error('Error details:', err.response?.data || err.message);
       setError('Failed to load magazine data');
       setPdfLoadError(true);
     } finally {
@@ -1147,6 +1156,12 @@ const Flipbook = () => {
                 href={`${backendUrl}/flipbook/download/${id}`}
                 target="_blank"
                 rel="noopener noreferrer"
+                onClick={(e) => {
+                  console.log('=== DOWNLOAD LINK CLICKED ===');
+                  console.log('Download URL:', `${backendUrl}/flipbook/download/${id}`);
+                  console.log('Magazine ID:', id);
+                  console.log('Backend URL:', backendUrl);
+                }}
                 className="bg-[#ffe000] text-[#162048] font-extrabold px-6 py-3 rounded-full hover:bg-yellow-400 transition-colors border-2 border-[#162048] shadow-lg inline-flex items-center transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1157,6 +1172,12 @@ const Flipbook = () => {
               <a
                 href={`${backendUrl}/flipbook/download/${id}`}
                 download="Magazine.pdf"
+                onClick={(e) => {
+                  console.log('=== DOWNLOAD LINK CLICKED ===');
+                  console.log('Download URL:', `${backendUrl}/flipbook/download/${id}`);
+                  console.log('Magazine ID:', id);
+                  console.log('Backend URL:', backendUrl);
+                }}
                 className="bg-[#162048] text-white font-extrabold px-6 py-3 rounded-full hover:bg-black transition-colors border-2 border-[#162048] shadow-lg inline-flex items-center transform hover:scale-105"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">

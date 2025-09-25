@@ -1231,10 +1231,20 @@ exports.downloadFlipbook = async (req, res) => {
   try {
     const { id } = req.params;
 
+    console.log('=== DOWNLOAD REQUEST DEBUG ===');
+    console.log('Requested magazine ID:', id);
+    console.log('Request headers:', req.headers);
+    console.log('Request URL:', req.url);
+    console.log('Request method:', req.method);
+
     const magazine = await FlipbookMagazine.findByPk(id);
     if (!magazine) {
+      console.error('Magazine not found in database:', id);
+      console.error('Available magazines:', await FlipbookMagazine.findAll({ attributes: ['id', 'title'] }));
       return res.status(404).json({ error: 'Flipbook magazine not found' });
     }
+
+    console.log('Found magazine:', magazine.title, 'with ID:', magazine.id);
 
     // Check if user can download
     if (magazine.accessType === 'paid' && (!req.admin || req.admin.role.name !== 'Master Admin')) {
