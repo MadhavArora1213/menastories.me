@@ -642,8 +642,8 @@ const AllEvents = () => {
                 disabled={!pagination.hasPrevPage}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                   pagination.hasPrevPage
-                    ? `${isDark ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-black"}`
-                    : `${isDark ? "bg-gray-800 text-gray-500" : "bg-gray-100 text-gray-400"} cursor-not-allowed`
+                    ? "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
+                    : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text-secondary cursor-not-allowed"
                 }`}
               >
                 Previous
@@ -660,8 +660,8 @@ const AllEvents = () => {
                       onClick={() => handlePageChange(pageNum)}
                       className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                         pageNum === pagination.currentPage
-                          ? `${isDark ? "bg-blue-600 text-white" : "bg-blue-500 text-white"}`
-                          : `${isDark ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-black"}`
+                          ? "bg-blue-500 text-white"
+                          : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
                       }`}
                     >
                       {pageNum}
@@ -675,8 +675,8 @@ const AllEvents = () => {
                 disabled={!pagination.hasNextPage}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                   pagination.hasNextPage
-                    ? `${isDark ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-black"}`
-                    : `${isDark ? "bg-gray-800 text-gray-500" : "bg-gray-100 text-gray-400"} cursor-not-allowed`
+                    ? "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
+                    : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text-secondary cursor-not-allowed"
                 }`}
               >
                 Next
@@ -689,11 +689,11 @@ const AllEvents = () => {
       {/* Delete Confirmation Modal */}
       {showDeleteConfirm && deleteTarget && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-          <div className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${isDark ? "bg-gray-800" : "bg-white"} border ${isDark ? "border-gray-700" : "border-gray-200"}`}>
+          <div className={`w-full max-w-md rounded-2xl shadow-2xl overflow-hidden ${cardBg}`}>
             <div className="p-6">
               <div className="flex items-center gap-3 mb-4">
-                <div className={`p-3 rounded-full ${isDark ? "bg-red-500/20" : "bg-red-100"}`}>
-                  <svg className={`w-6 h-6 ${isDark ? "text-red-400" : "text-red-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <div className="p-3 rounded-full bg-red-500/20">
+                  <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0 1 16.138 21H7.862a2 2 0 0 1-1.995-1.858L5 7m5 4v6m4-6v6M9 7V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v3M4 7h16" />
                   </svg>
                 </div>
@@ -703,7 +703,7 @@ const AllEvents = () => {
                 </div>
               </div>
 
-              <div className={`p-4 rounded-lg mb-6 ${isDark ? "bg-red-500/10 border border-red-500/20" : "bg-red-50 border border-red-200"}`}>
+              <div className="p-4 rounded-lg mb-6 bg-red-500/10 border border-red-500/20">
                 <p className={`text-sm ${textMain}`}>
                   Are you sure you want to delete <span className="font-semibold">"{deleteTarget.title}"</span>?
                 </p>
@@ -715,7 +715,7 @@ const AllEvents = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleDeleteCancel}
-                  className={`flex-1 px-4 py-2 rounded-lg font-medium transition ${isDark ? "bg-gray-700 hover:bg-gray-600 text-white" : "bg-gray-200 hover:bg-gray-300 text-gray-900"}`}
+                  className="flex-1 px-4 py-2 rounded-lg font-medium transition bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
                 >
                   Cancel
                 </button>

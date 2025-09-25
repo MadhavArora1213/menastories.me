@@ -97,15 +97,20 @@ const UpdateEvent = () => {
     }
   };
 
-  const cardBg = isDark ? "bg-black border border-white/10" : "bg-white border border-black/10";
-  const textMain = isDark ? "text-white" : "text-black";
-  const subText = isDark ? "text-gray-300" : "text-gray-600";
+  // Theme variables using CSS custom properties
+  const bgMain = "bg-primary-bg";
+  const textMain = "text-primary-text";
+  const subText = "text-primary-text-secondary";
+  const cardBg = "bg-primary-bg border border-primary-border";
+  const innerCardBg = "bg-primary-bg-secondary";
+  const innerBorderColor = "border-primary-border-secondary";
+  const inputBg = "bg-primary-bg border border-primary-border-secondary text-primary-text";
 
   if (loading) {
     return (
-      <div className={`min-h-screen ${isDark ? "bg-black" : "bg-white"} py-12 px-2 flex items-center justify-center`}>
+      <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center`}>
         <div className="text-center">
-          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-white mx-auto mb-4"></div>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-accent border-t-transparent mx-auto mb-4"></div>
           <p className={`text-xl ${textMain}`}>Loading event...</p>
         </div>
       </div>
@@ -114,7 +119,7 @@ const UpdateEvent = () => {
 
   if (!event || !event.id) {
     return (
-      <div className={`min-h-screen ${isDark ? "bg-black" : "bg-white"} py-12 px-2 flex items-center justify-center`}>
+      <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center`}>
         <div className="text-center">
           <svg className={`w-16 h-16 mx-auto mb-4 ${subText}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
@@ -123,7 +128,7 @@ const UpdateEvent = () => {
           <p className={`text-sm ${subText} mb-4`}>The event you're looking for doesn't exist or has been deleted.</p>
           <button
             onClick={() => navigate("/admin/events")}
-            className={`px-6 py-3 rounded-lg font-medium transition ${isDark ? "bg-white text-black hover:bg-gray-200" : "bg-black text-white hover:bg-gray-900"}`}
+            className="px-6 py-3 rounded-lg font-medium transition bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
           >
             Back to Events
           </button>
@@ -133,8 +138,8 @@ const UpdateEvent = () => {
   }
 
   return (
-    <div className={`min-h-screen ${isDark ? "bg-black" : "bg-white"} py-12 px-2 flex items-center justify-center transition-colors duration-300`}>
-      <div className={`w-full max-w-6xl ${cardBg} rounded-2xl p-8 md:p-12`}>
+    <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center transition-colors duration-300`}>
+      <div className={`w-full max-w-6xl ${cardBg} rounded-2xl p-8 md:p-12 shadow-lg`}>
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
@@ -146,7 +151,7 @@ const UpdateEvent = () => {
             </p>
           </div>
           <div className="flex-shrink-0">
-            <span className={`inline-block ${isDark ? "bg-blue-500/20 text-blue-400" : "bg-blue-100 text-blue-800"} px-4 py-2 rounded-lg font-semibold`}>
+            <span className="inline-block bg-blue-500/20 text-blue-400 px-4 py-2 rounded-lg font-semibold">
               <svg className="inline w-6 h-6 mr-1" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                 <path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
               </svg>
@@ -156,7 +161,7 @@ const UpdateEvent = () => {
         </div>
 
         {/* Current Info */}
-        <div className={`p-4 rounded-lg mb-6 ${isDark ? "bg-gray-800/50" : "bg-gray-50"} border ${isDark ? "border-white/10" : "border-gray-200"}`}>
+        <div className={`p-4 rounded-lg mb-6 ${innerCardBg} border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
           <h3 className={`font-semibold mb-2 ${textMain}`}>Current Information</h3>
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
             <div>
@@ -191,7 +196,7 @@ const UpdateEvent = () => {
         </div>
 
         {/* Form */}
-        <div className={`rounded-xl p-6 md:p-8 ${isDark ? "bg-gray-800/50" : "bg-gray-50"} border ${isDark ? "border-white/10" : "border-gray-200"}`}>
+        <div className={`rounded-xl p-6 md:p-8 ${innerCardBg} border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
           {event && event.id && (
             <EventForm
               initialData={event}
@@ -204,9 +209,9 @@ const UpdateEvent = () => {
 
         {/* Help Text */}
         <div className="mt-8">
-          <div className={`p-4 rounded-lg ${isDark ? "bg-amber-500/10 border border-amber-500/20" : "bg-amber-50 border border-amber-200"}`}>
+          <div className="p-4 rounded-lg bg-amber-500/10 border border-amber-500/20">
             <div className="flex items-start gap-3">
-              <svg className={`w-5 h-5 mt-0.5 ${isDark ? "text-amber-400" : "text-amber-600"}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg className="w-5 h-5 mt-0.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L4.082 16.5c-.77.833.192 2.5 1.732 2.5z" />
               </svg>
               <div>
@@ -227,32 +232,20 @@ const UpdateEvent = () => {
         <div className="mt-8 flex justify-between">
           <button
             onClick={() => navigate("/admin/events")}
-            className={`px-6 py-3 rounded-lg font-medium transition ${
-              isDark
-                ? "bg-gray-700 text-white hover:bg-gray-600"
-                : "bg-gray-200 text-gray-900 hover:bg-gray-300"
-            }`}
+            className="px-6 py-3 rounded-lg font-medium transition bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
           >
             ← Back to Events
           </button>
           <div className="flex gap-3">
             <button
               onClick={() => navigate(`/admin/events/delete/${id}`)}
-              className={`px-6 py-3 rounded-lg font-medium transition ${
-                isDark
-                  ? "bg-red-600 text-white hover:bg-red-700"
-                  : "bg-red-500 text-white hover:bg-red-600"
-              }`}
+              className="px-6 py-3 rounded-lg font-medium transition bg-red-500 text-white hover:bg-red-600"
             >
               Delete Event
             </button>
             <button
               onClick={() => navigate("/admin/categories")}
-              className={`px-6 py-3 rounded-lg font-medium transition ${
-                isDark
-                  ? "bg-blue-600 text-white hover:bg-blue-700"
-                  : "bg-blue-500 text-white hover:bg-blue-600"
-              }`}
+              className="px-6 py-3 rounded-lg font-medium transition bg-blue-500 text-white hover:bg-blue-600"
             >
               Manage Categories →
             </button>
