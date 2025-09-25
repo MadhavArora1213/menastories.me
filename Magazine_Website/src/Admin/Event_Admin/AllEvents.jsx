@@ -319,11 +319,11 @@ const AllEvents = () => {
                 placeholder="Search by title or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-3 border border-[var(--primary-border-secondary)] rounded-xl bg-[var(--primary-bg)] text-[var(--primary-text)] placeholder-[var(--primary-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-accent)] focus:border-transparent transition-all duration-200"
+                className="flex-1 px-4 py-3 border border-[var(--primary-border-secondary)] rounded-xl bg-[var(--primary-bg)] text-[var(--primary-text)] placeholder-[var(--primary-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-accent)] focus:border-transparent transition-all duration-200 min-w-0"
               />
               <button
                 onClick={handleSearch}
-                className="px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-[var(--primary-accent)] text-[var(--primary-bg)] hover:bg-[var(--primary-accent-hover)]"
+                className="px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-[var(--primary-accent)] text-[var(--primary-bg)] hover:bg-[var(--primary-accent-hover)] whitespace-nowrap flex-shrink-0"
               >
                 Search
               </button>
