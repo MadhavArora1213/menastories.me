@@ -49,8 +49,9 @@ router.get('/magazines/:id/pages/:pageNumber', flipbookController.getFlipbookPag
 router.get('/magazines/:id/toc', flipbookController.getTableOfContents);
 router.get('/search', flipbookController.searchInMagazine);
 
-// Public download route for free magazines
+// Public download routes for free magazines
 router.get('/download/:id', flipbookController.downloadFlipbook);
+router.get('/magazines/:id/download', flipbookController.downloadFlipbook);
 
 // Public page image routes (no authentication required)
 router.get('/magazines/:id/pages/:pageNumber/image', async (req, res) => {
@@ -181,8 +182,7 @@ router.post('/magazines/:id/share', async (req, res) => {
   res.json({ message: 'Sharing not implemented yet' });
 });
 
-// Downloads
-router.get('/magazines/:id/download', flipbookController.downloadFlipbook);
+// Downloads - Page downloads (admin only for now)
 router.get('/magazines/:id/pages/:pageNumber/download', flipbookController.downloadFlipbookPage);
 
 // Reprocessing
