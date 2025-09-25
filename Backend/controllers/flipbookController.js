@@ -676,24 +676,65 @@ exports.uploadFlipbook = async (req, res) => {
       return res.status(400).json({ error: 'No file provided' });
     }
 
-    // Basic PDF validation - just check header
+    // Basic PDF validation - check header and file integrity
     try {
       const buffer = await fs.readFile(req.file.path);
 
+      console.log(`Validating uploaded file: ${req.file.originalname}`);
+      console.log(`File size: ${buffer.length} bytes`);
+      console.log(`MIME type: ${req.file.mimetype}`);
+      console.log(`First 20 bytes: ${buffer.slice(0, 20).toString('hex')}`);
+
+      // Check if file is empty
+      if (buffer.length === 0) {
+        await fs.unlink(req.file.path);
+        return res.status(400).json({ error: 'Uploaded file is empty' });
+      }
+
       // Check PDF header
       if (!buffer.slice(0, 4).equals(Buffer.from('%PDF'))) {
-        // Clean up invalid file
+        console.log('PDF header validation failed');
         await fs.unlink(req.file.path);
-        return res.status(400).json({ error: 'Invalid PDF file format' });
+        return res.status(400).json({
+          error: 'Invalid PDF file format',
+          details: {
+            expectedHeader: '%PDF',
+            actualHeader: buffer.slice(0, 4).toString(),
+            fileSize: buffer.length,
+            mimeType: req.file.mimetype
+          }
+        });
       }
+
+      // Additional validation: check for minimum PDF structure
+      const bufferString = buffer.toString();
+      if (!bufferString.includes('%%EOF')) {
+        console.log('PDF trailer validation failed');
+        await fs.unlink(req.file.path);
+        return res.status(400).json({
+          error: 'PDF file appears to be incomplete or corrupted',
+          details: {
+            hasPDFHeader: true,
+            hasPDFTrailer: false,
+            fileSize: buffer.length
+          }
+        });
+      }
+
+      console.log('PDF validation passed successfully');
+
     } catch (validationError) {
+      console.error('File validation error:', validationError);
       // Clean up invalid file
       try {
         await fs.unlink(req.file.path);
       } catch (cleanupError) {
         console.error('Error cleaning up invalid file:', cleanupError);
       }
-      return res.status(400).json({ error: 'File validation failed' });
+      return res.status(400).json({
+        error: 'File validation failed',
+        details: validationError.message
+      });
     }
 
     const { title, description, magazineType, category, accessType, price } = req.body;
@@ -772,17 +813,35 @@ exports.uploadFlipbook = async (req, res) => {
     // Start background processing
     setTimeout(async () => {
       try {
+        console.log(`Starting background processing for magazine ${magazine.id}: ${magazine.title}`);
+        console.log(`Temporary file path: ${tempFilePath}`);
+
         // Additional validation: Check file size after upload
         const stats = await fs.stat(tempFilePath);
+        console.log(`Temporary file stats: size=${stats.size}, exists=${stats.isFile()}`);
+
         if (stats.size === 0) {
           throw new Error('Uploaded file is empty');
         }
 
+        // Check if Ghostscript is available
+        let gsPath;
+        try {
+          gsPath = await checkGhostscriptInstallation();
+          console.log(`Ghostscript found at: ${gsPath}`);
+        } catch (gsError) {
+          console.error('Ghostscript not found:', gsError.message);
+          await magazine.updateProcessingStatus('failed', null, gsError.message);
+          return;
+        }
+
         // Process the PDF
+        console.log(`Starting PDF processing for magazine ${magazine.id}`);
         await processFlipbookPDF(magazine.id, tempFilePath, gsPath);
 
         // After successful processing, move to final location with title-based name
         const finalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', filename);
+        console.log(`Moving processed file to final location: ${finalFilePath}`);
 
         // Move the processed file to final location
         await fs.rename(tempFilePath, finalFilePath);
@@ -793,14 +852,17 @@ exports.uploadFlipbook = async (req, res) => {
           processingStatus: 'completed'
         });
 
-        console.log(`Flipbook ${magazine.id} processing completed and file stored as: ${filename}`);
+        console.log(`Flipbook ${magazine.id} processing completed successfully and file stored as: ${filename}`);
       } catch (error) {
-        console.error('Error processing flipbook:', error);
+        console.error(`Error processing flipbook ${magazine.id}:`, error);
+        console.error('Error stack:', error.stack);
+
         await magazine.updateProcessingStatus('failed', null, error.message);
 
         // Clean up temporary file on error
         try {
           await fs.unlink(tempFilePath);
+          console.log(`Cleaned up temporary file: ${tempFilePath}`);
         } catch (cleanupError) {
           console.error('Error cleaning up temporary file:', cleanupError);
         }
@@ -820,13 +882,19 @@ exports.uploadFlipbook = async (req, res) => {
 // PDF Processing Function with Ghostscript
 async function processFlipbookPDF(magazineId, filePath, gsPath) {
   const magazine = await FlipbookMagazine.findByPk(magazineId);
-  if (!magazine) return;
+  if (!magazine) {
+    console.log(`Magazine ${magazineId} not found, skipping processing`);
+    return;
+  }
 
   const { spawn } = require('child_process');
   const path = require('path');
   const fs = require('fs').promises;
 
   try {
+    console.log(`Starting PDF processing for magazine ${magazineId}: ${magazine.title}`);
+    console.log(`Processing file: ${filePath}`);
+
     await magazine.updateProcessingStatus('processing', 0);
 
     // Validate Ghostscript installation
