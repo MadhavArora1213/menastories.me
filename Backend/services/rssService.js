@@ -6,7 +6,7 @@ class RSSService {
 
   constructor() {
     this.feedPath = path.join(__dirname, '../../rss.xml');
-    this.baseUrl = process.env.BASE_URL || 'http://localhost:5000';
+    this.baseUrl = process.env.BASE_URL || 'https://menastories.me';
   }
 
   // Generate RSS feed XML
