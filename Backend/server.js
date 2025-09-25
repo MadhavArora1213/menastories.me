@@ -610,6 +610,12 @@ app.use('/api/flipbook', (req, res, next) => {
   next();
 }, flipbookRoutes);
 
+// Flipbook routes without /api prefix (for frontend compatibility)
+app.use('/flipbook', (req, res, next) => {
+  console.log('Flipbook route hit (no /api prefix):', req.method, req.path);
+  next();
+}, flipbookRoutes);
+
 // Subcategory routes are now handled by the mounted subcategoryRoutes
 
 // ========================================
