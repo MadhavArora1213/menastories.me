@@ -1240,20 +1240,21 @@ exports.downloadFlipbook = async (req, res) => {
     const magazine = await FlipbookMagazine.findByPk(id);
     if (!magazine) {
       console.error('Magazine not found in database:', id);
-      console.error('Available magazines:', await FlipbookMagazine.findAll({ attributes: ['id', 'title'] }));
       return res.status(404).json({ error: 'Flipbook magazine not found' });
     }
 
     console.log('Found magazine:', magazine.title, 'with ID:', magazine.id);
 
-    // Check if user can download
-    if (magazine.accessType === 'paid' && (!req.admin || req.admin.role.name !== 'Master Admin')) {
-      return res.status(403).json({ error: 'Download not allowed for this magazine' });
+    // Check access permissions - Allow free magazines for all users
+    if (magazine.accessType === 'premium' || magazine.accessType === 'paid') {
+      // Only require admin auth for premium/paid content
+      if (!req.admin) {
+        return res.status(403).json({ error: 'Authentication required for premium content' });
+      }
     }
 
     // Check if file exists
     console.log(`Looking for PDF file: ${magazine.originalFilePath}`);
-    console.log(`Magazine ID: ${magazine.id}, Title: ${magazine.title}`);
 
     if (!magazine.originalFilePath) {
       console.error(`No file path stored for magazine ${magazine.id}`);
@@ -1262,6 +1263,8 @@ exports.downloadFlipbook = async (req, res) => {
 
     // Try to access the file
     let fileExists = false;
+    let finalPath = magazine.originalFilePath;
+    
     try {
       await fs.access(magazine.originalFilePath);
       fileExists = true;
@@ -1269,28 +1272,38 @@ exports.downloadFlipbook = async (req, res) => {
     } catch (accessError) {
       console.error(`File not accessible at stored path: ${magazine.originalFilePath}`, accessError.message);
 
-      // Try alternative path resolution
-      const alternativePath = path.join(__dirname, '..', 'storage', 'flipbooks', path.basename(magazine.originalFilePath));
-      console.log(`Trying alternative path: ${alternativePath}`);
+      // Try alternative path resolution for hosted environment
+      const filename = path.basename(magazine.originalFilePath);
+      const alternativePaths = [
+        path.join(__dirname, '..', 'storage', 'flipbooks', filename),
+        path.join(process.cwd(), 'storage', 'flipbooks', filename),
+        path.join('/var/www/storage/flipbooks', filename), // Common hosting path
+        path.join(__dirname, '..', '..', 'storage', 'flipbooks', filename)
+      ];
 
-      try {
-        await fs.access(alternativePath);
-        console.log(`File found at alternative path: ${alternativePath}`);
-        // Update the stored path if alternative works
-        await magazine.update({ originalFilePath: alternativePath });
-        fileExists = true;
-      } catch (altError) {
-        console.error(`File not found at alternative path either: ${alternativePath}`);
+      for (const altPath of alternativePaths) {
+        try {
+          await fs.access(altPath);
+          console.log(`File found at alternative path: ${altPath}`);
+          finalPath = altPath;
+          fileExists = true;
+          // Update the stored path
+          await magazine.update({ originalFilePath: altPath });
+          break;
+        } catch (altError) {
+          console.log(`File not found at: ${altPath}`);
+        }
       }
     }
 
     if (!fileExists) {
+      console.error('File not found at any path for magazine:', magazine.title);
       return res.status(404).json({ error: 'File not found on server' });
     }
 
     // Validate PDF structure before serving
     try {
-      const buffer = await fs.readFile(magazine.originalFilePath);
+      const buffer = await fs.readFile(finalPath);
 
       // Check PDF header
       if (!buffer.slice(0, 4).equals(Buffer.from('%PDF'))) {
@@ -1298,11 +1311,10 @@ exports.downloadFlipbook = async (req, res) => {
         return res.status(500).json({ error: 'PDF file is corrupted or invalid' });
       }
 
-      // Additional validation: Check for PDF trailer
-      const bufferString = buffer.toString();
-      if (!bufferString.includes('%%EOF')) {
-        console.error(`Invalid PDF structure for magazine ${magazine.id}: Missing PDF trailer`);
-        return res.status(500).json({ error: 'PDF file is corrupted or invalid' });
+      // Check file size
+      if (buffer.length === 0) {
+        console.error(`PDF file is empty for magazine ${magazine.id}`);
+        return res.status(500).json({ error: 'PDF file is empty' });
       }
 
     } catch (validationError) {
@@ -1313,27 +1325,39 @@ exports.downloadFlipbook = async (req, res) => {
     // Update download count
     await magazine.increment('downloadCount');
 
-    // Set headers for download with CORS support
-    const fileName = `${magazine.slug}.pdf`;
+    // Set headers for download with CORS support for hosted environment
+    const fileName = `${magazine.slug || magazine.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
     res.setHeader('Cache-Control', 'public, max-age=3600'); // Cache for 1 hour
 
-    // Stream the file
-    const fileStream = require('fs').createReadStream(magazine.originalFilePath);
-    fileStream.pipe(res);
+    console.log(`Serving file: ${finalPath} as ${fileName}`);
 
+    // Stream the file
+    const fileStream = require('fs').createReadStream(finalPath);
+    
     fileStream.on('error', (error) => {
       console.error('Error streaming file:', error);
-      res.status(500).json({ error: 'Error downloading file' });
+      if (!res.headersSent) {
+        res.status(500).json({ error: 'Error downloading file' });
+      }
     });
+
+    fileStream.on('open', () => {
+      console.log('File stream opened successfully');
+    });
+
+    fileStream.pipe(res);
 
   } catch (error) {
     console.error('Error downloading flipbook:', error);
-    res.status(500).json({ error: 'Failed to download flipbook' });
+    if (!res.headersSent) {
+      res.status(500).json({ error: 'Failed to download flipbook' });
+    }
   }
 };
 

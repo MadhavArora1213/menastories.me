@@ -140,10 +140,6 @@ router.get('/magazines/:id/analytics', flipbookController.getFlipbookAnalytics);
 router.put('/bulk', flipbookController.bulkUpdateMagazines);
 router.delete('/bulk', flipbookController.bulkDeleteMagazines);
 
-// Admin download route (original protected route)
-router.get('/admin/download/:id', flipbookController.downloadFlipbook);
-
-
 // Bookmarks (user-specific)
 router.post('/magazines/:id/bookmark', async (req, res) => {
   // Add bookmark

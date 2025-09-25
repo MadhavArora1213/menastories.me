@@ -331,7 +331,17 @@ export const flipbookService = {
     try {
       const response = await this.downloadMagazine(magazineId);
       const filename = `${magazineTitle.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
-      this.downloadBlob(response.data, filename);
+      
+      // Create download link
+      const url = window.URL.createObjectURL(response.data);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(url);
+      
       return true;
     } catch (error) {
       console.error('Failed to download magazine with filename:', error);
