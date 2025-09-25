@@ -27,13 +27,13 @@ const CreateEvent = () => {
     }
   };
 
-  // Use conditional classes instead of CSS custom properties
-  const bgMain = isDark ? "bg-gray-900" : "bg-white";
-  const textMain = isDark ? "text-white" : "text-black";
-  const subText = isDark ? "text-gray-300" : "text-gray-600";
-  const cardBg = isDark ? "bg-gray-800 border-gray-700" : "bg-white border-gray-200";
-  const innerCardBg = isDark ? "bg-gray-700" : "bg-gray-50";
-  const innerBorderColor = isDark ? "border-gray-600" : "border-gray-300";
+  // Use CSS custom properties for consistent theming
+  const bgMain = "bg-primary-bg";
+  const textMain = "text-primary-text";
+  const subText = "text-primary-text-secondary";
+  const cardBg = "bg-primary-bg border-primary-border";
+  const innerCardBg = "bg-primary-bg-secondary";
+  const innerBorderColor = "border-primary-border-secondary";
 
   return (
     <div className={`min-h-screen ${bgMain} py-12 px-2 flex items-center justify-center transition-colors duration-300`}>
