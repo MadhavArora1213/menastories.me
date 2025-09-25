@@ -98,12 +98,12 @@ const UpdateEvent = () => {
   };
 
   // Use CSS custom properties for consistent theming
-  const bgMain = "bg-primary-bg";
-  const textMain = "text-primary-text";
-  const subText = "text-primary-text-secondary";
-  const cardBg = "bg-primary-bg border-primary-border";
-  const innerCardBg = "bg-primary-bg-secondary";
-  const innerBorderColor = "border-primary-border-secondary";
+  const bgMain = "bg-[var(--primary-bg)]";
+  const textMain = "text-[var(--primary-text)]";
+  const subText = "text-[var(--primary-text-secondary)]";
+  const cardBg = "bg-[var(--primary-bg)] border-[var(--primary-border)]";
+  const innerCardBg = "bg-[var(--primary-bg-secondary)]";
+  const innerBorderColor = "border-[var(--primary-border-secondary)]";
 
   if (loading) {
     return (

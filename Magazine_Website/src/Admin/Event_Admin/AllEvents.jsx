@@ -12,14 +12,14 @@ const AllEvents = () => {
   const { showSuccess, showError } = useToast();
   const { isMasterAdmin, hasPermission } = useAdminAuth();
 
-  // Theme variables
-  const bgMain = "bg-primary-bg";
-  const textMain = "text-primary-text";
-  const subText = "text-primary-text-secondary";
-  const cardBg = "bg-primary-bg border border-primary-border";
-  const innerCardBg = "bg-primary-bg-secondary";
-  const innerBorderColor = "border-primary-border-secondary";
-  const inputBg = "bg-primary-bg border border-primary-border-secondary text-primary-text";
+  // Theme variables using CSS custom properties
+  const bgMain = "bg-[var(--primary-bg)]";
+  const textMain = "text-[var(--primary-text)]";
+  const subText = "text-[var(--primary-text-secondary)]";
+  const cardBg = "bg-[var(--primary-bg)] border-[var(--primary-border)]";
+  const innerCardBg = "bg-[var(--primary-bg-secondary)]";
+  const innerBorderColor = "border-[var(--primary-border-secondary)]";
+  const inputBg = "bg-[var(--primary-bg)] border-[var(--primary-border-secondary)] text-[var(--primary-text)]";
 
   const [events, setEvents] = useState([]);
   const [loading, setLoading] = useState(true);
