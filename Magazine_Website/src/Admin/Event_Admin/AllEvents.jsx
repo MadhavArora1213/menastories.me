@@ -272,24 +272,24 @@ const AllEvents = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-primary-bg py-12 px-2 flex items-center justify-center">
+      <div className="min-h-screen bg-[var(--primary-bg)] py-12 px-2 flex items-center justify-center">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-16 w-16 border-4 border-primary-accent border-t-transparent mx-auto mb-4"></div>
-          <p className="text-xl text-primary-text font-medium">Loading events...</p>
+          <div className="animate-spin rounded-full h-16 w-16 border-4 border-[var(--primary-accent)] border-t-transparent mx-auto mb-4"></div>
+          <p className="text-xl text-[var(--primary-text)] font-medium">Loading events...</p>
         </div>
       </div>
     );
   }
   return (
-    <div className="min-h-screen bg-primary-bg py-12 px-2">
+    <div className="min-h-screen bg-[var(--primary-bg)] py-12 px-2">
       <div className={`w-full max-w-7xl mx-auto ${cardBg} rounded-2xl p-8 md:p-12 shadow-lg`}>
         {/* Header */}
         <div className="flex flex-col md:flex-row md:items-center md:justify-between mb-8 gap-4">
           <div>
-            <h2 className="text-3xl md:text-4xl font-extrabold mb-2 text-primary-text">
+            <h2 className="text-3xl md:text-4xl font-extrabold mb-2 text-[var(--primary-text)]">
               All Events
             </h2>
-            <p className="text-base text-primary-text-secondary">
+            <p className="text-base text-[var(--primary-text-secondary)]">
               Manage all events in your system.
             </p>
           </div>
@@ -298,7 +298,7 @@ const AllEvents = () => {
             {hasPermission('content.create') && (
               <Link
                 to="/admin/events/create"
-                className="px-6 py-3 rounded-xl font-bold transition-all duration-200 bg-primary-accent text-primary-bg hover:bg-primary-accent-hover shadow-sm"
+                className="px-6 py-3 rounded-xl font-bold transition-all duration-200 bg-[var(--primary-accent)] text-[var(--primary-bg)] hover:bg-[var(--primary-accent-hover)] shadow-sm"
               >
                 + Create Event
               </Link>
@@ -309,32 +309,32 @@ const AllEvents = () => {
         {/* Filters */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div>
-            <label className="block text-sm font-medium mb-2 text-primary-text">Search Events</label>
+            <label className="block text-sm font-medium mb-2 text-[var(--primary-text)]">Search Events</label>
             <div className="flex gap-2">
               <input
                 type="text"
                 placeholder="Search by title or description..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="flex-1 px-4 py-3 border border-primary-border-secondary rounded-xl bg-primary-bg text-primary-text placeholder-primary-text-secondary focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-transparent transition-all duration-200"
+                className="flex-1 px-4 py-3 border border-[var(--primary-border-secondary)] rounded-xl bg-[var(--primary-bg)] text-[var(--primary-text)] placeholder-[var(--primary-text-secondary)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-accent)] focus:border-transparent transition-all duration-200"
               />
               <button
                 onClick={handleSearch}
-                className="px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-primary-accent text-primary-bg hover:bg-primary-accent-hover"
+                className="px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-[var(--primary-accent)] text-[var(--primary-bg)] hover:bg-[var(--primary-accent-hover)]"
               >
                 Search
               </button>
             </div>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-primary-text">Filter by Status</label>
+            <label className="block text-sm font-medium mb-2 text-[var(--primary-text)]">Filter by Status</label>
             <select
               value={selectedStatus}
               onChange={(e) => {
                 setSelectedStatus(e.target.value);
                 handleFilterChange();
               }}
-              className="w-full px-4 py-3 border border-primary-border-secondary rounded-xl bg-primary-bg text-primary-text focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 border border-[var(--primary-border-secondary)] rounded-xl bg-[var(--primary-bg)] text-[var(--primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-accent)] focus:border-transparent transition-all duration-200"
             >
               <option value="">All Statuses</option>
               <option value="draft">Draft</option>
@@ -347,14 +347,14 @@ const AllEvents = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-primary-text">Filter by Category</label>
+            <label className="block text-sm font-medium mb-2 text-[var(--primary-text)]">Filter by Category</label>
             <select
               value={selectedCategory}
               onChange={(e) => {
                 setSelectedCategory(e.target.value);
                 handleFilterChange();
               }}
-              className="w-full px-4 py-3 border border-primary-border-secondary rounded-xl bg-primary-bg text-primary-text focus:outline-none focus:ring-2 focus:ring-primary-accent focus:border-transparent transition-all duration-200"
+              className="w-full px-4 py-3 border border-[var(--primary-border-secondary)] rounded-xl bg-[var(--primary-bg)] text-[var(--primary-text)] focus:outline-none focus:ring-2 focus:ring-[var(--primary-accent)] focus:border-transparent transition-all duration-200"
             >
               <option value="">All Categories</option>
               <option value="business">Business</option>
@@ -370,7 +370,7 @@ const AllEvents = () => {
             </select>
           </div>
           <div>
-            <label className="block text-sm font-medium mb-2 text-primary-text">Actions</label>
+            <label className="block text-sm font-medium mb-2 text-[var(--primary-text)]">Actions</label>
             <button
               onClick={() => {
                 setSearchTerm("");
@@ -378,7 +378,7 @@ const AllEvents = () => {
                 setSelectedCategory("");
                 loadEvents(1);
               }}
-              className="w-full px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
+              className="w-full px-4 py-3 rounded-xl font-medium transition-all duration-200 bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text)] hover:bg-[var(--primary-bg)] hover:border-[var(--primary-border)]"
             >
               Clear Filters
             </button>
@@ -390,11 +390,11 @@ const AllEvents = () => {
           <div className={`${innerCardBg} rounded-2xl p-6 border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-primary-text-secondary">Total Events</p>
-                <p className="text-3xl font-bold text-primary-text mt-1">{statistics.totalEvents}</p>
+                <p className="text-sm font-medium text-[var(--primary-text-secondary)]">Total Events</p>
+                <p className="text-3xl font-bold text-[var(--primary-text)] mt-1">{statistics.totalEvents}</p>
               </div>
-              <div className="p-3 rounded-xl bg-primary-accent/10">
-                <svg className="w-6 h-6 text-primary-accent" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="p-3 rounded-xl bg-[var(--primary-accent)]/10">
+                <svg className="w-6 h-6 text-[var(--primary-accent)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
@@ -403,8 +403,8 @@ const AllEvents = () => {
           <div className={`${innerCardBg} rounded-2xl p-6 border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-primary-text-secondary">Published Events</p>
-                <p className="text-3xl font-bold text-primary-text mt-1">{statistics.publishedEvents}</p>
+                <p className="text-sm font-medium text-[var(--primary-text-secondary)]">Published Events</p>
+                <p className="text-3xl font-bold text-[var(--primary-text)] mt-1">{statistics.publishedEvents}</p>
               </div>
               <div className="p-3 rounded-xl bg-green-500/10">
                 <svg className="w-6 h-6 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -416,8 +416,8 @@ const AllEvents = () => {
           <div className={`${innerCardBg} rounded-2xl p-6 border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-primary-text-secondary">Upcoming Events</p>
-                <p className="text-3xl font-bold text-primary-text mt-1">{statistics.upcomingEvents}</p>
+                <p className="text-sm font-medium text-[var(--primary-text-secondary)]">Upcoming Events</p>
+                <p className="text-3xl font-bold text-[var(--primary-text)] mt-1">{statistics.upcomingEvents}</p>
               </div>
               <div className="p-3 rounded-xl bg-blue-500/10">
                 <svg className="w-6 h-6 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -429,8 +429,8 @@ const AllEvents = () => {
           <div className={`${innerCardBg} rounded-2xl p-6 border ${innerBorderColor} shadow-lg hover:shadow-xl transition-all duration-200`}>
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-primary-text-secondary">Total Registrations</p>
-                <p className="text-3xl font-bold text-primary-text mt-1">{statistics.totalRegistrations}</p>
+                <p className="text-sm font-medium text-[var(--primary-text-secondary)]">Total Registrations</p>
+                <p className="text-3xl font-bold text-[var(--primary-text)] mt-1">{statistics.totalRegistrations}</p>
               </div>
               <div className="p-3 rounded-xl bg-purple-500/10">
                 <svg className="w-6 h-6 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -442,36 +442,36 @@ const AllEvents = () => {
         </div>
 
         {/* Events Table */}
-        <div className="bg-primary-bg border border-primary-border rounded-2xl overflow-hidden shadow-lg">
+        <div className="bg-[var(--primary-bg)] border border-[var(--primary-border)] rounded-2xl overflow-hidden shadow-lg">
           <div className="overflow-x-auto">
-            <table className="min-w-full divide-y divide-primary-border-secondary">
-              <thead className="bg-primary-bg-secondary">
+            <table className="min-w-full divide-y divide-[var(--primary-border-secondary)]">
+              <thead className="bg-[var(--primary-bg-secondary)]">
                 <tr>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Title</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Type</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Category</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Status</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Start Date</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Capacity</th>
-                  <th className="px-6 py-4 text-left text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Registrations</th>
-                  <th className="px-6 py-4 text-center text-xs font-semibold text-primary-text-secondary uppercase tracking-wider">Actions</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Title</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Type</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Category</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Status</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Start Date</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Capacity</th>
+                  <th className="px-6 py-4 text-left text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Registrations</th>
+                  <th className="px-6 py-4 text-center text-xs font-semibold text-[var(--primary-text-secondary)] uppercase tracking-wider">Actions</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-primary-border-secondary">
+              <tbody className="divide-y divide-[var(--primary-border-secondary)]">
                 {filteredEvents.length === 0 ? (
                 <tr>
                   <td colSpan={8} className="py-12 text-center">
-                    <svg className="w-16 h-16 mx-auto mb-4 text-primary-text-secondary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-[var(--primary-text-secondary)]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <h3 className="text-xl font-semibold mb-2 text-primary-text">No events found</h3>
-                    <p className="text-sm text-primary-text-secondary mb-4">
+                    <h3 className="text-xl font-semibold mb-2 text-[var(--primary-text)]">No events found</h3>
+                    <p className="text-sm text-[var(--primary-text-secondary)] mb-4">
                       {searchTerm || selectedStatus || selectedCategory ? "Try adjusting your search or filter criteria." : "Create your first event to get started."}
                     </p>
                     {!searchTerm && !selectedStatus && !selectedCategory && hasPermission('content.create') && (
                       <Link
                         to="/admin/events/create"
-                        className="inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 bg-primary-accent text-primary-bg hover:bg-primary-accent-hover shadow-sm"
+                        className="inline-flex items-center px-6 py-3 rounded-xl font-medium transition-all duration-200 bg-[var(--primary-accent)] text-[var(--primary-bg)] hover:bg-[var(--primary-accent-hover)] shadow-sm"
                       >
                         <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
@@ -489,14 +489,14 @@ const AllEvents = () => {
                       key={event?.id || idx}
                       className={
                         idx % 2 === 0
-                          ? "bg-primary-bg hover:bg-primary-bg-secondary transition-all duration-200"
-                          : "bg-primary-bg-secondary hover:bg-primary-bg transition-all duration-200"
+                          ? "bg-[var(--primary-bg)] hover:bg-[var(--primary-bg-secondary)] transition-all duration-200"
+                          : "bg-[var(--primary-bg-secondary)] hover:bg-[var(--primary-bg)] transition-all duration-200"
                       }
                     >
-                      <td className="py-4 px-6 font-medium text-primary-text">
+                      <td className="py-4 px-6 font-medium text-[var(--primary-text)]">
                         <div>
                           <div className="font-semibold">{event?.title || 'Untitled Event'}</div>
-                          <div className="text-sm text-primary-text-secondary truncate max-w-xs">
+                          <div className="text-sm text-[var(--primary-text-secondary)] truncate max-w-xs">
                             {event?.shortDescription || event?.description?.substring(0, 50) + '...' || 'No description available'}
                           </div>
                         </div>
@@ -512,7 +512,7 @@ const AllEvents = () => {
                           {event?.eventType ? event.eventType.replace('_', ' ').replace(/\b\w/g, l => l.toUpperCase()) : 'N/A'}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-primary-text-secondary">
+                      <td className="py-4 px-6 text-[var(--primary-text-secondary)]">
                         {event?.category ? event.category.charAt(0).toUpperCase() + event.category.slice(1) : 'N/A'}
                       </td>
                       <td className="py-4 px-6">
@@ -520,13 +520,13 @@ const AllEvents = () => {
                           {event?.status ? event.status.charAt(0).toUpperCase() + event.status.slice(1) : 'Unknown'}
                         </span>
                       </td>
-                      <td className="py-4 px-6 text-primary-text-secondary">
+                      <td className="py-4 px-6 text-[var(--primary-text-secondary)]">
                         {event?.startDate ? formatDate(event.startDate) : 'N/A'}
                       </td>
-                      <td className="py-4 px-6 text-primary-text-secondary">
+                      <td className="py-4 px-6 text-[var(--primary-text-secondary)]">
                         {event?.capacity || 'Unlimited'}
                       </td>
-                      <td className="py-4 px-6 text-primary-text-secondary">
+                      <td className="py-4 px-6 text-[var(--primary-text-secondary)]">
                         {event?.registrationCount || 0}
                       </td>
                       <td className="py-3 px-4 text-center">
@@ -556,7 +556,7 @@ const AllEvents = () => {
                               </button>
                             </>
                           ) : event.status === 'pending_review' && !hasPermission('content.approve') ? (
-                            <span className="text-sm text-primary-text-secondary italic">
+                            <span className="text-sm text-[var(--primary-text-secondary)] italic">
                               Pending Review
                             </span>
                           ) : (
@@ -565,7 +565,7 @@ const AllEvents = () => {
                               {hasPermission('content.edit') && (
                                 <Link
                                   to={`/admin/events/update/${event?.id}`}
-                                  className="inline-flex items-center gap-1 bg-primary-accent hover:bg-primary-accent-hover text-primary-bg px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm text-sm"
+                                  className="inline-flex items-center gap-1 bg-[var(--primary-accent)] hover:bg-[var(--primary-accent-hover)] text-[var(--primary-bg)] px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm text-sm"
                                   title="Edit"
                                 >
                                   <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
@@ -617,7 +617,7 @@ const AllEvents = () => {
 
                           {/* Show message if no actions available */}
                           {!hasPermission('content.edit') && !hasPermission('content.delete') && !hasPermission('content.approve') && !hasPermission('content.publish') && (
-                            <span className="text-xs text-primary-text-secondary">No actions available</span>
+                            <span className="text-xs text-[var(--primary-text-secondary)]">No actions available</span>
                           )}
                         </div>
                       </td>
@@ -642,8 +642,8 @@ const AllEvents = () => {
                 disabled={!pagination.hasPrevPage}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                   pagination.hasPrevPage
-                    ? "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
-                    : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text-secondary cursor-not-allowed"
+                    ? "bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text)] hover:bg-[var(--primary-bg)] hover:border-[var(--primary-border)]"
+                    : "bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text-secondary)] cursor-not-allowed"
                 }`}
               >
                 Previous
@@ -660,8 +660,8 @@ const AllEvents = () => {
                       onClick={() => handlePageChange(pageNum)}
                       className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                         pageNum === pagination.currentPage
-                          ? "bg-primary-accent text-primary-bg"
-                          : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
+                          ? "bg-[var(--primary-accent)] text-[var(--primary-bg)]"
+                          : "bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text)] hover:bg-[var(--primary-bg)] hover:border-[var(--primary-border)]"
                       }`}
                     >
                       {pageNum}
@@ -675,8 +675,8 @@ const AllEvents = () => {
                 disabled={!pagination.hasNextPage}
                 className={`px-3 py-2 text-sm font-medium rounded-lg transition ${
                   pagination.hasNextPage
-                    ? "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
-                    : "bg-primary-bg-secondary border border-primary-border-secondary text-primary-text-secondary cursor-not-allowed"
+                    ? "bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text)] hover:bg-[var(--primary-bg)] hover:border-[var(--primary-border)]"
+                    : "bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text-secondary)] cursor-not-allowed"
                 }`}
               >
                 Next
@@ -715,7 +715,7 @@ const AllEvents = () => {
               <div className="flex gap-3">
                 <button
                   onClick={handleDeleteCancel}
-                  className="flex-1 px-4 py-2 rounded-lg font-medium transition bg-primary-bg-secondary border border-primary-border-secondary text-primary-text hover:bg-primary-bg hover:border-primary-border"
+                  className="flex-1 px-4 py-2 rounded-lg font-medium transition bg-[var(--primary-bg-secondary)] border border-[var(--primary-border-secondary)] text-[var(--primary-text)] hover:bg-[var(--primary-bg)] hover:border-[var(--primary-border)]"
                 >
                   Cancel
                 </button>
