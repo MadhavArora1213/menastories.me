@@ -4,16 +4,6 @@ const API_BASE = '/flipbook';
 
 // Flipbook Magazine Services
 export const flipbookService = {
-  // Get categories
-  async getCategories() {
-    try {
-      const response = await api.get('/categories');
-      return response.data;
-    } catch (error) {
-      console.error('Failed to fetch categories:', error);
-      throw error;
-    }
-  },
 
   // Get magazines with filtering and pagination
   async getFlipbookMagazines(params = {}) {
@@ -21,7 +11,8 @@ export const flipbookService = {
       const response = await api.get(`${API_BASE}/magazines`, { params });
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch flipbook magazines:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Unknown error';
+      console.error('Failed to fetch flipbook magazines:', errorMessage);
       throw error;
     }
   },
@@ -377,7 +368,8 @@ export const flipbookService = {
       const response = await api.get(`${API_BASE}/stats`, { params });
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch flipbook statistics:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Unknown error';
+      console.error('Failed to fetch flipbook statistics:', errorMessage);
       throw error;
     }
   },
@@ -408,7 +400,8 @@ export const flipbookService = {
       const response = await api.get(`${API_BASE}/categories`);
       return response.data;
     } catch (error) {
-      console.error('Failed to fetch categories:', error);
+      const errorMessage = error?.response?.data?.message || error?.message || 'Unknown error';
+      console.error('Failed to fetch categories:', errorMessage);
       throw error;
     }
   },
