@@ -301,8 +301,23 @@ const EditArticle = () => {
         showError('File size should be less than 5MB');
         return;
       }
+      console.log('=== IMAGE FILE CHANGE DEBUG ===');
+      console.log('New file selected:', {
+        name: file.name,
+        size: file.size,
+        type: file.type,
+        lastModified: file.lastModified
+      });
+      console.log('Previous state:', {
+        formDataFeaturedImage: formData.featuredImage,
+        newUploadedImage: newUploadedImage,
+        articleFeaturedImage: article.featuredImage
+      });
+
       setFormData(prev => ({ ...prev, featuredImage: file }));
       showInfo('Featured image selected successfully');
+
+      console.log('After state update - formData.featuredImage is now File object');
     }
   };
 
@@ -536,12 +551,25 @@ const EditArticle = () => {
                willDelete: !!oldImagePath
              });
 
+             console.log('=== IMAGE UPLOAD SUCCESS DEBUG ===');
+             console.log('Upload response:', uploadResponse);
+             console.log('Setting newUploadedImage to:', uploadResponse.file.filename);
+             console.log('Before setting state:', {
+               imageJustUploaded,
+               newUploadedImage,
+               formDataFeaturedImage: formData.featuredImage
+             });
+
              setImageJustUploaded(true);
              setNewUploadedImage(uploadResponse.file.filename);
              showInfo('Featured image uploaded successfully');
 
+             console.log('After setting state - newUploadedImage should now be:', uploadResponse.file.filename);
+
              // Clear the File object since we now have the uploaded filename
              setFormData(prev => ({ ...prev, featuredImage: null }));
+
+             console.log('After clearing formData.featuredImage - should be null now');
            } else {
              console.error('Upload failed:', uploadResponse);
              showError(`Failed to upload featured image: ${uploadResponse.message || 'Unknown error'}`);
@@ -684,8 +712,17 @@ const EditArticle = () => {
            }));
 
            // Clear the image upload flag since the image is now saved
+           console.log('=== IMAGE STATE RESET DEBUG ===');
+           console.log('Before reset:', {
+             imageJustUploaded,
+             newUploadedImage,
+             formDataFeaturedImage: formData.featuredImage
+           });
+
            setImageJustUploaded(false);
            setNewUploadedImage(null);
+
+           console.log('After reset - newUploadedImage should now be null');
          }
 
         // More specific success messages based on status
@@ -990,12 +1027,36 @@ const EditArticle = () => {
                         {newUploadedImage ? 'Uploaded Featured Image' : 'Featured Image Preview'}
                       </label>
                       <img
+                        key={newUploadedImage || (formData.featuredImage ? formData.featuredImage.name + formData.featuredImage.lastModified : article.featuredImage)}
                         src={newUploadedImage || (formData.featuredImage ? URL.createObjectURL(formData.featuredImage) : article.featuredImage)}
                         alt="Featured Preview"
                         className="max-w-full h-48 object-cover rounded-lg"
+                        onLoad={(e) => {
+                          console.log('✅ Image preview loaded successfully:', e.target.src);
+                        }}
                         onError={(e) => {
-                          console.error('Failed to load image preview:', e.target.src);
+                          console.error('❌ Failed to load image preview:', e.target.src);
+                          console.error('Image preview error details:', {
+                            newUploadedImage,
+                            hasFeaturedImage: !!formData.featuredImage,
+                            articleFeaturedImage: article.featuredImage,
+                            currentSrc: e.target.src,
+                            isFileObject: formData.featuredImage instanceof File,
+                            newUploadedImageType: typeof newUploadedImage
+                          });
+
+                          // Try to fix the image URL if it's a new uploaded image
+                          if (newUploadedImage && e.target.src.includes(newUploadedImage)) {
+                            console.log('🔄 Attempting to fix new uploaded image URL...');
+                            const fixedUrl = `https://menastories.me/storage/images/${newUploadedImage}`;
+                            console.log('Trying fixed URL:', fixedUrl);
+                            e.target.src = fixedUrl;
+                            return;
+                          }
+
+                          // Fallback to article featured image
                           if (article.featuredImage && e.target.src !== article.featuredImage) {
+                            console.log('🔄 Falling back to article featured image:', article.featuredImage);
                             e.target.src = article.featuredImage;
                           }
                         }}
