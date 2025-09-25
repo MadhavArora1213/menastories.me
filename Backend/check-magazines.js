@@ -1,25 +1,22 @@
-require('dotenv').config();
-const sequelize = require('./config/db');
 const { FlipbookMagazine } = require('./models');
 
 async function checkMagazines() {
   try {
-    await sequelize.authenticate();
-    console.log('Database connected successfully');
-
     const magazines = await FlipbookMagazine.findAll({
-      attributes: ['id', 'title', 'slug']
+      limit: 5,
+      attributes: ['id', 'title', 'accessType', 'originalFilePath']
     });
 
-    console.log('\nAvailable magazines:');
-    magazines.forEach(magazine => {
-      console.log(`${magazine.id} - ${magazine.title} (${magazine.slug})`);
+    console.log('Available magazines:');
+    magazines.forEach(m => {
+      console.log(`ID: ${m.id}, Title: ${m.title}, Access: ${m.accessType}, File: ${m.originalFilePath ? 'Yes' : 'No'}`);
     });
 
-    process.exit(0);
+    if (magazines.length === 0) {
+      console.log('No magazines found in database');
+    }
   } catch (error) {
-    console.error('Error:', error);
-    process.exit(1);
+    console.error('Error:', error.message);
   }
 }
 

@@ -303,7 +303,7 @@ export const flipbookService = {
   // Downloads
   async downloadMagazine(magazineId) {
     try {
-      const response = await api.get(`${API_BASE}/magazines/${magazineId}/download`, {
+      const response = await api.get(`${API_BASE}/download/${magazineId}`, {
         responseType: 'blob'
       });
       return response;
