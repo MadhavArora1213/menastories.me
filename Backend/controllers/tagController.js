@@ -5,10 +5,26 @@ const slugify = require('slugify');
 exports.getAllTags = async (req, res) => {
   try {
     const tags = await Tag.findAll({
+      include: [
+        {
+          model: require('../models/Category'),
+          as: 'tagCategory',
+          attributes: ['id', 'name']
+        }
+      ],
       order: [['name', 'ASC']]
     });
-    
-    res.status(200).json({ tags });
+
+    // Populate category field for frontend compatibility
+    const tagsWithCategory = tags.map(tag => {
+      const tagData = tag.toJSON();
+      if (tagData.tagCategory) {
+        tagData.category = tagData.tagCategory.name;
+      }
+      return tagData;
+    });
+
+    res.status(200).json({ tags: tagsWithCategory });
   } catch (error) {
     console.error('Get tags error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -18,9 +34,11 @@ exports.getAllTags = async (req, res) => {
 // Create a new tag
 exports.createTag = async (req, res) => {
   try {
-    const { name, type = 'regular', categoryId, parentId, description } = req.body;
+    const { name, type = 'regular', categoryId, category, parentId, description } = req.body;
     const userId = req.admin?.id;
     const userRole = req.admin?.role?.name || req.admin?.role;
+
+    console.log('Create tag request:', { name, type, categoryId, category, parentId, description });
 
     // Check permissions - only Master Admin can create new tags
     if (userRole !== 'Master Admin') {
@@ -47,11 +65,16 @@ exports.createTag = async (req, res) => {
     }
 
     // Validate categoryId if provided
+    let validatedCategoryId = categoryId;
     if (categoryId) {
       const Category = require('../models/Category');
-      const category = await Category.findByPk(categoryId);
-      if (!category) {
+      const categoryRecord = await Category.findByPk(categoryId);
+      if (!categoryRecord) {
         return res.status(400).json({ message: 'Category not found' });
+      }
+      // If category name is provided but doesn't match, use the one from DB
+      if (category && category !== categoryRecord.name) {
+        console.log('Category name mismatch, using DB value:', categoryRecord.name);
       }
     }
 
@@ -60,14 +83,33 @@ exports.createTag = async (req, res) => {
       name,
       slug,
       type,
-      categoryId,
+      categoryId: validatedCategoryId,
       parentId,
       description
     });
 
+    // Fetch the created tag with category information
+    const createdTag = await Tag.findByPk(tag.id, {
+      include: [
+        {
+          model: require('../models/Category'),
+          as: 'tagCategory',
+          attributes: ['id', 'name']
+        }
+      ]
+    });
+
+    // Populate category field for frontend compatibility
+    const tagData = createdTag.toJSON();
+    if (tagData.tagCategory) {
+      tagData.category = tagData.tagCategory.name;
+    }
+
+    console.log('Created tag:', tagData);
+
     res.status(201).json({
       message: 'Tag created successfully',
-      tag
+      tag: tagData
     });
   } catch (error) {
     console.error('Create tag error:', error);
@@ -214,14 +256,28 @@ exports.getTagsByType = async (req, res) => {
 exports.getTagById = async (req, res) => {
   try {
     const { id } = req.params;
-    
-    const tag = await Tag.findByPk(id);
-    
+
+    const tag = await Tag.findByPk(id, {
+      include: [
+        {
+          model: require('../models/Category'),
+          as: 'tagCategory',
+          attributes: ['id', 'name']
+        }
+      ]
+    });
+
     if (!tag) {
       return res.status(404).json({ message: 'Tag not found' });
     }
-    
-    res.status(200).json({ tag });
+
+    // Populate category field for frontend compatibility
+    const tagData = tag.toJSON();
+    if (tagData.tagCategory) {
+      tagData.category = tagData.tagCategory.name;
+    }
+
+    res.status(200).json({ tag: tagData });
   } catch (error) {
     console.error('Get tag by id error:', error);
     res.status(500).json({ message: 'Server error' });
@@ -232,7 +288,9 @@ exports.getTagById = async (req, res) => {
 exports.updateTag = async (req, res) => {
   try {
     const { id } = req.params;
-    const { name, type, categoryId, parentId, description } = req.body;
+    const { name, type, categoryId, category, parentId, description } = req.body;
+
+    console.log('Update tag request:', { id, name, type, categoryId, category, parentId, description });
 
     const tag = await Tag.findByPk(id);
 
@@ -249,24 +307,48 @@ exports.updateTag = async (req, res) => {
     }
 
     // Validate categoryId if provided
+    let validatedCategoryId = categoryId !== undefined ? categoryId : tag.categoryId;
     if (categoryId) {
       const Category = require('../models/Category');
-      const category = await Category.findByPk(categoryId);
-      if (!category) {
+      const categoryRecord = await Category.findByPk(categoryId);
+      if (!categoryRecord) {
         return res.status(400).json({ message: 'Category not found' });
+      }
+      // If category name is provided but doesn't match, use the one from DB
+      if (category && category !== categoryRecord.name) {
+        console.log('Category name mismatch, using DB value:', categoryRecord.name);
       }
     }
 
     // Update tag properties
     tag.name = name || tag.name;
     tag.type = type || tag.type;
-    tag.categoryId = categoryId !== undefined ? categoryId : tag.categoryId;
+    tag.categoryId = validatedCategoryId;
     tag.parentId = parentId !== undefined ? parentId : tag.parentId;
     tag.description = description !== undefined ? description : tag.description;
 
     await tag.save();
 
-    res.status(200).json({ message: 'Tag updated successfully', tag });
+    // Fetch the updated tag with category information
+    const updatedTag = await Tag.findByPk(tag.id, {
+      include: [
+        {
+          model: require('../models/Category'),
+          as: 'tagCategory',
+          attributes: ['id', 'name']
+        }
+      ]
+    });
+
+    // Populate category field for frontend compatibility
+    const tagData = updatedTag.toJSON();
+    if (tagData.tagCategory) {
+      tagData.category = tagData.tagCategory.name;
+    }
+
+    console.log('Updated tag:', tagData);
+
+    res.status(200).json({ message: 'Tag updated successfully', tag: tagData });
   } catch (error) {
     console.error('Update tag error:', error);
     res.status(500).json({ message: 'Server error' });
