@@ -1236,6 +1236,7 @@ exports.downloadFlipbook = async (req, res) => {
     console.log('Request headers:', req.headers);
     console.log('Request URL:', req.url);
     console.log('Request method:', req.method);
+    console.log('Admin status:', !!req.admin);
 
     const magazine = await FlipbookMagazine.findByPk(id);
     if (!magazine) {
@@ -1244,11 +1245,13 @@ exports.downloadFlipbook = async (req, res) => {
     }
 
     console.log('Found magazine:', magazine.title, 'with ID:', magazine.id);
+    console.log('Magazine access type:', magazine.accessType);
 
-    // Check access permissions - Allow free magazines for all users
+    // Allow downloads for free magazines regardless of authentication
+    // Only require authentication for premium/paid content
     if (magazine.accessType === 'premium' || magazine.accessType === 'paid') {
-      // Only require admin auth for premium/paid content
       if (!req.admin) {
+        console.log('Authentication required for premium/paid content');
         return res.status(403).json({ error: 'Authentication required for premium content' });
       }
     }
@@ -1261,7 +1264,7 @@ exports.downloadFlipbook = async (req, res) => {
       return res.status(404).json({ error: 'No file path stored for this magazine' });
     }
 
-    // Try to access the file
+    // Try to access the file with multiple path resolution strategies
     let fileExists = false;
     let finalPath = magazine.originalFilePath;
     
@@ -1277,8 +1280,10 @@ exports.downloadFlipbook = async (req, res) => {
       const alternativePaths = [
         path.join(__dirname, '..', 'storage', 'flipbooks', filename),
         path.join(process.cwd(), 'storage', 'flipbooks', filename),
-        path.join('/var/www/storage/flipbooks', filename), // Common hosting path
-        path.join(__dirname, '..', '..', 'storage', 'flipbooks', filename)
+        path.join('/var/www/html/Backend/storage/flipbooks', filename), // Common hosting path
+        path.join('/home/menastories/public_html/Backend/storage/flipbooks', filename), // Specific hosting path
+        path.join(__dirname, '..', '..', 'storage', 'flipbooks', filename),
+        path.join(__dirname, '..', '..', 'Backend', 'storage', 'flipbooks', filename)
       ];
 
       for (const altPath of alternativePaths) {
@@ -1298,6 +1303,9 @@ exports.downloadFlipbook = async (req, res) => {
 
     if (!fileExists) {
       console.error('File not found at any path for magazine:', magazine.title);
+      console.error('Attempted paths:');
+      console.error('- Original path:', magazine.originalFilePath);
+      console.error('- Alternative paths checked');
       return res.status(404).json({ error: 'File not found on server' });
     }
 
@@ -1317,13 +1325,17 @@ exports.downloadFlipbook = async (req, res) => {
         return res.status(500).json({ error: 'PDF file is empty' });
       }
 
+      console.log(`PDF validation passed. File size: ${buffer.length} bytes`);
+
     } catch (validationError) {
       console.error(`PDF validation failed for magazine ${magazine.id}:`, validationError.message);
       return res.status(500).json({ error: 'PDF file validation failed' });
     }
 
-    // Update download count
-    await magazine.increment('downloadCount');
+    // Update download count (only if admin is authenticated to avoid spam)
+    if (req.admin) {
+      await magazine.increment('downloadCount');
+    }
 
     // Set headers for download with CORS support for hosted environment
     const fileName = `${magazine.slug || magazine.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
@@ -1349,6 +1361,10 @@ exports.downloadFlipbook = async (req, res) => {
 
     fileStream.on('open', () => {
       console.log('File stream opened successfully');
+    });
+
+    fileStream.on('end', () => {
+      console.log('File stream ended successfully');
     });
 
     fileStream.pipe(res);
