@@ -5,7 +5,6 @@ import { useAdminAuth } from "../context/AdminAuthContext";
 import { eventService } from "../services/eventService";
 import { Link } from "react-router-dom";
 import { toast } from 'react-toastify';
-import CheckIn from "../Components/CheckIn";
 
 const AllEvents = () => {
   const { theme } = useTheme();
@@ -29,8 +28,6 @@ const AllEvents = () => {
   const [selectedCategory, setSelectedCategory] = useState("");
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [deleteTarget, setDeleteTarget] = useState(null);
-  const [showCheckIn, setShowCheckIn] = useState(false);
-  const [selectedEventForCheckIn, setSelectedEventForCheckIn] = useState(null);
   const [statistics, setStatistics] = useState({
     totalEvents: 0,
     publishedEvents: 0,
@@ -602,21 +599,6 @@ const AllEvents = () => {
                             </>
                           )}
 
-                          {/* Check-in button - for managing event attendance */}
-                          <button
-                            onClick={() => {
-                              setSelectedEventForCheckIn({ id: event?.id, title: event?.title });
-                              setShowCheckIn(true);
-                            }}
-                            className="inline-flex items-center gap-1 bg-indigo-500 hover:bg-indigo-600 text-white px-3 py-1.5 rounded-lg transition-all duration-200 shadow-sm text-sm"
-                            title="Check-in"
-                          >
-                            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                              <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                            </svg>
-                            Check-in
-                          </button>
-
                           {/* Delete button - requires content.delete permission */}
                           {hasPermission('content.delete') && (
                             <button
@@ -749,17 +731,6 @@ const AllEvents = () => {
         </div>
       )}
     </div>
-      {/* CheckIn Modal */}
-      {showCheckIn && selectedEventForCheckIn && (
-        <CheckIn
-          eventId={selectedEventForCheckIn.id}
-          eventTitle={selectedEventForCheckIn.title}
-          onClose={() => {
-            setShowCheckIn(false);
-            setSelectedEventForCheckIn(null);
-          }}
-        />
-      )}
 </div>
 );
 };
