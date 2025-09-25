@@ -8,28 +8,59 @@ const fs = require('fs').promises;
 async function checkGhostscriptInstallation() {
   return new Promise((resolve, reject) => {
     const { spawn } = require('child_process');
-    const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', ['--version']);
 
-    gs.on('close', (code) => {
-      if (code === 0) {
-        resolve();
-      } else {
-        reject(new Error('Ghostscript not found or not working'));
+    // Try common Ghostscript installation paths on Windows
+    const possiblePaths = [
+      'C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe',
+      'C:\\Program Files\\gs\\gs10.02.1\\bin\\gswin64c.exe',
+      'C:\\Program Files\\gs\\gs10.01.2\\bin\\gswin64c.exe',
+      'C:\\Program Files\\gs\\gs9.56.1\\bin\\gswin64c.exe',
+      'C:\\Program Files\\gs\\gs9.55.0\\bin\\gswin64c.exe',
+      'gswin64c.exe', // Try PATH
+      'gswin64.exe'   // Alternative executable name
+    ];
+
+    let attempts = 0;
+    const maxAttempts = possiblePaths.length;
+
+    function tryNextPath() {
+      if (attempts >= maxAttempts) {
+        reject(new Error('Ghostscript not found. Please install Ghostscript and ensure it\'s in your PATH.'));
+        return;
       }
-    });
 
-    gs.on('error', (error) => {
-      reject(error);
-    });
+      const gsPath = possiblePaths[attempts];
+      attempts++;
+
+      console.log(`Trying Ghostscript path: ${gsPath}`);
+
+      const gs = spawn(gsPath, ['--version']);
+
+      gs.on('close', (code) => {
+        if (code === 0) {
+          console.log(`Ghostscript found at: ${gsPath}`);
+          resolve(gsPath);
+        } else {
+          tryNextPath();
+        }
+      });
+
+      gs.on('error', (error) => {
+        console.log(`Ghostscript not found at ${gsPath}: ${error.message}`);
+        tryNextPath();
+      });
+    }
+
+    tryNextPath();
   });
 }
 
 // Configure multer for flipbook uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
+    const uploadPath = path.join(__dirname, '..', 'storage', 'flipbooks');
     // Ensure directory exists
-    require('fs').mkdirSync(uploadPath, { recursive: true });
+    fs.mkdir(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
@@ -316,7 +347,7 @@ exports.updateFlipbookMagazine = async (req, res) => {
        }
 
        // Set new file path
-       updateData.originalFilePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', req.file.filename);
+       updateData.originalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', req.file.filename);
        updateData.fileSize = req.file.size;
 
        // Reset processing status for new file
@@ -357,7 +388,15 @@ exports.updateFlipbookMagazine = async (req, res) => {
      if (req.file) {
        setTimeout(async () => {
          try {
-           await processFlipbookPDF(magazine.id, req.file.path);
+           let gsPath;
+           try {
+             gsPath = await checkGhostscriptInstallation();
+           } catch (gsError) {
+             console.error('Ghostscript not found:', gsError.message);
+             await magazine.updateProcessingStatus('failed', null, gsError.message);
+             return;
+           }
+           await processFlipbookPDF(magazine.id, req.file.path, gsPath);
          } catch (error) {
            console.error('Error processing updated flipbook:', error);
            await magazine.updateProcessingStatus('failed', null, error.message);
@@ -483,7 +522,6 @@ exports.getFlipbookPages = async (req, res) => {
 
       try {
         // Check if PDF file exists
-        const fs = require('fs').promises;
         await fs.access(magazine.originalFilePath);
 
         // Try to recreate pages from the PDF
@@ -506,7 +544,7 @@ exports.getFlipbookPages = async (req, res) => {
           } catch {
             // Create page image using Ghostscript
             await new Promise((resolve, reject) => {
-              const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+              const gs = spawn(gsPath, [
                 '-sDEVICE=png16m',
                 '-r150',
                 `-dFirstPage=${i}`,
@@ -531,7 +569,7 @@ exports.getFlipbookPages = async (req, res) => {
 
             // Create thumbnail
             await new Promise((resolve, reject) => {
-              const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+              const gs = spawn(gsPath, [
                 '-sDEVICE=png16m',
                 '-r72',
                 `-dFirstPage=${i}`,
@@ -557,8 +595,8 @@ exports.getFlipbookPages = async (req, res) => {
 
           // Create page record in database
           // Convert absolute paths to relative URLs for frontend access
-          const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
-          const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
+          const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*[\/\\]storage/, '/storage');
+          const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*[\/\\]storage/, '/storage');
 
           await FlipbookPage.create({
             magazineId: id,
@@ -640,19 +678,18 @@ exports.uploadFlipbook = async (req, res) => {
 
     // Basic PDF validation - just check header
     try {
-      const fs = require('fs');
-      const buffer = fs.readFileSync(req.file.path);
+      const buffer = await fs.readFile(req.file.path);
 
       // Check PDF header
       if (!buffer.slice(0, 4).equals(Buffer.from('%PDF'))) {
         // Clean up invalid file
-        fs.unlinkSync(req.file.path);
+        await fs.unlink(req.file.path);
         return res.status(400).json({ error: 'Invalid PDF file format' });
       }
     } catch (validationError) {
       // Clean up invalid file
       try {
-        require('fs').unlinkSync(req.file.path);
+        await fs.unlink(req.file.path);
       } catch (cleanupError) {
         console.error('Error cleaning up invalid file:', cleanupError);
       }
@@ -686,7 +723,7 @@ exports.uploadFlipbook = async (req, res) => {
     // Ensure unique filename with flipbook prefix
     let filename = `flipbook_${titleForFilename}.pdf`;
     let fileCounter = 1;
-    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
+    const storageDir = path.join(__dirname, '..', 'storage', 'flipbooks');
     while (await fs.access(path.join(storageDir, filename)).then(() => true).catch(() => false)) {
       filename = `flipbook_${titleForFilename}_${fileCounter}.pdf`;
       fileCounter++;
@@ -742,13 +779,12 @@ exports.uploadFlipbook = async (req, res) => {
         }
 
         // Process the PDF
-        await processFlipbookPDF(magazine.id, tempFilePath);
+        await processFlipbookPDF(magazine.id, tempFilePath, gsPath);
 
         // After successful processing, move to final location with title-based name
-        const finalFilePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', filename);
+        const finalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', filename);
 
         // Move the processed file to final location
-        const fs = require('fs').promises;
         await fs.rename(tempFilePath, finalFilePath);
 
         // Update magazine with final file path
@@ -764,7 +800,6 @@ exports.uploadFlipbook = async (req, res) => {
 
         // Clean up temporary file on error
         try {
-          const fs = require('fs').promises;
           await fs.unlink(tempFilePath);
         } catch (cleanupError) {
           console.error('Error cleaning up temporary file:', cleanupError);
@@ -783,7 +818,7 @@ exports.uploadFlipbook = async (req, res) => {
 };
 
 // PDF Processing Function with Ghostscript
-async function processFlipbookPDF(magazineId, filePath) {
+async function processFlipbookPDF(magazineId, filePath, gsPath) {
   const magazine = await FlipbookMagazine.findByPk(magazineId);
   if (!magazine) return;
 
@@ -795,8 +830,10 @@ async function processFlipbookPDF(magazineId, filePath) {
     await magazine.updateProcessingStatus('processing', 0);
 
     // Validate Ghostscript installation
+    let gsPath;
     try {
-      await checkGhostscriptInstallation();
+      gsPath = await checkGhostscriptInstallation();
+      console.log(`Using Ghostscript at: ${gsPath}`);
     } catch (gsError) {
       throw new Error(`Ghostscript is not properly installed or accessible: ${gsError.message}`);
     }
@@ -820,7 +857,7 @@ async function processFlipbookPDF(magazineId, filePath) {
       // Fallback: Try to get page count using Ghostscript
       try {
         const { spawn } = require('child_process');
-        const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+        const gs = spawn(gsPath, [
           '-q',
           '-dNODISPLAY',
           '-c', `(${optimizedPath}) (r) file runpdfbegin pdfpagecount = quit`
@@ -871,8 +908,8 @@ async function processFlipbookPDF(magazineId, filePath) {
 
       // Create page record
       // Convert absolute paths to relative URLs for frontend access
-      const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
-      const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*\/storage/, '/var/www/menastories/menastories.me/Backend/storage');
+      const imageUrl = pageImagePath.replace(/\\/g, '/').replace(/.*[\/\\]storage/, '/storage');
+      const thumbnailUrl = thumbnailPath.replace(/\\/g, '/').replace(/.*[\/\\]storage/, '/storage');
 
       await FlipbookPage.create({
         magazineId,
@@ -912,7 +949,7 @@ async function optimizePDFWithGhostscript(inputPath, outputPath) {
     const { spawn } = require('child_process');
 
     // Ghostscript command for PDF optimization and compression
-    const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+    const gs = spawn(gsPath, [
       '-sDEVICE=pdfwrite',
       '-dCompatibilityLevel=1.4',
       '-dPDFSETTINGS=/ebook', // Good balance of size and quality
@@ -953,7 +990,7 @@ async function renderPDFPageToImage(pdfPath, pageNumber, outputPath, dpi = 150) 
   return new Promise((resolve, reject) => {
     const { spawn } = require('child_process');
 
-    const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+    const gs = spawn(gsPath, [
       '-sDEVICE=png16m',
       `-r${dpi}`,
       '-dFirstPage=' + pageNumber,
@@ -1223,7 +1260,7 @@ exports.downloadFlipbook = async (req, res) => {
       console.error(`File not accessible at stored path: ${magazine.originalFilePath}`, accessError.message);
 
       // Try alternative path resolution
-      const alternativePath = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks', path.basename(magazine.originalFilePath));
+      const alternativePath = path.join(__dirname, '..', 'storage', 'flipbooks', path.basename(magazine.originalFilePath));
       console.log(`Trying alternative path: ${alternativePath}`);
 
       try {
@@ -1243,8 +1280,7 @@ exports.downloadFlipbook = async (req, res) => {
 
     // Validate PDF structure before serving
     try {
-      const fs = require('fs');
-      const buffer = fs.readFileSync(magazine.originalFilePath);
+      const buffer = await fs.readFile(magazine.originalFilePath);
 
       // Check PDF header
       if (!buffer.slice(0, 4).equals(Buffer.from('%PDF'))) {
@@ -1365,7 +1401,7 @@ exports.reprocessZeroPageMagazines = async (req, res) => {
           // Fallback to Ghostscript
           try {
             const { spawn } = require('child_process');
-            const gs = spawn('C:\\Program Files\\gs\\gs10.03.1\\bin\\gswin64c.exe', [
+            const gs = spawn(gsPath, [
               '-q',
               '-dNODISPLAY',
               '-c', `(${magazine.originalFilePath}) (r) file runpdfbegin pdfpagecount = quit`
@@ -1452,7 +1488,7 @@ exports.fixFilePaths = async (req, res) => {
     console.log(`Checking file paths for ${magazines.length} magazines`);
 
     const results = [];
-    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
+    const storageDir = path.join(__dirname, '..', 'storage', 'flipbooks');
 
     for (const magazine of magazines) {
       try {
@@ -1636,7 +1672,7 @@ exports.regeneratePDFs = async (req, res) => {
     console.log(`Checking ${magazines.length} magazines for regeneration`);
 
     const results = [];
-    const storageDir = path.join('/var/www/menastories/menastories.me/Backend/storage/flipbooks');
+    const storageDir = path.join(__dirname, '..', 'storage', 'flipbooks');
 
     for (const magazine of magazines) {
       try {

@@ -4,13 +4,14 @@ const flipbookController = require('../controllers/flipbookController');
 const { adminAuthMiddleware } = require('../middleware/adminAuth');
 const multer = require('multer');
 const path = require('path');
+const fs = require('fs').promises;
 
 // Configure multer for flipbook uploads
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadPath = '/var/www/menastories/menastories.me/Backend/storage/flipbooks';
+    const uploadPath = path.join(__dirname, '..', 'storage', 'flipbooks');
     // Ensure directory exists
-    require('fs').mkdirSync(uploadPath, { recursive: true });
+    fs.mkdir(uploadPath, { recursive: true });
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
@@ -65,8 +66,7 @@ router.get('/magazines/:id/pages/:pageNumber/image', async (req, res) => {
     }
 
     // Check if file exists
-    const fs = require('fs');
-    if (!fs.existsSync(page.imagePath)) {
+    if (!await fs.access(page.imagePath).then(() => true).catch(() => false)) {
       return res.status(404).json({ error: 'Image file not found on disk' });
     }
 
@@ -97,8 +97,7 @@ router.get('/magazines/:id/pages/:pageNumber/thumbnail', async (req, res) => {
     }
 
     // Check if file exists
-    const fs = require('fs');
-    if (!fs.existsSync(page.thumbnailPath)) {
+    if (!await fs.access(page.thumbnailPath).then(() => true).catch(() => false)) {
       return res.status(404).json({ error: 'Thumbnail file not found on disk' });
     }
 

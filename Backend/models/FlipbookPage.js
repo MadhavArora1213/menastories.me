@@ -1,4 +1,4 @@
-const { DataTypes } = require('sequelize');
+const { DataTypes, Op } = require('sequelize');
 const sequelize = require('../config/db');
 
 const FlipbookPage = sequelize.define('FlipbookPage', {
@@ -275,15 +275,15 @@ FlipbookPage.searchInMagazine = async function(magazineId, query, options = {}) 
     where: {
       magazineId,
       processingStatus: 'completed',
-      [require('sequelize').Op.or]: [
+      [Op.or]: [
         {
           extractedText: {
-            [require('sequelize').Op.iLike]: `%${query}%`
+            [Op.iLike]: `%${query}%`
           }
         },
         {
           searchableContent: {
-            [require('sequelize').Op.iLike]: `%${query}%`
+            [Op.iLike]: `%${query}%`
           }
         }
       ]
@@ -300,10 +300,10 @@ FlipbookPage.getMagazineStats = async function(magazineId) {
   const stats = await this.findAll({
     where: { magazineId },
     attributes: [
-      [require('sequelize').fn('COUNT', require('sequelize').col('id')), 'totalPages'],
-      [require('sequelize').fn('SUM', require('sequelize').col('viewCount')), 'totalViews'],
-      [require('sequelize').fn('AVG', require('sequelize').col('averageViewTime')), 'avgViewTime'],
-      [require('sequelize').fn('COUNT', require('sequelize').fn('DISTINCT', require('sequelize').col('id'))), 'processedPages']
+      [sequelize.fn('COUNT', sequelize.col('id')), 'totalPages'],
+      [sequelize.fn('SUM', sequelize.col('viewCount')), 'totalViews'],
+      [sequelize.fn('AVG', sequelize.col('averageViewTime')), 'avgViewTime'],
+      [sequelize.fn('COUNT', sequelize.fn('DISTINCT', sequelize.col('id'))), 'processedPages']
     ],
     where: {
       processingStatus: 'completed'
