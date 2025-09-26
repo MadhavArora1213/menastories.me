@@ -1368,17 +1368,38 @@ exports.downloadFlipbook = async (req, res) => {
 
     if (!magazine.originalFilePath) {
       console.error(`No file path stored for magazine ${magazine.id}: ${magazine.title}`);
-      const errorMessage = magazine.processingStatus === 'failed'
-        ? 'This magazine failed to process and cannot be downloaded. Please contact support or try uploading the magazine again.'
-        : 'This magazine is not available for download. The file may still be processing or may not have been uploaded successfully.';
+      let errorMessage;
+      let suggestions = [];
+
+      if (magazine.processingStatus === 'failed') {
+        errorMessage = 'This magazine failed to process and cannot be downloaded.';
+        suggestions = [
+          'The PDF file may not have been uploaded successfully',
+          'The file may have been corrupted during upload',
+          'Please try uploading the magazine again'
+        ];
+      } else {
+        errorMessage = 'This magazine is not available for download.';
+        suggestions = [
+          'The file may still be processing',
+          'The file may not have been uploaded successfully',
+          'Please check back in a few minutes or try uploading again'
+        ];
+      }
+
       return res.status(404).json({
         error: errorMessage,
+        suggestions: suggestions,
         magazine: {
           id: magazine.id,
           title: magazine.title,
           processingStatus: magazine.processingStatus,
           totalPages: magazine.totalPages,
           createdAt: magazine.createdAt
+        },
+        actions: {
+          reupload: 'You can reupload this magazine using the admin panel',
+          delete: 'If this magazine is no longer needed, you can delete it'
         }
       });
     }

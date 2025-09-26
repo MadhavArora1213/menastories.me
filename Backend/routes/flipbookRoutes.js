@@ -187,6 +187,42 @@ router.get('/identify-corrupted', flipbookController.identifyCorruptedPDFs);
 router.post('/fix-file-paths', flipbookController.fixFilePaths);
 router.post('/regenerate-pdfs', flipbookController.regeneratePDFs);
 
+// Delete broken magazines (admin only)
+router.delete('/magazines/:id/cleanup', async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const magazine = await require('../models').FlipbookMagazine.findByPk(id);
+    if (!magazine) {
+      return res.status(404).json({ error: 'Magazine not found' });
+    }
+
+    // Check if magazine has no file path (broken)
+    if (magazine.originalFilePath) {
+      return res.status(400).json({
+        error: 'This magazine has a valid file path and cannot be deleted via cleanup',
+        suggestion: 'Use the regular delete endpoint instead'
+      });
+    }
+
+    // Delete the magazine record
+    await magazine.destroy();
+
+    res.json({
+      message: 'Broken magazine record deleted successfully',
+      deletedMagazine: {
+        id: magazine.id,
+        title: magazine.title,
+        createdAt: magazine.createdAt
+      }
+    });
+
+  } catch (error) {
+    console.error('Error deleting broken magazine:', error);
+    res.status(500).json({ error: 'Failed to delete broken magazine' });
+  }
+});
+
 // Reading progress
 router.post('/magazines/:id/progress', async (req, res) => {
   // Update reading progress
