@@ -99,6 +99,26 @@ class ListService {
       throw new Error(error.response?.data?.message || 'Failed to update list');
     }
   }
+
+  // Delete a list
+  async deleteList(listId) {
+    try {
+      const response = await api.delete(`/lists/${listId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to delete list');
+    }
+  }
+
+  // Delete a list entry
+  async deleteListEntry(entryId) {
+    try {
+      const response = await api.delete(`/lists/entries/${entryId}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Failed to delete list entry');
+    }
+  }
 }
 
 export default new ListService();
