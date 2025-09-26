@@ -4,6 +4,44 @@ const multer = require('multer');
 const path = require('path');
 const fs = require('fs').promises;
 
+// Utility function to normalize file paths
+function normalizeFilePath(filePath) {
+  if (!filePath) return filePath;
+  return filePath.replace(/\\/g, '/');
+}
+
+// Utility function to resolve file path with multiple strategies
+async function resolveFilePath(storedPath) {
+  if (!storedPath) return null;
+
+  const normalizedPath = normalizeFilePath(storedPath);
+
+  // Try the stored path first
+  if (await fs.access(normalizedPath).then(() => true).catch(() => false)) {
+    return normalizedPath;
+  }
+
+  // Try alternative paths
+  const filename = path.basename(normalizedPath);
+  const alternativePaths = [
+    path.join(__dirname, '..', 'storage', 'flipbooks', filename),
+    path.join(process.cwd(), 'storage', 'flipbooks', filename),
+    path.join('/var/www/html/Backend/storage/flipbooks', filename),
+    path.join('/home/menastories/public_html/Backend/storage/flipbooks', filename),
+    path.join(__dirname, '..', '..', 'storage', 'flipbooks', filename),
+    path.join(__dirname, '..', '..', 'Backend', 'storage', 'flipbooks', filename)
+  ];
+
+  for (const altPath of alternativePaths) {
+    const normalizedAltPath = normalizeFilePath(altPath);
+    if (await fs.access(normalizedAltPath).then(() => true).catch(() => false)) {
+      return normalizedAltPath;
+    }
+  }
+
+  return null;
+}
+
 // Helper function to check Ghostscript installation
 async function checkGhostscriptInstallation() {
   return new Promise((resolve, reject) => {
@@ -346,8 +384,9 @@ exports.updateFlipbookMagazine = async (req, res) => {
          }
        }
 
-       // Set new file path
-       updateData.originalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', req.file.filename);
+       // Set new file path with normalized path
+       const normalizedPath = path.join(__dirname, '..', 'storage', 'flipbooks', req.file.filename).replace(/\\/g, '/');
+       updateData.originalFilePath = normalizedPath;
        updateData.fileSize = req.file.size;
 
        // Reset processing status for new file
@@ -840,7 +879,7 @@ exports.uploadFlipbook = async (req, res) => {
         await processFlipbookPDF(magazine.id, tempFilePath, gsPath);
 
         // After successful processing, move to final location with title-based name
-        const finalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', filename);
+        const finalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', filename).replace(/\\/g, '/');
         console.log(`Moving processed file to final location: ${finalFilePath}`);
 
         // Move the processed file to final location
@@ -1332,49 +1371,20 @@ exports.downloadFlipbook = async (req, res) => {
       return res.status(404).json({ error: 'No file path stored for this magazine' });
     }
 
-    // Try to access the file with multiple path resolution strategies
-    let fileExists = false;
-    let finalPath = magazine.originalFilePath;
-    
-    try {
-      await fs.access(magazine.originalFilePath);
-      fileExists = true;
-      console.log(`File exists at stored path: ${magazine.originalFilePath}`);
-    } catch (accessError) {
-      console.error(`File not accessible at stored path: ${magazine.originalFilePath}`, accessError.message);
+    // Try to access the file with improved path resolution
+    let finalPath = await resolveFilePath(magazine.originalFilePath);
 
-      // Try alternative path resolution for hosted environment
-      const filename = path.basename(magazine.originalFilePath);
-      const alternativePaths = [
-        path.join(__dirname, '..', 'storage', 'flipbooks', filename),
-        path.join(process.cwd(), 'storage', 'flipbooks', filename),
-        path.join('/var/www/html/Backend/storage/flipbooks', filename), // Common hosting path
-        path.join('/home/menastories/public_html/Backend/storage/flipbooks', filename), // Specific hosting path
-        path.join(__dirname, '..', '..', 'storage', 'flipbooks', filename),
-        path.join(__dirname, '..', '..', 'Backend', 'storage', 'flipbooks', filename)
-      ];
-
-      for (const altPath of alternativePaths) {
-        try {
-          await fs.access(altPath);
-          console.log(`File found at alternative path: ${altPath}`);
-          finalPath = altPath;
-          fileExists = true;
-          // Update the stored path
-          await magazine.update({ originalFilePath: altPath });
-          break;
-        } catch (altError) {
-          console.log(`File not found at: ${altPath}`);
-        }
-      }
-    }
-
-    if (!fileExists) {
+    if (!finalPath) {
       console.error('File not found at any path for magazine:', magazine.title);
       console.error('Attempted paths:');
       console.error('- Original path:', magazine.originalFilePath);
-      console.error('- Alternative paths checked');
       return res.status(404).json({ error: 'File not found on server' });
+    }
+
+    // Update the stored path if it was resolved to a different location
+    if (finalPath !== magazine.originalFilePath) {
+      console.log(`Updating stored path from ${magazine.originalFilePath} to ${finalPath}`);
+      await magazine.update({ originalFilePath: finalPath });
     }
 
     // Validate PDF structure before serving
