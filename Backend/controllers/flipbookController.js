@@ -102,9 +102,24 @@ const storage = multer.diskStorage({
     cb(null, uploadPath);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9);
-    const ext = path.extname(file.originalname);
-    cb(null, `flipbook-${uniqueSuffix}${ext}`);
+    // Sanitize the original filename to ensure it's safe for file system
+    const originalName = file.originalname.replace(/[^a-zA-Z0-9.-]/g, '_');
+    const ext = path.extname(originalName);
+    const baseName = path.basename(originalName, ext);
+    
+    // Ensure unique filename by adding timestamp if file already exists
+    let finalName = originalName;
+    let counter = 1;
+    
+    // Simple uniqueness check - in production you might want more sophisticated logic
+    const uploadPath = path.join(__dirname, '..', 'storage', 'flipbooks');
+    while (require('fs').existsSync(path.join(uploadPath, finalName))) {
+      finalName = `${baseName}_${Date.now()}_${counter}${ext}`;
+      counter++;
+    }
+    
+    console.log(`Storing file as: ${finalName}`);
+    cb(null, finalName);
   }
 });
 
@@ -388,6 +403,9 @@ exports.updateFlipbookMagazine = async (req, res) => {
        const normalizedPath = path.join(__dirname, '..', 'storage', 'flipbooks', req.file.filename).replace(/\\/g, '/');
        updateData.originalFilePath = normalizedPath;
        updateData.fileSize = req.file.size;
+       
+       console.log(`✅ File will be stored as: ${req.file.filename}`);
+       console.log(`✅ Database will store path: ${normalizedPath}`);
 
        // Reset processing status for new file
        updateData.processingStatus = 'pending';
@@ -793,21 +811,9 @@ exports.uploadFlipbook = async (req, res) => {
       counter++;
     }
 
-    // Generate title-based filename with flipbook prefix for better organization
-    const titleForFilename = (title || 'untitled').toLowerCase()
-      .replace(/[^a-z0-9\s-]/g, '') // Remove special characters
-      .replace(/\s+/g, '_') // Replace spaces with underscores
-      .replace(/_+/g, '_') // Replace multiple underscores with single
-      .trim();
-
-    // Ensure unique filename with flipbook prefix
-    let filename = `flipbook_${titleForFilename}.pdf`;
-    let fileCounter = 1;
+    // Use the original uploaded filename (already handled by multer with uniqueness)
+    const filename = req.file.filename;
     const storageDir = path.join(__dirname, '..', 'storage', 'flipbooks');
-    while (await fs.access(path.join(storageDir, filename)).then(() => true).catch(() => false)) {
-      filename = `flipbook_${titleForFilename}_${fileCounter}.pdf`;
-      fileCounter++;
-    }
 
     // Map category slugs to database enum values
     const categoryMapping = {
@@ -878,12 +884,18 @@ exports.uploadFlipbook = async (req, res) => {
         console.log(`Starting PDF processing for magazine ${magazine.id}`);
         await processFlipbookPDF(magazine.id, tempFilePath, gsPath);
 
-        // After successful processing, move to final location with title-based name
+        // File is already in the correct location with the original filename
         const finalFilePath = path.join(__dirname, '..', 'storage', 'flipbooks', filename).replace(/\\/g, '/');
-        console.log(`Moving processed file to final location: ${finalFilePath}`);
+        console.log(`File stored at final location: ${finalFilePath}`);
 
-        // Move the processed file to final location
-        await fs.rename(tempFilePath, finalFilePath);
+        // Verify file exists at final location
+        if (await fs.access(finalFilePath).then(() => true).catch(() => false)) {
+          console.log('✅ File successfully stored and accessible');
+        } else {
+          console.log('❌ File not found at expected location after processing');
+          await magazine.updateProcessingStatus('failed', null, 'File not found after processing');
+          return;
+        }
 
         // Update magazine with final file path
         await magazine.update({
@@ -1449,7 +1461,18 @@ exports.downloadFlipbook = async (req, res) => {
     }
 
     // Set headers for download with CORS support for hosted environment
-    const fileName = `${magazine.slug || magazine.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
+    // Use the original filename if available, otherwise fallback to slug-based name
+    let fileName = `${magazine.slug || magazine.title.replace(/[^a-z0-9]/gi, '_').toLowerCase()}.pdf`;
+    
+    // Try to extract original filename from the stored path
+    if (magazine.originalFilePath) {
+      const pathParts = magazine.originalFilePath.split(/[\/\\]/);
+      const storedFilename = pathParts[pathParts.length - 1];
+      if (storedFilename && storedFilename.endsWith('.pdf')) {
+        fileName = storedFilename;
+      }
+    }
+    
     res.setHeader('Content-Type', 'application/pdf');
     res.setHeader('Content-Disposition', `attachment; filename="${fileName}"`);
     res.setHeader('Access-Control-Allow-Origin', '*');
